@@ -1,0 +1,73 @@
+.container {
+  background-color: #F7F7F7;
+}
+
+.header {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  background-color: white;
+  margin-bottom: 5px;
+}
+
+.main_logo {
+  height: 40px;
+  margin-right: var(--margin-right);
+}
+
+.carwash_logo {
+  height: 20px;
+}
+
+.date {
+  background-color: white;
+  margin-bottom: 5px;
+}
+
+.flex_container {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  margin-bottom: 5px;
+}
+
+.date_flex_container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.time_flex_container {
+  margin-bottom: 15px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  margin-left: var(--margin-left);
+  font-size: large;
+  font-weight: bold;
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+}
+
+.right {
+  color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  margin-right: var(--margin-right);
+  font-size: large;
+  font-weight: medium;
+}
+
+.time {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  margin-bottom: 5px;
+}
+
+.check_icon {
+  color: rgba(0, 0, 0, 0.17);
+  margin-right: 5px;
+}
