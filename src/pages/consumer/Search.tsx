@@ -1,11 +1,11 @@
 import styles from './Search.module.scss';
-import Datepicker from '../components/Datepicker';
+import Datepicker from '../../components/Datepicker';
 import { IoIosArrowForward } from 'react-icons/io';
 import { BsCheckCircleFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
-import Item from '../components/Item';
+import Item from '../../components/Item';
 import classNames from 'classnames';
-import Header from '../components/Header';
+import Header from '../../components/Header';
 
 const Search = () => {
   return (
