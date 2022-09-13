@@ -18,7 +18,6 @@ import SignUpInfo from './pages/auth/SignUpInfo';
 
 function App() {
   return (
-    // <IsBurgermenuOpenProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
@@ -36,7 +35,6 @@ function App() {
         <Route path="/provider/menu/:code" element={<Menu />} />
       </Routes>
     </BrowserRouter>
-    // </IsBurgermenuOpenProvider>
   );
 }
 

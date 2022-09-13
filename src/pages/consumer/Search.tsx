@@ -6,46 +6,78 @@ import { Link } from 'react-router-dom';
 import Item from '../../components/Item';
 import classNames from 'classnames';
 import Header from '../../components/Header';
+import { Accordion } from 'react-bootstrap';
+import { NONAME } from 'dns';
 
 const Search = () => {
   return (
-    <div className={styles.container}>
-      <Header type={2} />
-      <div className={styles.date}>
-        <div className={styles.date_flex_container}>
-          <div className={styles.left}>날짜 선택</div>
-        </div>
-        <Datepicker />
-      </div>
+    <>
+      <Header type={1} />
+      <div className={styles.container}>
+        <Accordion flush>
+          <Accordion.Item eventKey="0" className={styles.select_car_item}>
+            <Accordion.Header>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  marginRight: '10px',
+                }}
+              >
+                <div style={{ fontSize: 'large', fontWeight: 'bolder' }}>
+                  차량 선택
+                </div>
+                <div>(대충 차 이름)</div>
+              </div>
+            </Accordion.Header>
+            <Accordion.Body>어쩌고 저쩌고</Accordion.Body>
+          </Accordion.Item>
+          <hr className={styles.seperator} />
+        </Accordion>
+        <Link
+          to="/search/map"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingTop: 16,
+            paddingBottom: 16,
+            textDecoration: 'none',
+            color: 'black',
+          }}
+        >
+          <div style={{ fontSize: 'large', fontWeight: 'bolder' }}>
+            검색 위치
+          </div>
+          <IoIosArrowForward size={23} />
+        </Link>
 
-      <div className={styles.flex_container}>
-        <div className={styles.left}>지역 선택</div>
-        <div className={styles.right}>
-          서울 강남구
-          <IoIosArrowForward size={30} />
+        {/* <div className={styles.flex_container}>
+          <div className={styles.left}>차량 선택</div>
+          <div className={styles.right}>
+            <IoIosArrowForward size={30} />
+          </div>
         </div>
-      </div>
+        <hr className={styles.seperator} />
 
-      <div
-        className={classNames(
-          styles.flex_container,
-          styles.time_flex_container
-        )}
-      >
-        <div className={styles.left}>시간 선택</div>
-        <div className={styles.right}>
-          <BsCheckCircleFill className={styles.check_icon} />
-          당일 가능 업체만
-          <IoIosArrowForward size={30} />
-        </div>
-      </div>
+        <div className={styles.flex_container}>
+          <div className={styles.left}>지역 선택</div>
+          <div className={styles.right}>
+            서울 강남구
+            <IoIosArrowForward size={30} />
+          </div>
+        </div> */}
 
-      <Item />
-      <Item />
-      <Item />
-      <Item />
-      <Item />
-    </div>
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+      </div>
+    </>
   );
 };
 
