@@ -4,7 +4,11 @@ const Item = () => {
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        <img src="업체사진.jpg" alt="스타일카케어" className={styles.image} />
+        <img
+          src="style_carcare.jpg"
+          alt="스타일카케어"
+          className={styles.image}
+        />
         <div className={styles.text}>
           <div className={styles.name}>스타일카케어</div>
           <div className={styles.subtext}>

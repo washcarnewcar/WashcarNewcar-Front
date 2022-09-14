@@ -18,40 +18,18 @@ interface HeaderProps {
 }
 
 const Header = ({ type }: HeaderProps) => {
-  // const { isOpen, setIsOpen } = useContext(IsBurgermenuOpenContext);
-  // const onClick = () => {
-  //   setIsOpen(!isOpen);
-  // };
-
   if (type === 1) {
     return (
-      // <div className={styles.container}>
-      //   <div className={styles.left}>
-      //     <Link to="/">
-      //       <img className={styles.main_logo} src="메인로고.png" alt="로고" />
-      //     </Link>
-      //   </div>
-      //   <div className={styles.center}>
-      //     <Link to="/">
-      //       <img className={styles.text_logo} src="세차새차.png" alt="세차새차" />
-      //     </Link>
-      //   </div>
-      //   <div className={styles.right}>
-      //     <button className={styles.menubutton} onClick={onClick}>
-      //       <FiMenu color="#2964F6" strokeWidth={3} size={'100%'} />
-      //     </button>
-      //   </div>
-      // </div>
       <Navbar sticky="top" bg="white" expand={false} id={styles.container}>
         <Container>
-          <Link to={'/'}>
+          <Link to={'/'} style={{ textDecoration: 'none' }}>
             <Navbar.Brand>
-              <img className={styles.main_logo} src="메인로고.png" alt="로고" />
               <img
-                className={styles.text_logo}
-                src="세차새차.png"
-                alt="세차새차"
+                className={styles.main_logo}
+                src="main_logo.png"
+                alt="로고"
               />
+              <span className={styles.text_logo}>세차새차</span>
             </Navbar.Brand>
           </Link>
           <Navbar.Toggle />

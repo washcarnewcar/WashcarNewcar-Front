@@ -1,0 +1,47 @@
+.container {
+
+  .select_car_item {
+    border: none;
+  }
+
+  .flex_container {
+    display: flex;
+    justify-content: space-between;
+    margin: 0px var(--margin-left);
+    padding: 12px 0px;
+
+    .left {
+      display: flex;
+      align-items: center;
+      font-size: large;
+      font-weight: bold;
+    }
+
+    .right {
+      color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      font-size: large;
+      font-weight: medium;
+    }
+  }
+
+
+  .time {
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    margin-bottom: 5px;
+  }
+
+  .check_icon {
+    color: rgba(0, 0, 0, 0.17);
+    margin-right: 5px;
+  }
+
+  .seperator {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 20px;
+  }
+}

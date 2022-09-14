@@ -1,10 +1,10 @@
 import './App.css';
 import { IsBurgermenuOpenProvider } from './contexts/burgermenu';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
-import Search from './pages/Search';
-import Provider from './pages/Provider';
-import Login from './pages/Login';
+import Index from './pages/Index';
+import Search from './pages/consumer/Search';
+import Provider from './pages/provider/Provider';
+import Login from './pages/auth/Login';
 import Reservation from './pages/Reservation';
 import LoginRedirect from './pages/LoginRedirect';
 import Seller from './pages/Seller';
@@ -13,15 +13,18 @@ import Contact from './pages/Contact';
 import Error from './pages/Error';
 import Store from './pages/Store';
 import Menu from './pages/Menu';
+import SignUp from './pages/auth/SignUp';
+import SignUpInfo from './pages/auth/SignUpInfo';
 
 function App() {
   return (
-    // <IsBurgermenuOpenProvider>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/search" element={<Search />} />
+        <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signup/info" element={<SignUpInfo />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/provider" element={<Provider />} />
         <Route path="/provider/store" element={<Store />} />
         <Route path="/reservation" element={<Reservation />} />
@@ -32,7 +35,6 @@ function App() {
         <Route path="/provider/menu/:code" element={<Menu />} />
       </Routes>
     </BrowserRouter>
-    // </IsBurgermenuOpenProvider>
   );
 }
 

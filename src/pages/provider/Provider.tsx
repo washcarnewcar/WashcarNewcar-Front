@@ -4,9 +4,9 @@ import { IoIosArrowForward } from 'react-icons/io';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router-dom';
 import { Navigate, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Loading from '../components/Loading';
-import { requestWithToken } from '../functions/request';
+import Header from '../../components/Header';
+import Loading from '../../components/Loading';
+import { requestWithToken } from '../../functions/request';
 import styles from './Provider.module.scss';
 
 interface ResponseJson {
@@ -20,7 +20,8 @@ interface Menu {
 }
 
 const Provider = () => {
-  const [ready, setReady] = useState(false);
+  // 임시로 true
+  const [ready, setReady] = useState(true);
   const [menuList, setMenuList] = useState(new Array<Menu>());
   const navigate = useNavigate();
 
@@ -62,7 +63,7 @@ const Provider = () => {
 
   return (
     <>
-      <Header type={2} />
+      <Header type={1} />
       <div id={styles.container}>
         <ButtonGroup>
           <LinkContainer
