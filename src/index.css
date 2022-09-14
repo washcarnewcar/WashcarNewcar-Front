@@ -21,3 +21,8 @@ code {
   min-width: 340px;
   margin: 0 auto;
 }
+
+/* 부트스트랩 크롬에서 테두리 생기는 것 없애기 */
+:focus {
+  box-shadow: none !important;
+}
