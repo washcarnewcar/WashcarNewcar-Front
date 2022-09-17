@@ -1,23 +1,84 @@
 import styles from './Search.module.scss';
-import Datepicker from '../../components/Datepicker';
 import { IoIosArrowForward } from 'react-icons/io';
-import { BsCheckCircleFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import Item from '../../components/Item';
-import classNames from 'classnames';
 import Header from '../../components/Header';
-import { Accordion, Dropdown, DropdownButton } from 'react-bootstrap';
-import { NONAME } from 'dns';
-import { useState } from 'react';
+import { Accordion } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 
 const Search = () => {
-  const [car, setCar] = useState('');
-  const [brand, setBrand] = useState('브랜드');
+  const [location, setLocation] = useState({
+    latitude: 0,
+    longitude: 0,
+  });
+  const [carNumber, setCarNumber] = useState('');
+  const [brand, setBrand] = useState('');
+  const [carText, setCarText] = useState('모두');
+  const [textLocation, setTextLocation] = useState('');
+  const geocoder = new kakao.maps.services.Geocoder();
 
-  function onBrandSelect(eventKey: string | null) {
-    if (!eventKey) return null;
-    setBrand(eventKey);
+  function onBrandChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value;
+    const index = e.target.selectedIndex;
+    const text = e.target.options[index].text;
+
+    if (index != 0) {
+      setBrand(text);
+      getCar(value);
+    }
   }
+
+  function onCarChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value;
+    const index = e.target.selectedIndex;
+    const text = e.target.options[index].text;
+
+    if (index == 0) {
+      setCarText('모두');
+    } else {
+      setCarNumber(value);
+      setCarText(`${brand} ${text}`);
+    }
+  }
+
+  function getBrand() {}
+
+  function getCar(brandNumber: string) {
+    console.log('getCar()');
+  }
+
+  async function getCurrentLocation() {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log(position);
+      setLocation({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+
+      geocoder.coord2Address(
+        position.coords.longitude,
+        position.coords.latitude,
+        (
+          result: {
+            address: kakao.maps.services.Address;
+            road_address: kakao.maps.services.RoadAaddress | null;
+          }[],
+          status: kakao.maps.services.Status
+        ) => {
+          console.log(result[0].address);
+          const address = result[0].address;
+          setTextLocation(
+            `현위치 : ${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
+          );
+        }
+      );
+    });
+  }
+
+  useEffect(() => {
+    getBrand();
+    getCurrentLocation();
+  }, []);
 
   return (
     <>
@@ -26,71 +87,42 @@ const Search = () => {
         <Accordion flush>
           <Accordion.Item eventKey="0" className={styles.select_car_item}>
             <Accordion.Header>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  marginRight: '10px',
-                }}
-              >
-                <div style={{ fontSize: 'large', fontWeight: 'bolder' }}>
-                  차량 선택
-                </div>
-                <div>{car}</div>
+              <div className={styles.select_car_header}>
+                <div className={styles.title}>차량 선택</div>
+                <div className={styles.car}>{carText}</div>
               </div>
             </Accordion.Header>
-            <Accordion.Body>
-              <DropdownButton
-                variant="outline-primary"
-                title={brand}
-                onSelect={onBrandSelect}
-              >
-                <Dropdown.Item eventKey="여기에 브랜드 입력">
-                  여기에 브랜드 입력
-                </Dropdown.Item>
-              </DropdownButton>
+            <Accordion.Body className={styles.select_car_body}>
+              <select className={styles.brand} onChange={onBrandChange}>
+                <option value="select">브랜드 선택</option>
+                <option value="0">현대</option>
+                <option value="1">제네시스</option>
+                <option value="2">쉐보레</option>
+                <option value="3">GM</option>
+              </select>
+              <select onChange={onCarChange}>
+                <option value="select">모델 선택</option>
+                <option value="0">EF쏘나타</option>
+                <option value="1">i30</option>
+                <option value="2">i40</option>
+                <option value="3">LF쏘나타</option>
+                <option value="4">NF쏘나타</option>
+                <option value="5">YF쏘나타</option>
+              </select>
             </Accordion.Body>
           </Accordion.Item>
-          <hr className={styles.seperator} />
         </Accordion>
-        <div
-          style={{
-            paddingLeft: 20,
-            paddingRight: 20,
-            paddingTop: 16,
-            paddingBottom: 16,
-          }}
-        >
-          <Link
-            to="/search/map"
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              textDecoration: 'none',
-              color: 'black',
-            }}
-          >
-            <div
-              style={{
-                fontSize: 'large',
-                fontWeight: 'bolder',
-              }}
-            >
-              검색 위치 설정
-            </div>
-            <div style={{ display: 'flex' }}>
-              <div style={{ marginRight: '10px' }}>
-                현위치 : 인하공업전문대학
-              </div>
-              <IoIosArrowForward size={23} />
+        <hr className={styles.seperator} />
+        <div className={styles.search_location}>
+          <Link to="/search/map" className={styles.inner}>
+            <div className={styles.title}>검색 위치 설정</div>
+            <div className={styles.right}>
+              <div className={styles.current_location}>{textLocation}</div>
+              <IoIosArrowForward size={20} />
             </div>
           </Link>
         </div>
-        <div
-          style={{ width: '100%', height: '13px', backgroundColor: '#f7f7f7' }}
-        ></div>
+        <div className={styles.blank}></div>
 
         <Item />
         <hr className={styles.seperator} />

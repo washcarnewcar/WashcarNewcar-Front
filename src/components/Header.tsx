@@ -26,7 +26,7 @@ const Header = ({ type }: HeaderProps) => {
             <Navbar.Brand>
               <img
                 className={styles.main_logo}
-                src="row_logo.png"
+                src="/row_logo.png"
                 alt="세차새차"
               />
             </Navbar.Brand>
@@ -51,7 +51,7 @@ const Header = ({ type }: HeaderProps) => {
             <Navbar.Brand>
               <img
                 className={styles.text_logo}
-                src="carwash.png"
+                src="/carwash.png"
                 alt="세차새차"
               />
               <img className={styles.main_logo} src="메인로고.png" alt="로고" />
