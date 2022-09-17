@@ -1,5 +1,7 @@
-.map {
-  margin-right: 30px;
-  margin-left: 30px;
-  height: calc(100vh - 100px);
+.body {
+  height: var(--vh);
+
+  .map {
+    height: 80%;
+  }
 }

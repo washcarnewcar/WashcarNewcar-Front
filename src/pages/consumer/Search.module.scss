@@ -28,15 +28,12 @@
 
   .search_location {
     padding: 16px 20px;
-
-    .inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      text-decoration: none;
-      color: black;
-      line-height: 21.6px;
-    }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: black;
+    line-height: 21.6px;
 
     .title {
       font-size: large;
