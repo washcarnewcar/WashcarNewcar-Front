@@ -5,6 +5,7 @@ import Item from '../../components/Item';
 import Header from '../../components/Header';
 import { Accordion } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
+import { BeatLoader } from 'react-spinners';
 
 const Search = () => {
   const [coordinate, setCoordinate] = useState({
@@ -134,7 +135,9 @@ const Search = () => {
         >
           <div className={styles.title}>검색 위치 설정</div>
           <div className={styles.right}>
-            <div className={styles.current_location}>{textLocation}</div>
+            <div className={styles.current_location}>
+              {textLocation === '' ? <BeatLoader size={10} /> : textLocation}
+            </div>
             <IoIosArrowForward size={20} />
           </div>
         </Link>
