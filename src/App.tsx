@@ -3,7 +3,7 @@ import { IsBurgermenuOpenProvider } from './contexts/burgermenu';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Index from './pages/Index';
 import Search from './pages/consumer/Search';
-import Provider from './pages/provider/provider';
+import Provider from './pages/provider/Provider';
 import Login from './pages/auth/Login';
 import Reservation from './pages/Reservation';
 import LoginRedirect from './pages/LoginRedirect';

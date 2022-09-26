@@ -1,6 +1,6 @@
 import styles from './Search.module.scss';
 import { IoIosArrowForward } from 'react-icons/io';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Item from '../../components/Item';
 import Header from '../../components/Header';
 import { Accordion } from 'react-bootstrap';
@@ -9,6 +9,7 @@ import { BeatLoader } from 'react-spinners';
 
 const Search = () => {
   const [coordinate, setCoordinate] = useState({
+    // 길튼교회 좌표
     latitude: 37.4527602629939,
     longitude: 126.7059347817178,
   });
@@ -16,8 +17,21 @@ const Search = () => {
   const [brand, setBrand] = useState('');
   const [carText, setCarText] = useState('모두');
   const [textLocation, setTextLocation] = useState('');
+  const [foundLocation, setFoundLocation] = useState(false);
   const geocoder = new kakao.maps.services.Geocoder();
+  const location = useLocation();
 
+  /**
+   * 최초 렌더 시 Brand와 위치를 받아온다.
+   */
+  useEffect(() => {
+    getBrand();
+    judgeIsState();
+  }, []);
+
+  /**
+   * 브랜드가 바뀌었을 때
+   */
   function onBrandChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const value = e.target.value;
     const index = e.target.selectedIndex;
@@ -29,6 +43,9 @@ const Search = () => {
     }
   }
 
+  /**
+   * 차 모델이 바뀌었을 때
+   */
   function onCarChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const value = e.target.value;
     const index = e.target.selectedIndex;
@@ -42,46 +59,56 @@ const Search = () => {
     }
   }
 
+  /**
+   * 브랜드를 받아오는 함수
+   */
   function getBrand() {}
 
+  /**
+   * 차 모델을 받아오는 함수
+   */
   function getCar(brandNumber: string) {
     console.log('getCar()');
   }
 
-  async function getCurrentLocation() {
+  /**
+   * /search/map으로부터 받아온 위치 정보가 있는지 판단
+   * 없다면 GPS를 사용하여 위치 받아옴
+   */
+  function judgeIsState() {
+    if (location.state?.coordinate) {
+      setCoordinate(location.state.coordinate);
+      setFoundLocation(true);
+    } else {
+      getLocationFromGeolocation();
+    }
+  }
+
+  /**
+   * geolocation을 사용하여 위치를 받아오는 함수
+   */
+  async function getLocationFromGeolocation() {
     navigator.geolocation.getCurrentPosition(
       positionCallback,
       positionErrorCallback
     );
   }
 
+  /**
+   * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
+   */
   function positionCallback(position: GeolocationPosition) {
     // 좌표 State에 저장
     setCoordinate({
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
     });
-
-    // 좌표를 주소로 변환
-    geocoder.coord2Address(
-      position.coords.longitude,
-      position.coords.latitude,
-      (
-        result: {
-          address: kakao.maps.services.Address;
-          road_address: kakao.maps.services.RoadAaddress | null;
-        }[],
-        status: kakao.maps.services.Status
-      ) => {
-        console.log(result[0].address);
-        const address = result[0].address;
-        setTextLocation(
-          `현위치 : ${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
-        );
-      }
-    );
+    setFoundLocation(true);
   }
 
+  /**
+   * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
+   */
   function positionErrorCallback(error: GeolocationPositionError) {
     if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
       console.log('권한 없음');
@@ -90,10 +117,28 @@ const Search = () => {
     }
   }
 
+  /**
+   * coordinate가 바뀌면 좌표를 주소로 변환하여 텍스트로 표시
+   */
   useEffect(() => {
-    getBrand();
-    getCurrentLocation();
-  }, []);
+    // 좌표를 주소로 변환
+    geocoder.coord2Address(
+      coordinate.longitude,
+      coordinate.latitude,
+      (
+        result: {
+          address: kakao.maps.services.Address;
+          road_address: kakao.maps.services.RoadAaddress | null;
+        }[],
+        status: kakao.maps.services.Status
+      ) => {
+        const address = result[0].address;
+        setTextLocation(
+          `${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
+        );
+      }
+    );
+  }, [coordinate]);
 
   return (
     <>
@@ -131,12 +176,15 @@ const Search = () => {
         <Link
           to="/search/map"
           className={styles.search_location}
-          state={{ coordinate: coordinate }}
+          state={{
+            coordinate: coordinate,
+            foundLocation: foundLocation,
+          }}
         >
           <div className={styles.title}>검색 위치 설정</div>
           <div className={styles.right}>
             <div className={styles.current_location}>
-              {textLocation === '' ? <BeatLoader size={10} /> : textLocation}
+              {foundLocation ? textLocation : <BeatLoader size={10} />}
             </div>
             <IoIosArrowForward size={20} />
           </div>
