@@ -3,7 +3,6 @@ import { Tab, Tabs } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
-import Slide from '../../components/Slide';
 import MenuItem from './MenuItem';
 import styles from './Store.module.scss';
 
@@ -40,9 +39,13 @@ function Store() {
       </div>
 
       <div className={styles.store_info}>
-        <div className={styles.preview_image}></div>
+        <img
+          className={styles.preview_image}
+          src="/style_carcare.jpg"
+          alt="테스트"
+        />
         <div className={styles.content}>
-          <div className={styles.store_name}></div>
+          <div className={styles.store_name}>스타일카케어</div>
         </div>
       </div>
 
@@ -61,6 +64,7 @@ function Store() {
           <Seperator />
           <MenuItem />
         </Tab>
+
         <Tab eventKey="info" title="정보" className={styles.tab}>
           asdfsda
         </Tab>
