@@ -1,0 +1,64 @@
+.container {
+
+  .select_car_item {
+    border: none;
+
+    .select_car_header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-right: 10px;
+
+      .title {
+        font-size: large;
+        font-weight: bolder;
+      }
+
+      .car {}
+    }
+
+    .select_car_body {
+      display: flex;
+
+      .brand {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .search_location {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: black;
+    line-height: 21.6px;
+
+    .title {
+      font-size: large;
+      font-weight: bolder;
+    }
+
+    .right {
+      display: flex;
+      align-items: center;
+
+      .current_location {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .blank {
+    width: 100%;
+    height: 13px;
+    background-color: #f7f7f7;
+  }
+
+  .seperator {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 20px;
+  }
+}

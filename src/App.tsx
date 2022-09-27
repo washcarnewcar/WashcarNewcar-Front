@@ -1,20 +1,20 @@
 import './App.css';
-import { IsBurgermenuOpenProvider } from './contexts/burgermenu';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Index from './pages/Index';
-import Search from './pages/consumer/Search';
+import Search from './pages/search/Search';
 import Provider from './pages/provider/Provider';
 import Login from './pages/auth/Login';
 import Reservation from './pages/Reservation';
-import LoginRedirect from './pages/LoginRedirect';
+import LoginRedirect from './pages/auth/LoginRedirect';
 import Seller from './pages/Seller';
-import LoginCheck from './pages/LoginCheck';
 import Contact from './pages/Contact';
 import Error from './pages/Error';
-import Store from './pages/Store';
+import EditStore from './pages/provider/EditStore';
 import Menu from './pages/Menu';
 import SignUp from './pages/auth/SignUp';
 import SignUpInfo from './pages/auth/SignUpInfo';
+import SelectMap from './pages/search/SelectMap';
+import Store from './pages/store/Store';
 
 function App() {
   return (
@@ -25,8 +25,10 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signup/info" element={<SignUpInfo />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/search/map" element={<SelectMap />} />
+        <Route path="/store/:slug" element={<Store />} />
         <Route path="/provider" element={<Provider />} />
-        <Route path="/provider/store" element={<Store />} />
+        <Route path="/provider/store" element={<EditStore />} />
         <Route path="/reservation" element={<Reservation />} />
         <Route path="/oauth2/redirect/:token" element={<LoginRedirect />} />
         <Route path="/seller" element={<Seller />} />

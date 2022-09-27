@@ -23,6 +23,6 @@ code {
 }
 
 /* 부트스트랩 크롬에서 테두리 생기는 것 없애기 */
-:focus {
+/* :focus {
   box-shadow: none !important;
-}
+} */
