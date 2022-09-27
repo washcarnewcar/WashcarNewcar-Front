@@ -6,6 +6,7 @@ import Header from '../../components/Header';
 import { Accordion } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
+import Seperator from '../../components/Seperator';
 
 const Search = () => {
   const [coordinate, setCoordinate] = useState({
@@ -191,15 +192,15 @@ const Search = () => {
         </Link>
         <div className={styles.blank}></div>
 
-        <Item />
-        <hr className={styles.seperator} />
-        <Item />
-        <hr className={styles.seperator} />
-        <Item />
-        <hr className={styles.seperator} />
-        <Item />
-
-        <Item />
+        <Item slug="test" />
+        <Seperator />
+        <Item slug="test" />
+        <Seperator />
+        <Item slug="test" />
+        <Seperator />
+        <Item slug="test" />
+        <Seperator />
+        <Item slug="test" />
       </div>
     </>
   );
