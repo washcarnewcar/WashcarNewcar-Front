@@ -48,3 +48,15 @@
 .tabs {
   .tab {}
 }
+
+.info_flex {
+  display: flex;
+  margin: 10px 20px;
+
+  .icon {}
+
+  .info_content {
+    margin-left: 10px;
+    white-space: pre-wrap;
+  }
+}
