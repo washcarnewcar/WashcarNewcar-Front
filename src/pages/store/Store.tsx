@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
 import MenuItem from './MenuItem';
@@ -33,9 +33,14 @@ const tempData = {
 };
 
 function Store() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams();
+  console.log(slug);
 
   function onTabClick(event: React.MouseEvent) {}
+
+  if (!slug || slug === '') {
+    return <Navigate to="/" />;
+  }
 
   return (
     <>
@@ -81,17 +86,17 @@ function Store() {
         justify
         onClick={onTabClick}
       >
-        <Tab eventKey="wash" title="세차" className={styles.tab}>
-          <MenuItem />
+        <Tab eventKey="wash" title="세차" tabClassName={styles.tab}>
+          <MenuItem slug={slug} number={'1'} />
           <Seperator />
-          <MenuItem />
+          <MenuItem slug={slug} number={'2'} />
           <Seperator />
-          <MenuItem />
+          <MenuItem slug={slug} number={'3'} />
           <Seperator />
-          <MenuItem />
+          <MenuItem slug={slug} number={'4'} />
         </Tab>
 
-        <Tab eventKey="info" title="정보" className={styles.tab}>
+        <Tab eventKey="info" title="정보" tabClassName={styles.tab}>
           <InfoItem type="call" data={tempData.call} />
           <Seperator />
           <InfoItem type="location" data={tempData.location} />
@@ -100,12 +105,6 @@ function Store() {
           <Seperator />
           <InfoItem type="information" data={tempData.information} />
         </Tab>
-        {/* <Tab
-          eventKey="review"
-          title="리뷰"
-          className={styles.tab}
-          disabled
-        ></Tab> */}
       </Tabs>
     </>
   );

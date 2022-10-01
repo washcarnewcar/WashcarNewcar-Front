@@ -10,7 +10,7 @@ import Seller from './pages/Seller';
 import Contact from './pages/Contact';
 import Error from './pages/Error';
 import EditStore from './pages/provider/EditStore';
-import Menu from './pages/Menu';
+import Menu from './pages/store/Menu';
 import SignUp from './pages/auth/SignUp';
 import SignUpInfo from './pages/auth/SignUpInfo';
 import SelectMap from './pages/search/SelectMap';
@@ -27,6 +27,7 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/search/map" element={<SelectMap />} />
         <Route path="/store/:slug" element={<Store />} />
+        <Route path="/store/:slug/menu/:number" element={<Menu />} />
         <Route path="/provider" element={<Provider />} />
         <Route path="/provider/store" element={<EditStore />} />
         <Route path="/reservation" element={<Reservation />} />
@@ -35,6 +36,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/error" element={<Error />} />
         <Route path="/provider/menu/:code" element={<Menu />} />
+        <Route path="*" element={<Error />} />
       </Routes>
     </BrowserRouter>
   );

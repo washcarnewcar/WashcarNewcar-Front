@@ -104,7 +104,7 @@ const Search = () => {
   const positionCallback = useCallback(
     (position: GeolocationPosition) => {
       // 좌표를 주소 텍스트로 변환, 좌표 State에 저장
-      coord2Address(position.coords.latitude, position.coords.longitude);
+      coord2Address(position.coords.longitude, position.coords.latitude);
       setCoordinate({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,

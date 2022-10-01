@@ -7,11 +7,6 @@ import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { BiCurrentLocation } from 'react-icons/bi';
 
-interface Coordinate {
-  latitude: number;
-  longitude: number;
-}
-
 const SelectMap = () => {
   const location = useLocation();
   const [coordinate, setCoordinate] = useState({
@@ -25,7 +20,6 @@ const SelectMap = () => {
 
   useEffect(() => {
     judgeFoundLocation();
-    // getCoordinate();
     setScreenSize();
     window.addEventListener('resize', () => setScreenSize());
   }, []);
@@ -137,11 +131,6 @@ const SelectMap = () => {
     let vh = window.innerHeight;
     document.documentElement.style.setProperty('--vh', `${vh - 56}px`);
   }
-
-  /**
-   * 위도와 경도를 받아서 textLocation에 주소를 찍는 함수
-   */
-  function coord2Address() {}
 
   /**
    * /search로부터 정보를 받아오지 못했다면

@@ -1,0 +1,125 @@
+.store {
+  margin: 20px;
+
+  .image_container {
+    height: 200px;
+    width: 100%;
+
+    .image {
+      object-fit: cover;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .menu_info {
+    margin-top: 10px;
+
+    .menu_title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+
+    .menu_detail {
+      font-size: 14px;
+      color: gray;
+      white-space: pre-wrap;
+    }
+  }
+
+}
+
+.price {
+  margin: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+
+  .price_title {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .price_value {
+    font-size: 20px;
+    font-weight: bold;
+  }
+}
+
+.option_header {
+  font-weight: bold;
+}
+
+.date {
+  margin: 10px 20px;
+
+  .date_title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .date_input {
+    display: flex;
+    margin-top: 10px;
+    background-color: #D9D9D9;
+    height: 60px;
+    width: 100%;
+    border-radius: 12px;
+    color: gray;
+
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.request {
+  margin: 10px 20px;
+
+  .request_title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .request_input {
+    padding: 10px;
+    border-radius: 12px;
+    margin-top: 10px;
+    resize: none;
+    width: 100%;
+  }
+}
+
+.result {
+  position: fixed;
+  // background-color: gray;
+  height: 70px;
+  width: 100%;
+  bottom: 0px;
+  display: flex;
+  padding: 10px;
+
+  .result_price {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    border-style: solid;
+    border-width: 1.5px;
+    border-color: #D9D9D9;
+    margin: 0px 5px;
+    padding: 0px 15px;
+    font-weight: bold;
+
+    border-radius: 40px;
+
+  }
+
+  .result_submit {
+    margin: 0px 5px;
+    width: 30%;
+    border-radius: 40px;
+    font-weight: bold;
+  }
+
+}

@@ -4,6 +4,7 @@
   scroll-snap-type: x mandatory;
 
   .image_container {
+    height: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -13,9 +14,10 @@
     scroll-snap-align: center;
 
     .image {
+      height: 100%;
       // max-width: 300px;
       width: 100%;
-      object-fit: cover;
+      object-fit: contain;
     }
   }
 }
@@ -46,7 +48,9 @@
 }
 
 .tabs {
-  .tab {}
+  .tab {
+    color: black;
+  }
 }
 
 .info_flex {
