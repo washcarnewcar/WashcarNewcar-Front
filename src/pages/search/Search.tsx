@@ -14,6 +14,7 @@ const Search = () => {
     latitude: 37.4527602629939,
     longitude: 126.7059347817178,
   });
+
   const [carNumber, setCarNumber] = useState('');
   const [brand, setBrand] = useState('');
   const [carText, setCarText] = useState('모두');
@@ -78,9 +79,16 @@ const Search = () => {
    */
   function judgeIsState() {
     if (location.state?.coordinate) {
+      console.log(`location으로부터 좌표값 받아옴`);
+
+      coord2Address(
+        location.state.coordinate.longitude,
+        location.state.coordinate.latitude
+      );
       setCoordinate(location.state.coordinate);
-      setFoundLocation(true);
     } else {
+      console.log(`geolocation으로부터 좌표값 받아옴`);
+
       getLocationFromGeolocation();
     }
   }
@@ -88,7 +96,7 @@ const Search = () => {
   /**
    * geolocation을 사용하여 위치를 받아오는 함수
    */
-  async function getLocationFromGeolocation() {
+  function getLocationFromGeolocation() {
     navigator.geolocation.getCurrentPosition(
       positionCallback,
       positionErrorCallback
@@ -99,12 +107,12 @@ const Search = () => {
    * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
    */
   function positionCallback(position: GeolocationPosition) {
-    // 좌표 State에 저장
+    // 좌표를 주소 텍스트로 변환, 좌표 State에 저장
+    coord2Address(position.coords.latitude, position.coords.longitude);
     setCoordinate({
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
     });
-    setFoundLocation(true);
   }
 
   /**
@@ -119,13 +127,15 @@ const Search = () => {
   }
 
   /**
-   * coordinate가 바뀌면 좌표를 주소로 변환하여 텍스트로 표시
+   * 좌표를 주소로 변환하여 텍스트로 표시하는 함수
    */
-  useEffect(() => {
+  function coord2Address(longitude: number, latitude: number) {
+    console.log(longitude, latitude);
+
     // 좌표를 주소로 변환
     geocoder.coord2Address(
-      coordinate.longitude,
-      coordinate.latitude,
+      latitude,
+      longitude,
       (
         result: {
           address: kakao.maps.services.Address;
@@ -133,13 +143,18 @@ const Search = () => {
         }[],
         status: kakao.maps.services.Status
       ) => {
-        const address = result[0].address;
-        setTextLocation(
-          `${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
-        );
+        console.log(status);
+
+        if (status == kakao.maps.services.Status.OK) {
+          const address = result[0].address;
+          setTextLocation(
+            `${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
+          );
+        }
+        setFoundLocation(true);
       }
     );
-  }, [coordinate]);
+  }
 
   return (
     <>
