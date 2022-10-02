@@ -1,9 +1,8 @@
 import styles from './SelectMap.module.scss';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import Header from '../../components/Header';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { BiCurrentLocation } from 'react-icons/bi';
 
@@ -14,36 +13,36 @@ const SelectMap = () => {
     longitude: 126.7059347817178,
   });
   const [textLocation, setTextLocation] = useState('');
-  const geocoder = new kakao.maps.services.Geocoder();
+  const geocoder = useMemo(() => new kakao.maps.services.Geocoder(), []);
   const navigate = useNavigate();
   const [locationLoaded, setLocationLoaded] = useState(false);
 
-  useEffect(() => {
-    judgeFoundLocation();
-    setScreenSize();
-    window.addEventListener('resize', () => setScreenSize());
+  /**
+   * geolocation으로부터 위치를 얻어오는 함수
+   */
+  const getLocationFromGeolocation = useCallback(() => {
+    navigator.geolocation.getCurrentPosition(
+      positionCallback,
+      positionErrorCallback
+    );
   }, []);
 
   /**
    * /search에서 위치를 찾고 왔는지 확인
    */
-  function judgeFoundLocation() {
+  const judgeFoundLocation = useCallback(() => {
     if (location.state?.foundLocation) {
       setCoordinate(location.state.coordinate);
     } else {
       getLocationFromGeolocation();
     }
-  }
+  }, [getLocationFromGeolocation, location]);
 
-  /**
-   * geolocation으로부터 위치를 얻어오는 함수
-   */
-  function getLocationFromGeolocation() {
-    navigator.geolocation.getCurrentPosition(
-      positionCallback,
-      positionErrorCallback
-    );
-  }
+  useEffect(() => {
+    judgeFoundLocation();
+    setScreenSize();
+    window.addEventListener('resize', () => setScreenSize());
+  }, [judgeFoundLocation]);
 
   /**
    * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
@@ -86,7 +85,7 @@ const SelectMap = () => {
         setLocationLoaded(true);
       }
     );
-  }, [coordinate]);
+  }, [coordinate, geocoder]);
 
   /**
    * 드래그 할 때 좌표값 변경
@@ -154,6 +153,7 @@ const SelectMap = () => {
           >
             확인
           </Button>
+          {/* TODO: 버튼을 누르면 현위치를 잡을 때까지 spinner 띄우면 좋음 */}
           <button
             className={styles.current_location}
             onClick={onCurrentLocationClick}
