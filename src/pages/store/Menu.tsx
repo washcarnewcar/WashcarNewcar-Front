@@ -1,4 +1,5 @@
 import { Accordion, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { Navigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
@@ -61,7 +62,12 @@ const Menu = () => {
 
       <div className={styles.date}>
         <div className={styles.date_title}>예약날짜 선택</div>
-        <div className={styles.date_input}>예약 날짜를 선택해주세요</div>
+        <Link
+          to={`/store/${slug}/menu/${number}/time`}
+          className={styles.date_input}
+        >
+          예약 날짜를 선택해주세요
+        </Link>
       </div>
 
       <Seperator />

@@ -15,6 +15,7 @@ import SignUp from './pages/auth/SignUp';
 import SignUpInfo from './pages/auth/SignUpInfo';
 import SelectMap from './pages/search/SelectMap';
 import Store from './pages/store/Store';
+import MenuTime from './pages/store/MenuTime';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/search/map" element={<SelectMap />} />
         <Route path="/store/:slug" element={<Store />} />
         <Route path="/store/:slug/menu/:number" element={<Menu />} />
+        <Route path="/store/:slug/menu/:number/time" element={<MenuTime />} />
         <Route path="/provider" element={<Provider />} />
         <Route path="/provider/store" element={<EditStore />} />
         <Route path="/reservation" element={<Reservation />} />
