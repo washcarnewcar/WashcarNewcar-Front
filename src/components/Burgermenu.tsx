@@ -2,7 +2,7 @@ import styles from './Burgermenu.module.scss';
 import { useContext } from 'react';
 import IsBurgermenuOpenContext from '../contexts/burgermenu';
 
-const Burgermenu = () => {
+function Burgermenu() {
   const width = 250;
   const { isOpen, setIsOpen } = useContext(IsBurgermenuOpenContext);
 
@@ -31,6 +31,6 @@ const Burgermenu = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Burgermenu;

@@ -10,7 +10,7 @@ import {
 import { Link } from 'react-router-dom';
 import styles from './SignUpInfo.module.scss';
 
-const SignUpInfo = () => {
+function SignUpInfo() {
   const [carrier, setCarrier] = useState('SKT');
   const [mobile, setMobile] = useState('010');
 
@@ -96,6 +96,6 @@ const SignUpInfo = () => {
       </div>
     </>
   );
-};
+}
 
 export default SignUpInfo;

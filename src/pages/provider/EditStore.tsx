@@ -14,7 +14,7 @@ interface StoreImage {
   url: string;
 }
 
-const EditStore = () => {
+function EditStore() {
   const [inputs, setInputs] = useState({
     name: '',
     slug: '',
@@ -140,6 +140,6 @@ const EditStore = () => {
       </div>
     </>
   );
-};
+}
 
 export default EditStore;

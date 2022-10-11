@@ -9,11 +9,11 @@ interface DatePickerProps {
   availableDays: string[];
 }
 
-const Datepicker = ({
+function Datepicker({
   onClickDate,
   setIsDaySelect,
   availableDays,
-}: DatePickerProps) => {
+}: DatePickerProps) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const today = useMemo(() => new Date(), []);
 
@@ -51,7 +51,7 @@ const Datepicker = ({
   }
 
   return <div className={styles.calendar_container}>{generateDays()}</div>;
-};
+}
 
 interface DayProps {
   date: Date;

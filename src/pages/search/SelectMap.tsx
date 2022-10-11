@@ -6,7 +6,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { BiCurrentLocation } from 'react-icons/bi';
 
-const SelectMap = () => {
+function SelectMap() {
   const location = useLocation();
   const navigate = useNavigate();
   const [coordinate, setCoordinate] = useState({
@@ -174,6 +174,6 @@ const SelectMap = () => {
       </div>
     </>
   );
-};
+}
 
 export default SelectMap;

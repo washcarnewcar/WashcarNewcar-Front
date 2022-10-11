@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
 import Datepicker from '../../components/Datepicker';
 import Header from '../../components/Header';
-import styles from './MenuTime.module.scss';
+import styles from './ReservationTime.module.scss';
 
 const amTimeList = [
   { time: new Date(0, 0, 0, 0, 0), available: false },
@@ -71,7 +71,7 @@ const tempAvailableDays = [
   '2022-10-19',
 ];
 
-function MenuTime() {
+function ReservationTime() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [date, setDate] = useState(new Date());
   const [availableDays, setAvailableDays] = useState(['']);
@@ -217,4 +217,4 @@ function MenuTime() {
   );
 }
 
-export default MenuTime;
+export default ReservationTime;

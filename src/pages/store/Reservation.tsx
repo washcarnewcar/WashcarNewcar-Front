@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Navigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
-import styles from './Menu.module.scss';
+import styles from './Reservation.module.scss';
 
 const tempData = {
   title: '외부 세차',
@@ -14,7 +14,7 @@ const tempData = {
   price: 80000,
 };
 
-const Menu = () => {
+function Reservation() {
   const { slug, number } = useParams();
   const [carNumber, setCarNumber] = useState('');
   const [brand, setBrand] = useState('');
@@ -150,6 +150,6 @@ const Menu = () => {
       </div>
     </>
   );
-};
+}
 
-export default Menu;
+export default Reservation;

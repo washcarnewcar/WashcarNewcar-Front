@@ -8,7 +8,7 @@ interface CardProps {
   type: string;
 }
 
-const CardGrid = () => {
+function CardGrid() {
   return (
     <div className={styles.card_grid}>
       <Link to="/search" className={styles.card_grid_item}>
@@ -25,6 +25,6 @@ const CardGrid = () => {
       </Link>
     </div>
   );
-};
+}
 
 export default CardGrid;

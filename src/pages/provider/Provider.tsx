@@ -19,7 +19,7 @@ interface Menu {
   code: string;
 }
 
-const Provider = () => {
+function Provider() {
   // 임시로 true
   const [ready, setReady] = useState(true);
   const [menuList, setMenuList] = useState(new Array<Menu>());
@@ -98,6 +98,6 @@ const Provider = () => {
       </div>
     </>
   );
-};
+}
 
 export default Provider;

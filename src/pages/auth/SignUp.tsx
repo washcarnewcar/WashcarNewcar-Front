@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import styles from './SignUp.module.scss';
 
-const SignUp = () => {
+function SignUp() {
   return (
     <>
       <div className={styles.container}>
@@ -48,6 +48,6 @@ const SignUp = () => {
       </div>
     </>
   );
-};
+}
 
 export default SignUp;

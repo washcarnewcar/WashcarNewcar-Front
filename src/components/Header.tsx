@@ -17,7 +17,7 @@ interface HeaderProps {
   type: number;
 }
 
-const Header = ({ type }: HeaderProps) => {
+function Header({ type }: HeaderProps) {
   if (type === 1) {
     return (
       <Navbar sticky="top" bg="white" expand={false} id={styles.container}>
@@ -62,6 +62,6 @@ const Header = ({ type }: HeaderProps) => {
     );
   }
   return <></>;
-};
+}
 
 export default Header;

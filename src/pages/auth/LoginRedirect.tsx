@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const LoginRedirect = () => {
+function LoginRedirect() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
 
@@ -18,6 +18,6 @@ const LoginRedirect = () => {
   }, [navigate, token]);
 
   return null;
-};
+}
 
 export default LoginRedirect;

@@ -5,7 +5,7 @@ interface ItemProps {
   slug: string;
 }
 
-const Item = ({ slug }: ItemProps) => {
+function Item({ slug }: ItemProps) {
   return (
     <Link to={`/store/${slug}`} className={styles.link}>
       <div className={styles.container}>
@@ -42,7 +42,7 @@ const Item = ({ slug }: ItemProps) => {
       </div>
     </Link>
   );
-};
+}
 
 interface ITag {
   text: string;

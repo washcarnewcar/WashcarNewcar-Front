@@ -8,68 +8,21 @@ import { useEffect, useMemo, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 import Seperator from '../../components/Seperator';
 
-const Search = () => {
+function Search() {
   const [coordinate, setCoordinate] = useState({
     // 길튼교회 좌표
     latitude: 37.4527602629939,
     longitude: 126.7059347817178,
   });
-
-  const [carNumber, setCarNumber] = useState('');
-  const [brand, setBrand] = useState('');
-  const [carText, setCarText] = useState('모두');
   const [textLocation, setTextLocation] = useState('');
   const [foundLocation, setFoundLocation] = useState(false);
   const geocoder = useMemo(() => new kakao.maps.services.Geocoder(), []);
   const location = useLocation();
 
   /**
-   * 브랜드가 바뀌었을 때
-   */
-  function onBrandChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-    const index = e.target.selectedIndex;
-    const text = e.target.options[index].text;
-
-    if (index !== 0) {
-      setBrand(text);
-      getCar(value);
-    }
-  }
-
-  /**
-   * 차 모델이 바뀌었을 때
-   */
-  function onCarChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-    const index = e.target.selectedIndex;
-    const text = e.target.options[index].text;
-
-    if (index === 0) {
-      setCarText('모두');
-    } else {
-      setCarNumber(value);
-      setCarText(`${brand} ${text}`);
-    }
-  }
-
-  /**
-   * 브랜드를 받아오는 함수
-   */
-  function getBrand() {}
-
-  /**
-   * 차 모델을 받아오는 함수
-   */
-  function getCar(brandNumber: string) {
-    console.log('getCar()');
-  }
-
-  /**
-   * 최초 렌더 시 Brand와 위치를 받아온다.
+   * 최초 렌더 시 위치를 받아온다.
    */
   useEffect(() => {
-    getBrand();
     judgeIsState();
 
     /**
@@ -154,35 +107,6 @@ const Search = () => {
     <>
       <Header type={1} />
       <div className={styles.container}>
-        <Accordion flush>
-          <Accordion.Item eventKey="0" className={styles.select_car_item}>
-            <Accordion.Header>
-              <div className={styles.select_car_header}>
-                <div className={styles.title}>차량 선택</div>
-                <div className={styles.car}>{carText}</div>
-              </div>
-            </Accordion.Header>
-            <Accordion.Body className={styles.select_car_body}>
-              <select className={styles.brand} onChange={onBrandChange}>
-                <option value="select">브랜드 선택</option>
-                <option value="0">현대</option>
-                <option value="1">제네시스</option>
-                <option value="2">쉐보레</option>
-                <option value="3">GM</option>
-              </select>
-              <select onChange={onCarChange}>
-                <option value="select">모델 선택</option>
-                <option value="0">EF쏘나타</option>
-                <option value="1">i30</option>
-                <option value="2">i40</option>
-                <option value="3">LF쏘나타</option>
-                <option value="4">NF쏘나타</option>
-                <option value="5">YF쏘나타</option>
-              </select>
-            </Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-        <hr className={styles.seperator} />
         <Link
           to="/search/map"
           className={styles.search_location}
@@ -191,7 +115,7 @@ const Search = () => {
             foundLocation: foundLocation,
           }}
         >
-          <div className={styles.title}>검색 위치 설정</div>
+          <div className={styles.title}>검색 위치</div>
           <div className={styles.right}>
             <div className={styles.current_location}>
               {foundLocation ? textLocation : <BeatLoader size={10} />}
@@ -213,6 +137,6 @@ const Search = () => {
       </div>
     </>
   );
-};
+}
 
 export default Search;

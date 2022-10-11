@@ -3,7 +3,7 @@ import { Tab, Tabs } from 'react-bootstrap';
 import { Navigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
-import MenuItem from './MenuItem';
+import MenuItem from '../../components/MenuItem';
 import styles from './Store.module.scss';
 import {
   IoCallOutline,
