@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import moment from 'moment';
 import 'moment/locale/ko';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
 import Datepicker from '../../components/Datepicker';
 import Header from '../../components/Header';
@@ -77,31 +77,30 @@ function MenuTime() {
   const [availableDays, setAvailableDays] = useState(['']);
   const [isDaySelect, setIsDaySelect] = useState(false);
 
-  const getAvailableDay = useCallback(() => {
-    // 가능한 시간을 불러오는 코드
-    setAvailableDays(tempAvailableDays);
-  }, []);
-
-  const onClickTime = useCallback(
-    (time: Date) => {
-      const newDate = new Date();
-      newDate.setMonth(date.getMonth());
-      newDate.setDate(date.getDate());
-      newDate.setHours(time.getHours());
-      newDate.setMinutes(time.getMinutes());
-      setSelectedDate(newDate);
-      setIsDaySelect(true);
-    },
-    [date]
-  );
-
-  const onClickDate = useCallback((date: Date) => {
-    setDate(date);
-  }, []);
-
   useEffect(() => {
     getAvailableDay();
+
+    /**
+     * 가능한 시간을 불러오는 함수
+     */
+    function getAvailableDay() {
+      setAvailableDays(tempAvailableDays);
+    }
   }, []);
+
+  function onClickTime(time: Date) {
+    const newDate = new Date();
+    newDate.setMonth(date.getMonth());
+    newDate.setDate(date.getDate());
+    newDate.setHours(time.getHours());
+    newDate.setMinutes(time.getMinutes());
+    setSelectedDate(newDate);
+    setIsDaySelect(true);
+  }
+
+  function onClickDate(date: Date) {
+    setDate(date);
+  }
 
   return (
     <>

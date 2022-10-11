@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Item from '../../components/Item';
 import Header from '../../components/Header';
 import { Accordion } from 'react-bootstrap';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 import Seperator from '../../components/Seperator';
 
@@ -66,12 +66,67 @@ const Search = () => {
   }
 
   /**
-   * 좌표를 주소로 변환하여 텍스트로 표시하는 함수
+   * 최초 렌더 시 Brand와 위치를 받아온다.
    */
-  const coord2Address = useCallback(
-    (longitude: number, latitude: number) => {
-      console.log(longitude, latitude);
+  useEffect(() => {
+    getBrand();
+    judgeIsState();
 
+    /**
+     * /search/map으로부터 받아온 위치 정보가 있는지 판단
+     * 없다면 GPS를 사용하여 위치 받아옴
+     */
+    function judgeIsState() {
+      if (location.state?.coordinate) {
+        console.log(`location으로부터 좌표값 받아옴`);
+        coord2Address(
+          location.state.coordinate.longitude,
+          location.state.coordinate.latitude
+        );
+        setCoordinate(location.state.coordinate);
+      } else {
+        console.log(`geolocation으로부터 좌표값 받아옴`);
+        getLocationFromGeolocation();
+      }
+    }
+
+    /**
+     * geolocation을 사용하여 위치를 받아오는 함수
+     */
+    function getLocationFromGeolocation() {
+      navigator.geolocation.getCurrentPosition(
+        positionCallback,
+        positionErrorCallback
+      );
+    }
+
+    /**
+     * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
+     */
+    function positionCallback(position: GeolocationPosition) {
+      // 좌표를 주소 텍스트로 변환, 좌표 State에 저장
+      coord2Address(position.coords.longitude, position.coords.latitude);
+      setCoordinate({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+    }
+
+    /**
+     * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
+     */
+    function positionErrorCallback(error: GeolocationPositionError) {
+      if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
+        console.log('권한 없음');
+      } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+        console.log('위치를 사용할 수 없음');
+      }
+    }
+
+    /**
+     * 좌표를 주소로 변환하여 텍스트로 표시하는 함수
+     */
+    function coord2Address(longitude: number, latitude: number) {
       // 좌표를 주소로 변환
       geocoder.coord2Address(
         longitude,
@@ -83,8 +138,6 @@ const Search = () => {
           }[],
           status: kakao.maps.services.Status
         ) => {
-          console.log(status);
-
           if (status === kakao.maps.services.Status.OK) {
             const address = result[0].address;
             setTextLocation(
@@ -94,74 +147,8 @@ const Search = () => {
           setFoundLocation(true);
         }
       );
-    },
-    [geocoder]
-  );
-
-  /**
-   * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
-   */
-  const positionCallback = useCallback(
-    (position: GeolocationPosition) => {
-      // 좌표를 주소 텍스트로 변환, 좌표 State에 저장
-      coord2Address(position.coords.longitude, position.coords.latitude);
-      setCoordinate({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      });
-    },
-    [coord2Address]
-  );
-
-  /**
-   * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
-   */
-  const positionErrorCallback = useCallback(
-    (error: GeolocationPositionError) => {
-      if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
-        console.log('권한 없음');
-      } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
-        console.log('위치를 사용할 수 없음');
-      }
-    },
-    []
-  );
-
-  /**
-   * geolocation을 사용하여 위치를 받아오는 함수
-   */
-  const getLocationFromGeolocation = useCallback(() => {
-    navigator.geolocation.getCurrentPosition(
-      positionCallback,
-      positionErrorCallback
-    );
-  }, [positionCallback, positionErrorCallback]);
-
-  /**
-   * /search/map으로부터 받아온 위치 정보가 있는지 판단
-   * 없다면 GPS를 사용하여 위치 받아옴
-   */
-  const judgeIsState = useCallback(() => {
-    if (location.state?.coordinate) {
-      console.log(`location으로부터 좌표값 받아옴`);
-      coord2Address(
-        location.state.coordinate.longitude,
-        location.state.coordinate.latitude
-      );
-      setCoordinate(location.state.coordinate);
-    } else {
-      console.log(`geolocation으로부터 좌표값 받아옴`);
-      getLocationFromGeolocation();
     }
-  }, [coord2Address, getLocationFromGeolocation, location]);
-
-  /**
-   * 최초 렌더 시 Brand와 위치를 받아온다.
-   */
-  useEffect(() => {
-    getBrand();
-    judgeIsState();
-  }, [judgeIsState]);
+  }, [geocoder, location]);
 
   return (
     <>

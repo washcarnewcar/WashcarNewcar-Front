@@ -8,13 +8,13 @@ import { BiCurrentLocation } from 'react-icons/bi';
 
 const SelectMap = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [coordinate, setCoordinate] = useState({
     latitude: 37.4527602629939,
     longitude: 126.7059347817178,
   });
   const [textLocation, setTextLocation] = useState('');
   const geocoder = useMemo(() => new kakao.maps.services.Geocoder(), []);
-  const navigate = useNavigate();
   const [locationLoaded, setLocationLoaded] = useState(false);
 
   /**
@@ -27,22 +27,22 @@ const SelectMap = () => {
     );
   }, []);
 
-  /**
-   * /search에서 위치를 찾고 왔는지 확인
-   */
-  const judgeFoundLocation = useCallback(() => {
-    if (location.state?.foundLocation) {
-      setCoordinate(location.state.coordinate);
-    } else {
-      getLocationFromGeolocation();
-    }
-  }, [getLocationFromGeolocation, location]);
-
   useEffect(() => {
     judgeFoundLocation();
     setScreenSize();
     window.addEventListener('resize', () => setScreenSize());
-  }, [judgeFoundLocation]);
+
+    /**
+     * /search에서 위치를 찾고 왔는지 확인
+     */
+    function judgeFoundLocation() {
+      if (location.state?.foundLocation) {
+        setCoordinate(location.state.coordinate);
+      } else {
+        getLocationFromGeolocation();
+      }
+    }
+  }, [getLocationFromGeolocation, location]);
 
   /**
    * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수

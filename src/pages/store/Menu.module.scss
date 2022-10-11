@@ -73,6 +73,27 @@
   }
 }
 
+.car {
+  margin: 10px 20px;
+
+  .car_title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .select_wrapper {
+    margin-top: 10px;
+
+    .select {
+      border-style: solid;
+      border-width: 2px;
+      border-color: var(--main-color);
+      border-radius: 10px;
+    }
+  }
+
+}
+
 .request {
   margin: 10px 20px;
 

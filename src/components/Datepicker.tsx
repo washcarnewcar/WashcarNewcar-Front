@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import moment from 'moment';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './Datepicker.module.scss';
 
 interface DatePickerProps {
@@ -17,22 +17,18 @@ const Datepicker = ({
   const [selectedDate, setSelectedDate] = useState(new Date());
   const today = useMemo(() => new Date(), []);
 
-  const isDateAvailable = useCallback(
-    (date: Date) => {
-      if (availableDays.includes(moment(date).format('YYYY-MM-DD')))
-        return true;
-      else return false;
-    },
-    [availableDays]
-  );
+  function isDateAvailable(date: Date) {
+    if (availableDays.includes(moment(date).format('YYYY-MM-DD'))) return true;
+    else return false;
+  }
 
-  const onClick = useCallback((date: Date) => {
+  function onClick(date: Date) {
     setSelectedDate(date);
     setIsDaySelect(false);
     onClickDate(date);
-  }, []);
+  }
 
-  const generateDays = useCallback(() => {
+  function generateDays() {
     const days = [];
 
     // 2주
@@ -52,7 +48,7 @@ const Datepicker = ({
     }
 
     return days;
-  }, [selectedDate, isDateAvailable, onClick, today]);
+  }
 
   return <div className={styles.calendar_container}>{generateDays()}</div>;
 };
@@ -72,7 +68,7 @@ const Day = ({
 }: DayProps) => {
   const week = ['일', '월', '화', '수', '목', '금', '토']; // 일주일
 
-  const selectClass = useCallback(() => {
+  function selectClass() {
     const arr = [styles.date];
     if (available) {
       if (selected) {
@@ -84,7 +80,7 @@ const Day = ({
       arr.push(styles.date_unavailable);
     }
     return classNames(arr);
-  }, [available, selected]);
+  }
 
   return (
     <div className={styles.date_container}>

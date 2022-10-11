@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+import { useEffect, useState } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Navigate, useParams } from 'react-router-dom';
@@ -14,6 +16,43 @@ const tempData = {
 
 const Menu = () => {
   const { slug, number } = useParams();
+  const [carNumber, setCarNumber] = useState('');
+  const [brand, setBrand] = useState('');
+  const [carText, setCarText] = useState('모두');
+
+  function onBrandChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value;
+    const index = e.target.selectedIndex;
+    const text = e.target.options[index].text;
+
+    if (index !== 0) {
+      setBrand(text);
+      getCar(value);
+    }
+  }
+
+  /**
+   * 차 모델이 바뀌었을 때
+   */
+  function onCarChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value;
+    const index = e.target.selectedIndex;
+    const text = e.target.options[index].text;
+
+    if (index === 0) {
+      setCarText('모두');
+    } else {
+      setCarNumber(value);
+      setCarText(`${brand} ${text}`);
+    }
+  }
+
+  /**
+   * 차 모델을 받아오는 함수
+   */
+  function getCar(brandNumber: string) {
+    console.log('getCar()');
+  }
 
   if (!slug || !number) {
     return <Navigate to="/" />;
@@ -22,7 +61,6 @@ const Menu = () => {
   return (
     <>
       <Header type={1} />
-      {/* {slug} 가게의 {number} 메뉴번호 */}
 
       <div className={styles.store}>
         <div className={styles.image_container}>
@@ -68,6 +106,30 @@ const Menu = () => {
         >
           예약 날짜를 선택해주세요
         </Link>
+      </div>
+
+      <Seperator />
+
+      <div className={styles.car}>
+        <div className={styles.car_title}>차량 선택</div>
+        <div className={styles.select_wrapper}>
+          <select className={styles.select} onChange={onBrandChange}>
+            <option value="select">브랜드 선택</option>
+            <option value="0">현대</option>
+            <option value="1">제네시스</option>
+            <option value="2">쉐보레</option>
+            <option value="3">GM</option>
+          </select>
+          <select className={styles.select} onChange={onCarChange}>
+            <option value="select">모델 선택</option>
+            <option value="0">EF쏘나타</option>
+            <option value="1">i30</option>
+            <option value="2">i40</option>
+            <option value="3">LF쏘나타</option>
+            <option value="4">NF쏘나타</option>
+            <option value="5">YF쏘나타</option>
+          </select>
+        </div>
       </div>
 
       <Seperator />
