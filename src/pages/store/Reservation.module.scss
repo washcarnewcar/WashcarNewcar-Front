@@ -62,14 +62,26 @@
     text-decoration: none;
     display: flex;
     margin-top: 10px;
-    background-color: #D9D9D9;
     height: 60px;
     width: 100%;
     border-radius: 12px;
-    color: gray;
 
     align-items: center;
     justify-content: center;
+  }
+
+  .date_input_selected {
+    color: var(--main-color);
+    background-color: white;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--main-color);
+  }
+
+  .date_input_unselected {
+    background-color: #D9D9D9;
+    color: gray;
+
   }
 }
 
@@ -82,13 +94,18 @@
   }
 
   .select_wrapper {
+    display: flex;
+    justify-content: space-between;
     margin-top: 10px;
 
     .select {
+      height: 40px;
+      width: 48%;
       border-style: solid;
       border-width: 2px;
       border-color: var(--main-color);
       border-radius: 10px;
+      text-align: center;
     }
   }
 

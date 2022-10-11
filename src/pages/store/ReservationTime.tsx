@@ -3,6 +3,7 @@ import moment from 'moment';
 import 'moment/locale/ko';
 import { useEffect, useState } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
+import { useNavigate, useParams } from 'react-router-dom';
 import Datepicker from '../../components/Datepicker';
 import Header from '../../components/Header';
 import styles from './ReservationTime.module.scss';
@@ -72,6 +73,8 @@ const tempAvailableDays = [
 ];
 
 function ReservationTime() {
+  const navigate = useNavigate();
+  const { slug, number } = useParams();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [date, setDate] = useState(new Date());
   const [availableDays, setAvailableDays] = useState(['']);
@@ -100,6 +103,12 @@ function ReservationTime() {
 
   function onClickDate(date: Date) {
     setDate(date);
+  }
+
+  function onClickSubmit() {
+    navigate(`/store/${slug}/menu/${number}`, {
+      state: { selectedDate: selectedDate },
+    });
   }
 
   return (
@@ -209,7 +218,11 @@ function ReservationTime() {
             ? moment(selectedDate).format('MM월 D일 a h시 mm분')
             : '시간을 선택해주세요'}
         </div>
-        <Button className={styles.result_submit} disabled={!isDaySelect}>
+        <Button
+          className={styles.result_submit}
+          disabled={!isDaySelect}
+          onClick={onClickSubmit}
+        >
           선택
         </Button>
       </div>

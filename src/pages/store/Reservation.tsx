@@ -1,7 +1,8 @@
 import classNames from 'classnames';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Navigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
@@ -14,11 +15,78 @@ const tempData = {
   price: 80000,
 };
 
+const tempBrandData = {
+  brand: [
+    {
+      number: 0,
+      name: '현대',
+    },
+    {
+      number: 1,
+      name: '제네시스',
+    },
+    {
+      number: 2,
+      name: '기아',
+    },
+    {
+      number: 3,
+      name: '쉐보레',
+    },
+  ],
+};
+
+const tempModelData = {
+  model: [
+    {
+      number: 0,
+      name: 'EF쏘나타',
+    },
+    {
+      number: 1,
+      name: 'i30',
+    },
+    {
+      number: 2,
+      name: 'i40',
+    },
+    {
+      number: 3,
+      name: 'LF쏘나타',
+    },
+  ],
+};
+
 function Reservation() {
+  const location = useLocation();
   const { slug, number } = useParams();
-  const [carNumber, setCarNumber] = useState('');
-  const [brand, setBrand] = useState('');
-  const [carText, setCarText] = useState('모두');
+  const [brands, setBrands] = useState([{ number: 0, name: '' }]);
+  const [models, setModels] = useState([{ number: 0, name: '' }]);
+  const [selectedBrandNumber, setSelectedBrandNumber] = useState('');
+  const [selectedCarNumber, setSelectedCarNumber] = useState('');
+  const [isSelectedDate, setIsSelectedDate] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  useState(() => {
+    judgeSelectedDate();
+    getBrand();
+
+    /**
+     * 날짜 선택 페이지에서 날짜를 선택했는지 판단
+     */
+    function judgeSelectedDate() {
+      if (location.state?.selectedDate) {
+        setIsSelectedDate(true);
+        setSelectedDate(location.state.selectedDate);
+      } else {
+        setIsSelectedDate(false);
+      }
+    }
+
+    function getBrand() {
+      setBrands(tempBrandData.brand);
+    }
+  });
 
   function onBrandChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const value = e.target.value;
@@ -26,8 +94,8 @@ function Reservation() {
     const text = e.target.options[index].text;
 
     if (index !== 0) {
-      setBrand(text);
-      getCar(value);
+      setSelectedBrandNumber(value);
+      getCars(value);
     }
   }
 
@@ -39,23 +107,17 @@ function Reservation() {
     const index = e.target.selectedIndex;
     const text = e.target.options[index].text;
 
-    if (index === 0) {
-      setCarText('모두');
-    } else {
-      setCarNumber(value);
-      setCarText(`${brand} ${text}`);
+    if (index !== 0) {
+      setSelectedCarNumber(value);
     }
   }
 
   /**
    * 차 모델을 받아오는 함수
    */
-  function getCar(brandNumber: string) {
-    console.log('getCar()');
-  }
-
-  if (!slug || !number) {
-    return <Navigate to="/" />;
+  function getCars(brandNumber: string) {
+    console.log(`getCar(${brandNumber})`);
+    setModels(tempModelData.model);
   }
 
   return (
@@ -102,9 +164,14 @@ function Reservation() {
         <div className={styles.date_title}>예약날짜 선택</div>
         <Link
           to={`/store/${slug}/menu/${number}/time`}
-          className={styles.date_input}
+          className={classNames(styles.date_input, {
+            [styles.date_input_selected]: isSelectedDate,
+            [styles.date_input_unselected]: !isSelectedDate,
+          })}
         >
-          예약 날짜를 선택해주세요
+          {isSelectedDate
+            ? moment(selectedDate).format('MM월 D일 a h시 mm분')
+            : '예약 날짜를 선택해주세요'}
         </Link>
       </div>
 
@@ -115,19 +182,19 @@ function Reservation() {
         <div className={styles.select_wrapper}>
           <select className={styles.select} onChange={onBrandChange}>
             <option value="select">브랜드 선택</option>
-            <option value="0">현대</option>
-            <option value="1">제네시스</option>
-            <option value="2">쉐보레</option>
-            <option value="3">GM</option>
+            {brands.map((brand) => (
+              <option key={brand.number} value={brand.number}>
+                {brand.name}
+              </option>
+            ))}
           </select>
           <select className={styles.select} onChange={onCarChange}>
             <option value="select">모델 선택</option>
-            <option value="0">EF쏘나타</option>
-            <option value="1">i30</option>
-            <option value="2">i40</option>
-            <option value="3">LF쏘나타</option>
-            <option value="4">NF쏘나타</option>
-            <option value="5">YF쏘나타</option>
+            {models.map((model) => (
+              <option key={model.number} value={model.number}>
+                {model.name}
+              </option>
+            ))}
           </select>
         </div>
       </div>
