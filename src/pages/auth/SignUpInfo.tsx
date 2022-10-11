@@ -84,13 +84,6 @@ const SignUpInfo = () => {
             >
               회원가입
             </Button>
-            <a href={process.env.REACT_APP_API + '/oauth2/authorization/kakao'}>
-              <img
-                src="/kakao_login_large_wide.png"
-                alt="카카오 로그인"
-                className={styles.kakao_login}
-              ></img>
-            </a>
 
             <div className={styles.signup}>
               <div>이미 계정이 있으신가요?</div>
