@@ -14,14 +14,14 @@ function SignUpInfo() {
   const [carrier, setCarrier] = useState('SKT');
   const [mobile, setMobile] = useState('010');
 
-  function onCarrierSelect(eventKey: string | null) {
-    if (!eventKey) return null;
-    setCarrier(eventKey);
+  function onCarrierSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+    console.log(e.target.value);
+    setCarrier(e.target.value);
   }
 
-  function onMobileSelect(eventKey: string | null) {
-    if (!eventKey) return null;
-    setMobile(eventKey);
+  function onMobileSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+    console.log(e.target.value);
+    setMobile(e.target.value);
   }
 
   return (
@@ -50,27 +50,19 @@ function SignUpInfo() {
               />
             </Form.Group>
             <InputGroup className={styles.phone_group}>
-              <DropdownButton
-                onSelect={onCarrierSelect}
-                variant="outline-secondary"
-                title={carrier}
-              >
-                <Dropdown.Item eventKey="SKT">SKT</Dropdown.Item>
-                <Dropdown.Item eventKey="KT">KT</Dropdown.Item>
-                <Dropdown.Item eventKey="LGU+">LGU+</Dropdown.Item>
-              </DropdownButton>
-              <DropdownButton
-                onSelect={onMobileSelect}
-                variant="outline-secondary"
-                title={mobile}
-              >
-                <Dropdown.Item eventKey="010">010</Dropdown.Item>
-                <Dropdown.Item eventKey="011">011</Dropdown.Item>
-                <Dropdown.Item eventKey="016">016</Dropdown.Item>
-                <Dropdown.Item eventKey="017">017</Dropdown.Item>
-                <Dropdown.Item eventKey="018">018</Dropdown.Item>
-                <Dropdown.Item eventKey="019">019</Dropdown.Item>
-              </DropdownButton>
+              <Form.Select onChange={onCarrierSelect} className={styles.select}>
+                <option value="SKT">SKT</option>
+                <option value="KT">KT</option>
+                <option value="LGU+">LGU+</option>
+              </Form.Select>
+              <Form.Select onChange={onMobileSelect} className={styles.select}>
+                <option value="010">010</option>
+                <option value="011">011</option>
+                <option value="016">016</option>
+                <option value="017">017</option>
+                <option value="018">018</option>
+                <option value="019">019</option>
+              </Form.Select>
               <Form.Control
                 type="number"
                 className={styles.phone}

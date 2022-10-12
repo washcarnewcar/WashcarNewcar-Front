@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { Accordion, Button } from 'react-bootstrap';
+import { Accordion, Button, Form, InputGroup } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import { Navigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
@@ -66,6 +66,8 @@ function Reservation() {
   const [selectedCarNumber, setSelectedCarNumber] = useState('');
   const [isSelectedDate, setIsSelectedDate] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [carrier, setCarrier] = useState('');
+  const [mobile, setMobile] = useState('');
 
   useState(() => {
     judgeSelectedDate();
@@ -120,6 +122,16 @@ function Reservation() {
     setModels(tempModelData.model);
   }
 
+  function onCarrierSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+    console.log(e.target.value);
+    setCarrier(e.target.value);
+  }
+
+  function onMobileSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+    console.log(e.target.value);
+    setMobile(e.target.value);
+  }
+
   return (
     <>
       <Header type={1} />
@@ -160,8 +172,8 @@ function Reservation() {
 
       <Seperator />
 
-      <div className={styles.date}>
-        <div className={styles.date_title}>예약날짜 선택</div>
+      <div className={styles.element}>
+        <div className={styles.element_title}>예약날짜 선택</div>
         <Link
           to={`/store/${slug}/menu/${number}/time`}
           className={classNames(styles.date_input, {
@@ -177,33 +189,62 @@ function Reservation() {
 
       <Seperator />
 
-      <div className={styles.car}>
-        <div className={styles.car_title}>차량 선택</div>
+      <div className={styles.element}>
+        <div className={styles.element_title}>차량 선택</div>
         <div className={styles.select_wrapper}>
-          <select className={styles.select} onChange={onBrandChange}>
+          <Form.Select className={styles.select} onChange={onBrandChange}>
             <option value="select">브랜드 선택</option>
             {brands.map((brand) => (
               <option key={brand.number} value={brand.number}>
                 {brand.name}
               </option>
             ))}
-          </select>
-          <select className={styles.select} onChange={onCarChange}>
+          </Form.Select>
+          <Form.Select className={styles.select} onChange={onCarChange}>
             <option value="select">모델 선택</option>
             {models.map((model) => (
               <option key={model.number} value={model.number}>
                 {model.name}
               </option>
             ))}
-          </select>
+          </Form.Select>
         </div>
+      </div>
+
+      <Seperator />
+
+      <div className={styles.element}>
+        <div className={styles.element_title}>휴대폰 번호</div>
+        <InputGroup className={styles.phone_group}>
+          <Form.Select onChange={onCarrierSelect} className={styles.select}>
+            <option value="SKT">SKT</option>
+            <option value="KT">KT</option>
+            <option value="LGU+">LGU+</option>
+          </Form.Select>
+          <Form.Select onChange={onMobileSelect} className={styles.select}>
+            <option value="010">010</option>
+            <option value="011">011</option>
+            <option value="016">016</option>
+            <option value="017">017</option>
+            <option value="018">018</option>
+            <option value="019">019</option>
+          </Form.Select>
+          <Form.Control
+            type="number"
+            className={styles.phone}
+            placeholder="핸드폰 번호"
+          />
+        </InputGroup>
       </div>
 
       <Seperator />
 
       <div className={styles.request}>
         <div className={styles.request_title}>요청사항</div>
-        <textarea className={styles.request_input}></textarea>
+        <Form.Control
+          type="textarea"
+          className={styles.request_input}
+        ></Form.Control>
       </div>
 
       <div className={styles.result}>

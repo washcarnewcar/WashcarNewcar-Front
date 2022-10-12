@@ -31,13 +31,13 @@ function Item({ slug }: ItemProps) {
             <Tag text="스페셜세차 66,000원" />
             <Tag text="프리미엄세차 126,000원" />
           </div>
-          <div className={styles.inner2}>
+          {/* <div className={styles.inner2}>
             <Tag text="10:00" />
             <Tag text="10:30" />
             <Tag text="11:00" />
             <Tag text="12:00" />
             <Tag text="12:30" />
-          </div>
+          </div> */}
         </div>
       </div>
     </Link>

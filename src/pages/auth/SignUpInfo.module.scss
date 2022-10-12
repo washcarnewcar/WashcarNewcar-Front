@@ -57,8 +57,13 @@
       }
 
       .phone_group {
+        .select {
+          max-width: 30%;
+        }
+
         .phone {
           height: 45px;
+
         }
       }
 
