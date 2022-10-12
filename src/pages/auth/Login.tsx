@@ -8,26 +8,22 @@ function Login() {
     <>
       <div className={styles.container}>
         <Link to="/" className={styles.logo_container}>
-          <img src="row_logo.png" alt="세차새차" className={styles.img_logo} />
+          <img src="/row_logo.png" alt="세차새차" className={styles.img_logo} />
         </Link>
 
         <div className={styles.form_container}>
           <div className={styles.title}>로그인</div>
           <Form className={styles.form}>
-            <Form.Group className={styles.id_group}>
-              <Form.Control
-                type="text"
-                className={styles.id}
-                placeholder="아이디"
-              />
-            </Form.Group>
-            <Form.Group className={styles.pw_group}>
-              <Form.Control
-                type="password"
-                className={styles.pw}
-                placeholder="비밀번호"
-              />
-            </Form.Group>
+            <Form.Control
+              type="text"
+              className={styles.id}
+              placeholder="아이디"
+            />
+            <Form.Control
+              type="password"
+              className={styles.pw}
+              placeholder="비밀번호"
+            />
             <Button
               variant="primary"
               type="submit"

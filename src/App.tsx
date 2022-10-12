@@ -15,6 +15,8 @@ import SignUpInfo from './pages/auth/SignUpInfo';
 import SelectMap from './pages/search/SelectMap';
 import Store from './pages/store/Store';
 import ReservationTime from './pages/store/ReservationTime';
+import Find from './pages/find/Find';
+import FindList from './pages/find/FindList';
 
 function App() {
   return (
@@ -34,7 +36,8 @@ function App() {
         />
         <Route path="/provider" element={<Provider />} />
         <Route path="/provider/store" element={<EditStore />} />
-        {/* <Route path="/reservation" element={<Reservation />} /> */}
+        <Route path="/find" element={<Find />} />
+        <Route path="/find/:phone" element={<FindList />} />
         <Route path="/oauth2/redirect/:token" element={<LoginRedirect />} />
         <Route path="/seller" element={<Seller />} />
         <Route path="/contact" element={<Contact />} />

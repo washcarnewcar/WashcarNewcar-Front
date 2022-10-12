@@ -1,6 +1,5 @@
 import Burgermenu from '../components/Burgermenu';
 import Header from '../components/Header';
-import CardGrid from '../components/CardGrid';
 import { useEffect } from 'react';
 
 const Seller = () => {

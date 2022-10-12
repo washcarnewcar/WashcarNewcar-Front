@@ -215,26 +215,11 @@ function Reservation() {
 
       <div className={styles.element}>
         <div className={styles.element_title}>휴대폰 번호</div>
-        <InputGroup className={styles.phone_group}>
-          <Form.Select onChange={onCarrierSelect} className={styles.select}>
-            <option value="SKT">SKT</option>
-            <option value="KT">KT</option>
-            <option value="LGU+">LGU+</option>
-          </Form.Select>
-          <Form.Select onChange={onMobileSelect} className={styles.select}>
-            <option value="010">010</option>
-            <option value="011">011</option>
-            <option value="016">016</option>
-            <option value="017">017</option>
-            <option value="018">018</option>
-            <option value="019">019</option>
-          </Form.Select>
-          <Form.Control
-            type="number"
-            className={styles.phone}
-            placeholder="핸드폰 번호"
-          />
-        </InputGroup>
+        <Form.Control
+          type="tel"
+          className={styles.phone}
+          placeholder="휴대폰 번호"
+        />
       </div>
 
       <Seperator />
@@ -242,7 +227,7 @@ function Reservation() {
       <div className={styles.request}>
         <div className={styles.request_title}>요청사항</div>
         <Form.Control
-          type="textarea"
+          as="textarea"
           className={styles.request_input}
         ></Form.Control>
       </div>

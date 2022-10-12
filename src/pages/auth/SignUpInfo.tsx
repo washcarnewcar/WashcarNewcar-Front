@@ -28,8 +28,7 @@ function SignUpInfo() {
     <>
       <div className={styles.container}>
         <Link to="/" className={styles.logo_container}>
-          <img src="/main_logo.png" alt="로고" className={styles.img_logo} />
-          <div className={styles.text_logo}>세차새차</div>
+          <img src="/row_logo.png" alt="세차새차" className={styles.img_logo} />
         </Link>
 
         <div className={styles.form_container}>
