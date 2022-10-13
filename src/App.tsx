@@ -1,5 +1,11 @@
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import {
+  BrowserRouter,
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  Routes,
+} from 'react-router-dom';
 import Index from './pages/Index';
 import Search from './pages/search/Search';
 import Provider from './pages/provider/Provider';
@@ -18,35 +24,37 @@ import ReservationTime from './pages/store/ReservationTime';
 import Find from './pages/find/Find';
 import FindList from './pages/find/FindList';
 
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/signup/info" element={<SignUpInfo />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/search/map" element={<SelectMap />} />
-        <Route path="/store/:slug" element={<Store />} />
-        <Route path="/store/:slug/menu/:number" element={<Reservation />} />
-        <Route
-          path="/store/:slug/menu/:number/time"
-          element={<ReservationTime />}
-        />
-        <Route path="/provider" element={<Provider />} />
-        <Route path="/provider/store" element={<EditStore />} />
-        <Route path="/find" element={<Find />} />
-        <Route path="/find/:phone" element={<FindList />} />
-        <Route path="/oauth2/redirect/:token" element={<LoginRedirect />} />
-        <Route path="/seller" element={<Seller />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/error" element={<Error />} />
-        <Route path="/provider/menu/:code" element={<Reservation />} />
-        <Route path="*" element={<Error />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" errorElement={<Error />}>
+      <Route index element={<Index />} />
+      <Route path="login" element={<Login />} />
+      <Route path="signup" element={<SignUp />} />
+      <Route path="signup/info" element={<SignUpInfo />} />
 
-export default App;
+      <Route path="search" element={<Search />} />
+      <Route path="search/map" element={<SelectMap />} />
+
+      <Route path="store/:slug">
+        <Route index element={<Store />} />
+        <Route path="menu/:number">
+          <Route index element={<Reservation />} />
+          <Route path="time" element={<ReservationTime />} />
+        </Route>
+      </Route>
+
+      <Route path="provider">
+        <Route index element={<Provider />} />
+        <Route path="provider/store" element={<EditStore />} />
+      </Route>
+
+      <Route path="find" element={<Find />} />
+      <Route path="find/:phone" element={<FindList />} />
+
+      <Route path="oauth2/redirect/:token" element={<LoginRedirect />} />
+      {/* <Route path="/provider/menu/:code" element={<Reservation />} /> */}
+    </Route>
+  )
+);
+
+export default router;
