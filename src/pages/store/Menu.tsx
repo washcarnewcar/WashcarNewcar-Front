@@ -1,12 +1,12 @@
 import classNames from 'classnames';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
-import { Accordion, Button, Form, InputGroup } from 'react-bootstrap';
+import { useState } from 'react';
+import { Accordion, Button, Form } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
-import { Navigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
-import styles from './Reservation.module.scss';
+import styles from './Menu.module.scss';
 
 const tempData = {
   title: '외부 세차',
@@ -57,7 +57,7 @@ const tempModelData = {
   ],
 };
 
-function Reservation() {
+function Menu() {
   const location = useLocation();
   const { slug, number } = useParams();
   const [brands, setBrands] = useState([{ number: 0, name: '' }]);
@@ -245,4 +245,4 @@ function Reservation() {
   );
 }
 
-export default Reservation;
+export default Menu;

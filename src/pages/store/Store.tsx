@@ -11,7 +11,6 @@ import {
   IoLocationOutline,
   IoNavigateOutline,
 } from 'react-icons/io5';
-import classNames from 'classnames';
 
 const tempData = {
   call: '010-2474-6837',

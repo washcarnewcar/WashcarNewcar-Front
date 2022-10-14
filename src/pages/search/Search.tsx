@@ -3,7 +3,6 @@ import { IoIosArrowForward } from 'react-icons/io';
 import { Link, useLocation } from 'react-router-dom';
 import Item from '../../components/Item';
 import Header from '../../components/Header';
-import { Accordion } from 'react-bootstrap';
 import { useEffect, useMemo, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 import Seperator from '../../components/Seperator';

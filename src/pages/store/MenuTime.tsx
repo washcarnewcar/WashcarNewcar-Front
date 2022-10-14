@@ -6,7 +6,7 @@ import { Accordion, Button } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import Datepicker from '../../components/Datepicker';
 import Header from '../../components/Header';
-import styles from './ReservationTime.module.scss';
+import styles from './MenuTime.module.scss';
 
 const amTimeList = [
   { time: new Date(0, 0, 0, 0, 0), available: false },
@@ -72,7 +72,7 @@ const tempAvailableDays = [
   '2022-10-19',
 ];
 
-function ReservationTime() {
+function MenuTime() {
   const navigate = useNavigate();
   const { slug, number } = useParams();
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -230,4 +230,4 @@ function ReservationTime() {
   );
 }
 
-export default ReservationTime;
+export default MenuTime;

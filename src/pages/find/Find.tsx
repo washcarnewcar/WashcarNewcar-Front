@@ -1,21 +1,15 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { useNavigate, Form as RouterForm, Router } from 'react-router-dom';
+import { Form as RouterForm } from 'react-router-dom';
 import Header from '../../components/Header';
 import styles from './Find.module.scss';
 
 function Find() {
-  // const navigate = useNavigate();
   const [phone, setPhone] = useState('');
-  const form = useRef();
 
   function onPhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
     setPhone(e.target.value);
   }
-
-  // function onSubmitClick() {
-  //   navigate(`/find/${phone}`);
-  // }
 
   return (
     <>
@@ -34,7 +28,7 @@ function Find() {
             as="input"
             onChange={onPhoneChange}
           ></Form.Control>
-          <Button variant="primary" className={styles.submit} type="button">
+          <Button variant="primary" className={styles.submit} type="submit">
             확인
           </Button>
         </RouterForm>

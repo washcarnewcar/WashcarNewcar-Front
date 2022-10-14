@@ -1,28 +1,24 @@
-import './App.css';
 import {
-  BrowserRouter,
   createBrowserRouter,
   createRoutesFromElements,
   Route,
-  Routes,
 } from 'react-router-dom';
 import Index from './pages/Index';
 import Search from './pages/search/Search';
 import Provider from './pages/provider/Provider';
 import Login from './pages/auth/Login';
 import LoginRedirect from './pages/auth/LoginRedirect';
-import Seller from './pages/Seller';
-import Contact from './pages/Contact';
 import Error from './pages/Error';
 import EditStore from './pages/provider/EditStore';
-import Reservation from './pages/store/Reservation';
+import Menu from './pages/store/Menu';
 import SignUp from './pages/auth/SignUp';
 import SignUpInfo from './pages/auth/SignUpInfo';
 import SelectMap from './pages/search/SelectMap';
 import Store from './pages/store/Store';
-import ReservationTime from './pages/store/ReservationTime';
+import MenuTime from './pages/store/MenuTime';
 import Find from './pages/find/Find';
 import FindList from './pages/find/FindList';
+import Reservation from './pages/reservation/Reservation';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -38,8 +34,8 @@ const router = createBrowserRouter(
       <Route path="store/:slug">
         <Route index element={<Store />} />
         <Route path="menu/:number">
-          <Route index element={<Reservation />} />
-          <Route path="time" element={<ReservationTime />} />
+          <Route index element={<Menu />} />
+          <Route path="time" element={<MenuTime />} />
         </Route>
       </Route>
 
@@ -51,8 +47,11 @@ const router = createBrowserRouter(
       <Route path="find" element={<Find />} />
       <Route path="find/:phone" element={<FindList />} />
 
+      <Route path="reservation">
+        <Route path=":id" element={<Reservation />} />
+      </Route>
+
       <Route path="oauth2/redirect/:token" element={<LoginRedirect />} />
-      {/* <Route path="/provider/menu/:code" element={<Reservation />} /> */}
     </Route>
   )
 );

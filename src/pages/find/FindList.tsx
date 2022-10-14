@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import { ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import { isTemplateExpression } from 'typescript';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
 import styles from './FindList.module.scss';
