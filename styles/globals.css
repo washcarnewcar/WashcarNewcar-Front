@@ -1,0 +1,9 @@
+:root {
+  --margin-left: 20px;
+  --margin-right: 20px;
+  --main-color: #2964F6;
+  --max-width: 576px;
+  max-width: var(--max-width);
+  min-width: 340px;
+  margin: 0 auto;
+}

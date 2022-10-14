@@ -1,0 +1,156 @@
+.container {
+
+  .select_car_item {
+    border: none;
+
+    .select_car_header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-right: 10px;
+
+      .title {
+        font-size: large;
+        font-weight: bolder;
+      }
+
+      .car {}
+    }
+
+    .select_car_body {
+      display: flex;
+
+      .brand {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .search_location {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: black;
+    line-height: 21.6px;
+
+    .title {
+      font-size: large;
+      font-weight: bolder;
+    }
+
+    .right {
+      display: flex;
+      align-items: center;
+
+      .current_location {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .blank {
+    width: 100%;
+    height: 15px;
+    background-color: #f7f7f7;
+  }
+
+  .seperator {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 20px;
+  }
+}
+
+.link {
+  text-decoration: none;
+  color: black;
+
+  .container {
+    background-color: white;
+    margin-bottom: 5px;
+  }
+
+  .title {
+    padding-right: var(--margin-right);
+    padding-left: var(--margin-left);
+    padding-top: 10px;
+    display: flex;
+
+    .image {
+      width: 60px;
+      height: 60px;
+      border-radius: 20px;
+      object-fit: cover;
+    }
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      padding-left: 10px;
+      justify-content: space-evenly;
+
+      .name {
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .subtext {
+        display: flex;
+        align-items: center;
+
+        .distance {
+          font-size: 12px;
+          margin-right: 10px;
+        }
+
+        .ratings {
+          font-size: 12px;
+
+          .number {
+            font-weight: bold;
+            margin-left: 4px;
+            margin-right: 4px;
+          }
+        }
+      }
+    }
+  }
+
+  .content {
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 20px;
+
+    .inner1 {
+      display: flex;
+      gap: 5px;
+      width: fit-content;
+    }
+
+    .inner2 {
+      display: flex;
+      gap: 5px;
+    }
+  }
+
+
+  .tag_container {
+    white-space: nowrap;
+    padding: 3px 10px;
+
+    border-color: gray;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 20px;
+
+    font-size: 12px;
+    color: gray;
+    word-break: keep-all;
+
+    width: fit-content;
+  }
+}

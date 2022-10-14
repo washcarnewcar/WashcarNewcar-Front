@@ -1,0 +1,82 @@
+.container {
+
+  .info_container {
+    padding: 20px;
+    background-color: rgb(244, 244, 244);
+
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 15px 15px 0px 0px;
+    }
+
+    .detail {
+      border-radius: 0px 0px 15px 15px;
+    }
+
+    .list {
+      border-color: lightgray;
+
+      .head {
+        font-size: 14px;
+        width: 75px;
+      }
+
+      .content {
+        font-size: 14px;
+        font-weight: bold;
+        padding: 5px 0px;
+        word-break: keep-all;
+      }
+    }
+  }
+
+  .predict_container {
+    .predict_title {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .predict {
+      background-color: white;
+      display: flex;
+      justify-content: space-around;
+      border-color: lightgray;
+      border-radius: 10px;
+      border-style: solid;
+      border-width: 1px;
+      padding: 10px;
+
+      .hour {
+        display: flex;
+        align-items: center;
+      }
+
+      .minute {
+        display: flex;
+        align-items: center;
+      }
+
+      .select {
+        width: 100px;
+      }
+
+      .text {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  .button_container {
+    margin-top: 20px;
+    text-align: center;
+
+    .button {
+      border-radius: 30px;
+      padding: 8px 30px;
+      margin: 0px 5px;
+    }
+  }
+}
