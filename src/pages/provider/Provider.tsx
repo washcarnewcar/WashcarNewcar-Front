@@ -1,5 +1,7 @@
+import classNames from 'classnames';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { Button, ButtonGroup, ListGroup } from 'react-bootstrap';
+import { Alert, Button, ButtonGroup, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router-dom';
@@ -19,14 +21,14 @@ interface Menu {
   code: string;
 }
 
-function Provider() {
+export default function Provider() {
   // 임시로 true
   const [ready, setReady] = useState(true);
   const [menuList, setMenuList] = useState(new Array<Menu>());
   const navigate = useNavigate();
 
   useEffect(() => {
-    getCalendarList();
+    // getCalendarList();
   }, []);
 
   const getCalendarList = async () => {
@@ -64,40 +66,91 @@ function Provider() {
   return (
     <>
       <Header type={1} />
-      <div id={styles.container}>
-        <ButtonGroup>
-          <LinkContainer
-            to="/매장주소로이동"
-            className={styles.store_edit_button_link}
-          >
-            <Button
-              className={styles.store_show_button}
-              variant="outline-primary"
-            >
-              매장 페이지 보기
+      <div className={styles.container}>
+        <div className={styles.status_container}>
+          <Alert className={styles.status}>매장 승인 대기중입니다.</Alert>
+        </div>
+
+        <div className={styles.menus_container}>
+          <div className={styles.title}>세차 예약 요청</div>
+          <List />
+        </div>
+
+        <div className={styles.menus_container}>
+          <div className={styles.title}>오늘의 세차 스케줄</div>
+          <List />
+        </div>
+
+        <div className={styles.menus_container}>
+          <div className={styles.title}>매장 관리</div>
+          <div className={styles.buttongroup}>
+            <Button className={styles.button} variant="outline-primary">
+              매장 정보 설정
             </Button>
-          </LinkContainer>
-          <LinkContainer
-            to="/provider/store"
-            className={styles.store_edit_button_link}
-          >
-            <Button className={styles.store_edit_button}>매장 정보 변경</Button>
-          </LinkContainer>
-        </ButtonGroup>
-        <ListGroup className={styles.list_container}>
-          <ListGroup.Item variant="secondary">세차메뉴 입력 +</ListGroup.Item>
-          {menuList.map((menu: Menu) => (
-            <LinkContainer to={'/provider/menu/' + menu.code}>
-              <ListGroup.Item key={menu.name} className={styles.list_item}>
-                <div>{menu.name}</div>
-                <IoIosArrowForward size={20} />
-              </ListGroup.Item>
-            </LinkContainer>
-          ))}
-        </ListGroup>
+            <Button className={styles.button} variant="outline-primary">
+              메뉴 관리
+            </Button>
+            <Button className={styles.button} variant="outline-primary">
+              매장 운영 시간 설정
+            </Button>
+          </div>
+        </div>
       </div>
     </>
   );
 }
 
-export default Provider;
+function List() {
+  return (
+    <ListGroup className={classNames(styles.list, styles.reqest)}>
+      <ListGroup.Item>
+        <Link to="/" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
+              </div>
+            </div>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
+        </Link>
+      </ListGroup.Item>
+      <ListGroup.Item>
+        <Link to="/" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
+              </div>
+            </div>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
+        </Link>
+      </ListGroup.Item>
+      <ListGroup.Item>
+        <Link to="/" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
+              </div>
+            </div>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
+        </Link>
+      </ListGroup.Item>
+    </ListGroup>
+  );
+}

@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import { useState } from 'react';
 import { Accordion, Button, Form } from 'react-bootstrap';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Seperator from '../../components/Seperator';
@@ -59,6 +59,7 @@ const tempModelData = {
 
 function Menu() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { slug, number } = useParams();
   const [brands, setBrands] = useState([{ number: 0, name: '' }]);
   const [models, setModels] = useState([{ number: 0, name: '' }]);
@@ -130,6 +131,11 @@ function Menu() {
   function onMobileSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     console.log(e.target.value);
     setMobile(e.target.value);
+  }
+
+  function onSubmitClick() {
+    console.log('서버로 예약 요청을 전송하는 로직');
+    navigate(`/reservation/${1}`);
   }
 
   return (
@@ -239,7 +245,9 @@ function Menu() {
             {Intl.NumberFormat().format(tempData.price)}원
           </div>
         </div>
-        <Button className={styles.result_submit}>예약하기</Button>
+        <Button className={styles.result_submit} onClick={onSubmitClick}>
+          예약하기
+        </Button>
       </div>
     </>
   );

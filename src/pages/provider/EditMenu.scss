@@ -1,0 +1,46 @@
+.container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.top {
+  display: flex;
+  justify-content: space-around;
+}
+
+.store_edit_button_link {}
+
+.store_show_button {
+  // width: 100%;
+}
+
+.store_edit_button {
+  // width: 100%;
+}
+
+.list_container {
+  padding-top: 20px;
+}
+
+.list_item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: large;
+  font-weight: bolder;
+  margin-bottom: 10px;
+}
+
+.regular {
+  margin-top: 10px;
+  font-size: medium;
+  // font-weight: bolder;
+}
+
+.buttongroup {
+  text-align: center;
+}
