@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 import Header from '../../../components/header';
 import Seperator from '../../../components/seperator';
@@ -34,11 +34,6 @@ const tempData = {
 export default function Store() {
   const router = useRouter();
   const { slug } = router.query;
-
-  if (!slug || typeof slug !== 'string') {
-    router.replace('/');
-    return <></>;
-  }
 
   return (
     <>
@@ -80,13 +75,13 @@ export default function Store() {
 
       <Tabs defaultActiveKey="wash" className={styles.tabs} justify>
         <Tab eventKey="wash" title="세차" tabClassName={styles.tab}>
-          <MenuItem slug={slug} number={'1'} />
+          <MenuItem slug={slug as string} number={'1'} />
           <Seperator />
-          <MenuItem slug={slug} number={'2'} />
+          <MenuItem slug={slug as string} number={'2'} />
           <Seperator />
-          <MenuItem slug={slug} number={'3'} />
+          <MenuItem slug={slug as string} number={'3'} />
           <Seperator />
-          <MenuItem slug={slug} number={'4'} />
+          <MenuItem slug={slug as string} number={'4'} />
         </Tab>
 
         <Tab eventKey="info" title="정보" tabClassName={styles.tab}>

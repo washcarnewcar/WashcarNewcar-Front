@@ -1,11 +1,12 @@
 import styles from '../../styles/Search.module.scss';
 import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../components/header';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 import Seperator from '../../components/seperator';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Script from 'next/script';
 
 export default function Search() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function Search() {
    * 최초 렌더 시 위치를 받아온다.
    */
   useEffect(() => {
-    window.kakao.maps.load(() => {
+    window.kakao?.maps.load(() => {
       const geocoder = new window.kakao.maps.services.Geocoder();
 
       judgeIsState();
@@ -115,6 +116,9 @@ export default function Search() {
 
   return (
     <>
+      <Script
+        src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_APPKEY}&libraries=services,clusterer&autoload=false`}
+      />
       <Header type={1} />
       <div className={styles.container}>
         <Link

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { BiCurrentLocation } from 'react-icons/bi';
 import { useRouter } from 'next/router';
+import Script from 'next/script';
 
 function SelectMap() {
   const router = useRouter();
@@ -14,42 +15,80 @@ function SelectMap() {
     longitude: 126.7059347817178,
   });
   const [textLocation, setTextLocation] = useState('');
-  const geocoder = useMemo(() => new kakao.maps.services.Geocoder(), []);
   const [locationLoaded, setLocationLoaded] = useState(false);
+
+  useEffect(() => {
+    /**
+     * /search로부터 정보를 받아오지 못했다면
+     * (정상 시나리오가 아니라면)
+     * 루트로 보낸다
+     */
+    if (
+      !longitude ||
+      !latitude ||
+      typeof longitude !== 'string' ||
+      typeof latitude !== 'string'
+    ) {
+      router.push('/');
+    }
+
+    window.kakao?.maps.load(() => {
+      const geocoder = new kakao.maps.services.Geocoder();
+
+      /**
+       * 좌표값이 바뀌면 좌표값을 가지고 텍스트로 변환 후 표시
+       */
+      useEffect(() => {
+        geocoder.coord2Address(
+          coordinate.longitude,
+          coordinate.latitude,
+          (
+            result: {
+              address: kakao.maps.services.Address;
+              road_address: kakao.maps.services.RoadAaddress | null;
+            }[],
+            status: kakao.maps.services.Status
+          ) => {
+            const address = result[0].address;
+            setTextLocation(`${address.address_name}`);
+            setLocationLoaded(true);
+          }
+        );
+      }, [coordinate]);
+    });
+
+    judgeFoundLocation();
+    setScreenSize();
+    window.addEventListener('resize', () => setScreenSize());
+  }, []);
 
   /**
    * geolocation으로부터 위치를 얻어오는 함수
    */
-  const getLocationFromGeolocation = useCallback(() => {
+  function getLocationFromGeolocation() {
     navigator.geolocation.getCurrentPosition(
       positionCallback,
       positionErrorCallback
     );
-  }, []);
+  }
 
-  useEffect(() => {
-    judgeFoundLocation();
-    setScreenSize();
-    window.addEventListener('resize', () => setScreenSize());
-
-    /**
-     * /search에서 위치를 찾고 왔는지 확인
-     */
-    function judgeFoundLocation() {
-      if (
-        foundLocation &&
-        typeof longitude === 'string' &&
-        typeof latitude === 'string'
-      ) {
-        setCoordinate({
-          longitude: parseFloat(longitude),
-          latitude: parseFloat(latitude),
-        });
-      } else {
-        getLocationFromGeolocation();
-      }
+  /**
+   * /search에서 위치를 찾고 왔는지 확인
+   */
+  function judgeFoundLocation() {
+    if (
+      foundLocation &&
+      typeof longitude === 'string' &&
+      typeof latitude === 'string'
+    ) {
+      setCoordinate({
+        longitude: parseFloat(longitude),
+        latitude: parseFloat(latitude),
+      });
+    } else {
+      getLocationFromGeolocation();
     }
-  }, [getLocationFromGeolocation]);
+  }
 
   /**
    * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
@@ -74,30 +113,9 @@ function SelectMap() {
   }
 
   /**
-   * 좌표값이 바뀌면 좌표값을 가지고 텍스트로 변환 후 표시
-   */
-  useEffect(() => {
-    geocoder.coord2Address(
-      coordinate.longitude,
-      coordinate.latitude,
-      (
-        result: {
-          address: kakao.maps.services.Address;
-          road_address: kakao.maps.services.RoadAaddress | null;
-        }[],
-        status: kakao.maps.services.Status
-      ) => {
-        const address = result[0].address;
-        setTextLocation(`${address.address_name}`);
-        setLocationLoaded(true);
-      }
-    );
-  }, [coordinate, geocoder]);
-
-  /**
    * 드래그 할 때 좌표값 변경
    */
-  function onDrag(target: kakao.maps.Map, event: kakao.maps.event.MouseEvent) {
+  function onDrag(target: kakao.maps.Map) {
     setCoordinate({
       latitude: target.getCenter().getLat(),
       longitude: target.getCenter().getLng(),
@@ -141,22 +159,11 @@ function SelectMap() {
     document.documentElement.style.setProperty('--vh', `${vh - 56}px`);
   }
 
-  /**
-   * /search로부터 정보를 받아오지 못했다면
-   * (정상 시나리오가 아니라면)
-   * 루트로 보낸다
-   */
-  if (
-    !longitude ||
-    !latitude ||
-    typeof longitude !== 'string' ||
-    typeof latitude !== 'string'
-  ) {
-    router.replace('/search');
-  }
-
   return (
     <>
+      <Script
+        src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_APPKEY}&libraries=services,clusterer&autoload=false`}
+      />
       <Header type={1} />
       <div className={styles.body}>
         <div className={styles.address_container}>
