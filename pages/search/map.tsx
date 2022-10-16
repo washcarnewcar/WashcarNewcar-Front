@@ -1,7 +1,13 @@
 import styles from '../../styles/SelectMap.module.scss';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import Header from '../../components/header';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  DragEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Button } from 'react-bootstrap';
 import { BiCurrentLocation } from 'react-icons/bi';
 import { useRouter } from 'next/router';
@@ -16,6 +22,7 @@ function SelectMap() {
   });
   const [textLocation, setTextLocation] = useState('');
   const [locationLoaded, setLocationLoaded] = useState(false);
+  let geocoder: any;
 
   useEffect(() => {
     /**
@@ -33,34 +40,34 @@ function SelectMap() {
     }
 
     window.kakao?.maps.load(() => {
-      const geocoder = new kakao.maps.services.Geocoder();
-
-      /**
-       * 좌표값이 바뀌면 좌표값을 가지고 텍스트로 변환 후 표시
-       */
-      useEffect(() => {
-        geocoder.coord2Address(
-          coordinate.longitude,
-          coordinate.latitude,
-          (
-            result: {
-              address: kakao.maps.services.Address;
-              road_address: kakao.maps.services.RoadAaddress | null;
-            }[],
-            status: kakao.maps.services.Status
-          ) => {
-            const address = result[0].address;
-            setTextLocation(`${address.address_name}`);
-            setLocationLoaded(true);
-          }
-        );
-      }, [coordinate]);
+      geocoder = new kakao.maps.services.Geocoder();
     });
 
     judgeFoundLocation();
     setScreenSize();
     window.addEventListener('resize', () => setScreenSize());
   }, []);
+
+  /**
+   * 좌표값이 바뀌면 좌표값을 가지고 텍스트로 변환 후 표시
+   */
+  useEffect(() => {
+    geocoder?.coord2Address(
+      coordinate.longitude,
+      coordinate.latitude,
+      (
+        result: {
+          address: kakao.maps.services.Address;
+          road_address: kakao.maps.services.RoadAaddress | null;
+        }[],
+        status: kakao.maps.services.Status
+      ) => {
+        const address = result[0].address;
+        setTextLocation(`${address.address_name}`);
+        setLocationLoaded(true);
+      }
+    );
+  }, [coordinate]);
 
   /**
    * geolocation으로부터 위치를 얻어오는 함수
@@ -115,7 +122,7 @@ function SelectMap() {
   /**
    * 드래그 할 때 좌표값 변경
    */
-  function onDrag(target: kakao.maps.Map) {
+  function onDrag(target: any) {
     setCoordinate({
       latitude: target.getCenter().getLat(),
       longitude: target.getCenter().getLng(),
