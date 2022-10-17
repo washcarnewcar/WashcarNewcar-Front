@@ -73,7 +73,7 @@ export default function Store() {
         </div>
       </div>
 
-      <Tabs defaultActiveKey="wash" className={styles.tabs} justify>
+      <Tabs defaultActiveKey="wash" className={styles.tabs} justify id="tabs">
         <Tab eventKey="wash" title="세차" tabClassName={styles.tab}>
           <MenuItem slug={slug as string} number={'1'} />
           <Seperator />

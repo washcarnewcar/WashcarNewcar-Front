@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, ListGroup } from 'react-bootstrap';
 import Header from '../../components/header';
@@ -113,7 +114,9 @@ export default function Reservation() {
           <Button variant="outline-danger" className={styles.button}>
             예약취소
           </Button>
-          <Button className={styles.button}>홈으로 돌아가기</Button>
+          <Link href={`/`}>
+            <Button className={styles.button}>홈으로 돌아가기</Button>
+          </Link>
         </div>
       </div>
     </>

@@ -23,6 +23,7 @@ interface Menu {
 export default function Provider() {
   // 임시로 true
   const router = useRouter();
+  const { slug } = router.query;
   const [ready, setReady] = useState(true);
   const [menuList, setMenuList] = useState(new Array<Menu>());
 
@@ -89,9 +90,11 @@ export default function Provider() {
             <Button className={styles.button} variant="outline-primary">
               메뉴 관리
             </Button>
-            <Button className={styles.button} variant="outline-primary">
-              매장 운영 시간 설정
-            </Button>
+            <Link href={`/provider/${slug}/time`}>
+              <Button className={styles.button} variant="outline-primary">
+                매장 운영 시간 설정
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
