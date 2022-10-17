@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
@@ -22,9 +23,11 @@ function SignUpInfo() {
       <div className={styles.container}>
         <Link href="/">
           <a className={styles.logo_container}>
-            <img
+            <Image
               src="/row_logo.png"
               alt="세차새차"
+              height={54}
+              width={200}
               className={styles.img_logo}
             />
           </a>

@@ -7,6 +7,7 @@ import Seperator from '../../components/seperator';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
+import Image from 'next/image';
 
 export default function Search() {
   const router = useRouter();
@@ -112,7 +113,7 @@ export default function Search() {
         );
       }
     });
-  }, []);
+  }, [latitude, longitude]);
 
   return (
     <>
@@ -167,9 +168,11 @@ function Item({ slug }: ItemProps) {
       <a className={styles.link}>
         <div className={styles.container}>
           <div className={styles.title}>
-            <img
-              src="style_carcare.jpg"
+            <Image
+              src="/style_carcare.jpg"
               alt="스타일카케어"
+              width={60}
+              height={60}
               className={styles.image}
             />
             <div className={styles.text}>

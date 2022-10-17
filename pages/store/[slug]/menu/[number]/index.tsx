@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -143,9 +144,11 @@ export default function Menu() {
 
       <div className={styles.store}>
         <div className={styles.image_container}>
-          <img
+          <Image
             src="/style_carcare.jpg"
             alt="menu_image"
+            width={200}
+            height={200}
             className={styles.image}
           />
         </div>

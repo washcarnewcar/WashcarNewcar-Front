@@ -1,6 +1,7 @@
 import styles from '../styles/Header.module.scss';
 import { Container, Nav, Navbar, Offcanvas } from 'react-bootstrap';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface HeaderProps {
   type: number;
@@ -12,14 +13,14 @@ export default function Header({ type }: HeaderProps) {
       <Navbar sticky="top" bg="white" expand={false} id={styles.container}>
         <Container>
           <Link href="/">
-            <a>
-              <Navbar.Brand>
-                <img
-                  className={styles.main_logo}
-                  src="/row_logo.png"
-                  alt="세차새차"
-                />
-              </Navbar.Brand>
+            <a style={{ display: 'flex' }}>
+              <Image
+                className={styles.main_logo}
+                src="/row_logo.png"
+                alt="세차새차"
+                width={146}
+                height={40}
+              />
             </a>
           </Link>
           <Navbar.Toggle />
@@ -37,29 +38,7 @@ export default function Header({ type }: HeaderProps) {
         </Container>
       </Navbar>
     );
-  } else if (type === 2) {
-    return (
-      <Navbar sticky="top" bg="white" expand={false} id={styles.container2}>
-        <Container className={styles.logo_container}>
-          <Link href="/">
-            <a>
-              <Navbar.Brand>
-                <img
-                  className={styles.text_logo}
-                  src="/carwash.png"
-                  alt="세차새차"
-                />
-                <img
-                  className={styles.main_logo}
-                  src="메인로고.png"
-                  alt="로고"
-                />
-              </Navbar.Brand>
-            </a>
-          </Link>
-        </Container>
-      </Navbar>
-    );
+  } else {
+    return <></>;
   }
-  return <></>;
 }

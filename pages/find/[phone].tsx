@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { IoIosArrowForward } from 'react-icons/io';
@@ -98,9 +99,11 @@ function FindListItem({ data }: FindListItemProps) {
         <div className={styles.left}>
           <div className={styles.date}>2022.9.6(화) 16:00</div>
           <div className={styles.info}>
-            <img
+            <Image
               src="/style_carcare.jpg"
               alt="스타일 카케어"
+              width={65}
+              height={65}
               className={styles.image}
             />
             <div className={styles.info_text}>

@@ -48,6 +48,24 @@ function SelectMap() {
     judgeFoundLocation();
     setScreenSize();
     window.addEventListener('resize', () => setScreenSize());
+
+    /**
+     * /search에서 위치를 찾고 왔는지 확인
+     */
+    function judgeFoundLocation() {
+      if (
+        foundLocation &&
+        typeof longitude === 'string' &&
+        typeof latitude === 'string'
+      ) {
+        setCoordinate({
+          longitude: parseFloat(longitude),
+          latitude: parseFloat(latitude),
+        });
+      } else {
+        getLocationFromGeolocation();
+      }
+    }
   }, []);
 
   /**
@@ -79,24 +97,6 @@ function SelectMap() {
       positionCallback,
       positionErrorCallback
     );
-  }
-
-  /**
-   * /search에서 위치를 찾고 왔는지 확인
-   */
-  function judgeFoundLocation() {
-    if (
-      foundLocation &&
-      typeof longitude === 'string' &&
-      typeof latitude === 'string'
-    ) {
-      setCoordinate({
-        longitude: parseFloat(longitude),
-        latitude: parseFloat(latitude),
-      });
-    } else {
-      getLocationFromGeolocation();
-    }
   }
 
   /**

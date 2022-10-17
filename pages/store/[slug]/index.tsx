@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Tab, Tabs } from 'react-bootstrap';
+import { Carousel, Tab, Tabs } from 'react-bootstrap';
 import Header from '../../../components/header';
 import Seperator from '../../../components/seperator';
 import styles from '../../../styles/Store.module.scss';
@@ -11,6 +11,7 @@ import {
 } from 'react-icons/io5';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const tempData = {
   call: '010-2474-6837',
@@ -38,33 +39,35 @@ export default function Store() {
   return (
     <>
       <Header type={1} />
-      <div className={styles.store_image}>
-        <div className={styles.image_container}>
+      <Carousel>
+        <Carousel.Item className={styles.carousel_item}>
           <img
             className={styles.image}
             src="/sample_store_image.png"
             alt="sample"
           />
-        </div>
-        <div className={styles.image_container}>
+        </Carousel.Item>
+        <Carousel.Item className={styles.carousel_item}>
           <img
             className={styles.image}
             src="/sample_store_image.png"
             alt="sample"
           />
-        </div>
-        <div className={styles.image_container}>
+        </Carousel.Item>
+        <Carousel.Item className={styles.carousel_item}>
           <img
             className={styles.image}
-            src="/kakao_login_large_wide.png"
+            src="/sample_store_image.png"
             alt="sample"
           />
-        </div>
-      </div>
+        </Carousel.Item>
+      </Carousel>
 
       <div className={styles.store_info}>
-        <img
+        <Image
           className={styles.preview_image}
+          width={60}
+          height={60}
           src="/style_carcare.jpg"
           alt="테스트"
         />
@@ -161,13 +164,13 @@ function MenuItem({ slug, number }: MenuItemProps) {
     <Link href={`/store/${slug}/menu/${number}`}>
       <a className={styles.link}>
         <div className={styles.container}>
-          <div className={styles.menu_image}>
-            <img
-              className={styles.menu_image_img}
-              src="/style_carcare.jpg"
-              alt="menu_image"
-            />
-          </div>
+          <Image
+            width={90}
+            height={90}
+            className={styles.menu_image}
+            src="/style_carcare.jpg"
+            alt="menu_image"
+          />
           <div className={styles.content}>
             <div className={styles.menu_title}>외부 세차</div>
             <div className={styles.menu_detail}>
