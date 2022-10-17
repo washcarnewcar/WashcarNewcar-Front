@@ -22,7 +22,9 @@ function SelectMap() {
   });
   const [textLocation, setTextLocation] = useState('');
   const [locationLoaded, setLocationLoaded] = useState(false);
-  let geocoder: any;
+  const [geocoder, setGeocoder] = useState<
+    { coord2Address: Function } | undefined
+  >();
 
   useEffect(() => {
     /**
@@ -40,7 +42,7 @@ function SelectMap() {
     }
 
     window.kakao?.maps.load(() => {
-      geocoder = new kakao.maps.services.Geocoder();
+      setGeocoder(new window.kakao.maps.services.Geocoder());
     });
 
     judgeFoundLocation();
