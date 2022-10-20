@@ -8,14 +8,12 @@ export default function Redirect() {
   useEffect(() => {
     if (!token || typeof token !== 'string') {
       router.push('/');
-      return;
+    } else {
+      localStorage.clear();
+      localStorage.setItem('token', token);
+      router.push('/');
     }
-
-    localStorage.clear();
-    localStorage.setItem('token', token);
-    router.push('/');
-    return;
   }, []);
 
-  return null;
+  return <></>;
 }

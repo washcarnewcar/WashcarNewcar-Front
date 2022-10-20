@@ -1,7 +1,7 @@
 import styles from '../../styles/Search.module.scss';
 import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../components/header';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 import Seperator from '../../components/seperator';
 import Link from 'next/link';
@@ -19,107 +19,118 @@ export default function Search() {
   });
   const [textLocation, setTextLocation] = useState('');
   const [foundLocation, setFoundLocation] = useState(false);
+  const [geocoder, setGeocoder] = useState<
+    { coord2Address: Function } | undefined
+  >();
 
   /**
-   * 최초 렌더 시 위치를 받아온다.
+   * /search/map으로부터 받아온 위치 정보가 있는지 판단
+   * 없다면 GPS를 사용하여 위치 받아옴
+   */
+  const judgeIsState = useCallback(() => {
+    if (
+      longitude &&
+      latitude &&
+      typeof longitude === 'string' &&
+      typeof latitude === 'string'
+    ) {
+      console.log(`location으로부터 좌표값 받아옴`);
+      coord2Address(parseFloat(longitude), parseFloat(latitude));
+      setCoordinate({
+        longitude: parseFloat(longitude),
+        latitude: parseFloat(latitude),
+      });
+    } else {
+      console.log(`geolocation으로부터 좌표값 받아옴`);
+      getLocationFromGeolocation();
+    }
+  }, [geocoder]);
+
+  /**
+   * geolocation을 사용하여 위치를 받아오는 함수
+   */
+  const getLocationFromGeolocation = useCallback(() => {
+    navigator.geolocation.getCurrentPosition(
+      positionCallback,
+      positionErrorCallback
+    );
+  }, [geocoder]);
+
+  /**
+   * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
+   */
+  const positionCallback = useCallback(
+    (position: GeolocationPosition) => {
+      // 좌표를 주소 텍스트로 변환, 좌표 State에 저장
+      coord2Address(position.coords.longitude, position.coords.latitude);
+      setCoordinate({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+    },
+    [geocoder]
+  );
+
+  /**
+   * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
+   */
+  const positionErrorCallback = useCallback(
+    (error: GeolocationPositionError) => {
+      if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
+        console.log('권한 없음');
+      } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+        console.log('위치를 사용할 수 없음');
+      }
+    },
+    [geocoder]
+  );
+
+  /**
+   * 좌표를 주소로 변환하여 텍스트로 표시하는 함수
+   */
+  const coord2Address = useCallback(
+    (longitude: number, latitude: number) => {
+      // 좌표를 주소로 변환
+      geocoder?.coord2Address(
+        longitude,
+        latitude,
+        (
+          result: {
+            address: kakao.maps.services.Address;
+            road_address: kakao.maps.services.RoadAaddress | null;
+          }[],
+          status: kakao.maps.services.Status
+        ) => {
+          if (status === kakao.maps.services.Status.OK) {
+            const address = result[0].address;
+            setTextLocation(
+              `${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
+            );
+          }
+          setFoundLocation(true);
+        }
+      );
+    },
+    [geocoder]
+  );
+
+  /**
+   * 스크립트를 받아오면 geocoder를 받아와 세팅한다.
    */
   useEffect(() => {
-    window.kakao?.maps.load(() => {
-      const geocoder = new window.kakao.maps.services.Geocoder();
-
-      judgeIsState();
-
-      /**
-       * /search/map으로부터 받아온 위치 정보가 있는지 판단
-       * 없다면 GPS를 사용하여 위치 받아옴
-       */
-      function judgeIsState() {
-        if (
-          longitude &&
-          latitude &&
-          typeof longitude === 'string' &&
-          typeof latitude === 'string'
-        ) {
-          console.log(`location으로부터 좌표값 받아옴`);
-          coord2Address(parseFloat(longitude), parseFloat(latitude));
-          setCoordinate({
-            longitude: parseFloat(longitude),
-            latitude: parseFloat(latitude),
-          });
-        } else {
-          console.log(`geolocation으로부터 좌표값 받아옴`);
-          getLocationFromGeolocation();
-        }
-      }
-
-      /**
-       * geolocation을 사용하여 위치를 받아오는 함수
-       */
-      function getLocationFromGeolocation() {
-        navigator.geolocation.getCurrentPosition(
-          positionCallback,
-          positionErrorCallback
-        );
-      }
-
-      /**
-       * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
-       */
-      function positionCallback(position: GeolocationPosition) {
-        // 좌표를 주소 텍스트로 변환, 좌표 State에 저장
-        coord2Address(position.coords.longitude, position.coords.latitude);
-        setCoordinate({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      }
-
-      /**
-       * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
-       */
-      function positionErrorCallback(error: GeolocationPositionError) {
-        if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
-          console.log('권한 없음');
-        } else if (
-          error.code === GeolocationPositionError.POSITION_UNAVAILABLE
-        ) {
-          console.log('위치를 사용할 수 없음');
-        }
-      }
-
-      /**
-       * 좌표를 주소로 변환하여 텍스트로 표시하는 함수
-       */
-      function coord2Address(longitude: number, latitude: number) {
-        // 좌표를 주소로 변환
-        geocoder.coord2Address(
-          longitude,
-          latitude,
-          (
-            result: {
-              address: kakao.maps.services.Address;
-              road_address: kakao.maps.services.RoadAaddress | null;
-            }[],
-            status: kakao.maps.services.Status
-          ) => {
-            if (status === kakao.maps.services.Status.OK) {
-              const address = result[0].address;
-              setTextLocation(
-                `${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
-              );
-            }
-            setFoundLocation(true);
-          }
-        );
-      }
+    kakao?.maps?.load(() => {
+      setGeocoder(new kakao.maps.services.Geocoder());
     });
-  }, [latitude, longitude]);
+  }, []);
+
+  useEffect(() => {
+    if (geocoder) {
+      judgeIsState();
+    }
+  }, [geocoder]);
 
   return (
     <>
-      <Script
-        src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_APPKEY}&libraries=services,clusterer&autoload=false`}
-      />
       <Header type={1} />
       <div className={styles.container}>
         <Link

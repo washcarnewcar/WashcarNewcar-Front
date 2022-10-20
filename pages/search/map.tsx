@@ -1,11 +1,10 @@
 import styles from '../../styles/SelectMap.module.scss';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import Header from '../../components/header';
-import {
+import React, {
   DragEventHandler,
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 import { Button } from 'react-bootstrap';
@@ -26,50 +25,156 @@ function SelectMap() {
     { coord2Address: Function } | undefined
   >();
 
+  /**
+   * /search에서 위치를 찾고 왔는지 확인
+   */
+  const judgeFoundLocation = useCallback(() => {
+    if (foundLocation && longitude && latitude) {
+      setCoordinate({
+        longitude: parseFloat(longitude as string),
+        latitude: parseFloat(latitude as string),
+      });
+    } else {
+      getLocationFromGeolocation();
+    }
+  }, []);
+
+  /**
+   * geolocation으로부터 위치를 얻어오는 함수
+   */
+  const getLocationFromGeolocation = useCallback(() => {
+    navigator.geolocation.getCurrentPosition(
+      positionCallback,
+      positionErrorCallback
+    );
+  }, []);
+
+  /**
+   * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
+   */
+  const positionCallback = useCallback((position: GeolocationPosition) => {
+    // 좌표 State에 저장
+    setCoordinate({
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    });
+  }, []);
+
+  /**
+   * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
+   */
+  const positionErrorCallback = useCallback(
+    (error: GeolocationPositionError) => {
+      if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
+        console.log('권한 없음');
+      } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+        console.log('위치를 사용할 수 없음');
+      }
+    },
+    []
+  );
+
+  /**
+   * 드래그 할 때 좌표값 변경
+   */
+  const onDrag = useCallback(
+    (target: kakao.maps.Map | React.DragEvent<HTMLDivElement>) => {
+      const mapTarget = target as kakao.maps.Map;
+      setCoordinate({
+        latitude: mapTarget.getCenter().getLat(),
+        longitude: mapTarget.getCenter().getLng(),
+      });
+    },
+    []
+  );
+
+  const fuck: DragEventHandler<HTMLDivElement> = (
+    event: React.DragEvent<HTMLDivElement>
+  ) => {};
+
+  /**
+   * 줌 할 때 좌표값 변경
+   */
+  const onZoomChanged = useCallback((target: kakao.maps.Map) => {
+    setCoordinate({
+      latitude: target.getCenter().getLat(),
+      longitude: target.getCenter().getLng(),
+    });
+  }, []);
+
+  /**
+   * 드래그가 끝나면 좌표값을 가지고 텍스트로 변환 후 표시
+   */
+  const onDragEnd = useCallback(() => {
+    geocoder?.coord2Address(
+      coordinate.longitude,
+      coordinate.latitude,
+      (
+        result: {
+          address: kakao.maps.services.Address;
+          road_address: kakao.maps.services.RoadAaddress | null;
+        }[],
+        status: kakao.maps.services.Status
+      ) => {
+        const address = result[0].address;
+        setTextLocation(`${address.address_name}`);
+        setLocationLoaded(true);
+      }
+    );
+  }, [geocoder, coordinate]);
+
+  /**
+   * 현위치 버튼을 클릭했을 때 현위치로 이동
+   */
+  const onCurrentLocationClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      getLocationFromGeolocation();
+    },
+    []
+  );
+
+  /**
+   * 확인 버튼을 눌렀을 때 /search로 이동
+   */
+  const onSubmitClick = useCallback(() => {
+    router.push({
+      pathname: '/search',
+      query: { longitude: coordinate.longitude, latitude: coordinate.latitude },
+    });
+  }, []);
+
+  /**
+   * 현재 스크린 사이즈를 계산하여 css에 적용
+   */
+  const setScreenSize = useCallback(() => {
+    let vh = window.innerHeight;
+    document.documentElement.style.setProperty('--vh', `${vh - 56}px`);
+  }, []);
+
   useEffect(() => {
     /**
      * /search로부터 정보를 받아오지 못했다면
      * (정상 시나리오가 아니라면)
      * 루트로 보낸다
      */
-    if (
-      !longitude ||
-      !latitude ||
-      typeof longitude !== 'string' ||
-      typeof latitude !== 'string'
-    ) {
+    if (!longitude || !latitude) {
       router.push('/');
     }
 
-    window.kakao?.maps.load(() => {
-      setGeocoder(new window.kakao.maps.services.Geocoder());
+    /**
+     * geocoder를 받아와 세팅한다.
+     */
+    kakao.maps.load(() => {
+      setGeocoder(new kakao.maps.services.Geocoder());
     });
 
     judgeFoundLocation();
     setScreenSize();
     window.addEventListener('resize', () => setScreenSize());
-
-    /**
-     * /search에서 위치를 찾고 왔는지 확인
-     */
-    function judgeFoundLocation() {
-      if (
-        foundLocation &&
-        typeof longitude === 'string' &&
-        typeof latitude === 'string'
-      ) {
-        setCoordinate({
-          longitude: parseFloat(longitude),
-          latitude: parseFloat(latitude),
-        });
-      } else {
-        getLocationFromGeolocation();
-      }
-    }
   }, []);
 
   /**
-   * 좌표값이 바뀌면 좌표값을 가지고 텍스트로 변환 후 표시
+   * 처음 로딩되면 좌표값을 가지고 텍스트로 변환 후 표시
    */
   useEffect(() => {
     geocoder?.coord2Address(
@@ -87,92 +192,10 @@ function SelectMap() {
         setLocationLoaded(true);
       }
     );
-  }, [coordinate]);
-
-  /**
-   * geolocation으로부터 위치를 얻어오는 함수
-   */
-  function getLocationFromGeolocation() {
-    navigator.geolocation.getCurrentPosition(
-      positionCallback,
-      positionErrorCallback
-    );
-  }
-
-  /**
-   * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
-   */
-  function positionCallback(position: GeolocationPosition) {
-    // 좌표 State에 저장
-    setCoordinate({
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    });
-  }
-
-  /**
-   * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
-   */
-  function positionErrorCallback(error: GeolocationPositionError) {
-    if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
-      console.log('권한 없음');
-    } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
-      console.log('위치를 사용할 수 없음');
-    }
-  }
-
-  /**
-   * 드래그 할 때 좌표값 변경
-   */
-  function onDrag(target: any) {
-    setCoordinate({
-      latitude: target.getCenter().getLat(),
-      longitude: target.getCenter().getLng(),
-    });
-  }
-
-  /**
-   * 줌 할 때 좌표값 변경
-   */
-  function onZoomChanged(target: kakao.maps.Map) {
-    setCoordinate({
-      latitude: target.getCenter().getLat(),
-      longitude: target.getCenter().getLng(),
-    });
-  }
-
-  /**
-   * 현위치 버튼을 클릭했을 때 현위치로 이동
-   */
-  function onCurrentLocationClick(
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) {
-    getLocationFromGeolocation();
-  }
-
-  /**
-   * 확인 버튼을 눌렀을 때 /search로 이동
-   */
-  function onSubmitClick() {
-    router.push({
-      pathname: '/search',
-      query: { longitude: coordinate.longitude, latitude: coordinate.latitude },
-    });
-  }
-
-  /**
-   * 현재 스크린 사이즈를 계산하여 css에 적용
-   */
-  function setScreenSize() {
-    let vh = window.innerHeight;
-    document.documentElement.style.setProperty('--vh', `${vh - 56}px`);
-  }
+  }, [geocoder]);
 
   return (
     <>
-      <Script
-        src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_APPKEY}&libraries=services,clusterer&autoload=false`}
-      />
       <Header type={1} />
       <div className={styles.body}>
         <div className={styles.address_container}>
@@ -192,16 +215,19 @@ function SelectMap() {
             <BiCurrentLocation size={30} color="#2964F6" />
           </button>
         </div>
-        <Map
-          center={{ lat: coordinate.latitude, lng: coordinate.longitude }}
-          className={styles.map}
-          onDrag={onDrag}
-          onZoomChanged={onZoomChanged}
-        >
-          <MapMarker
-            position={{ lat: coordinate.latitude, lng: coordinate.longitude }}
-          ></MapMarker>
-        </Map>
+        {geocoder ? (
+          <Map
+            center={{ lat: coordinate.latitude, lng: coordinate.longitude }}
+            className={styles.map}
+            onDrag={onDrag}
+            onDragEnd={onDragEnd}
+            onZoomChanged={onZoomChanged}
+          >
+            <MapMarker
+              position={{ lat: coordinate.latitude, lng: coordinate.longitude }}
+            ></MapMarker>
+          </Map>
+        ) : null}
       </div>
     </>
   );
