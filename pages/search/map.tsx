@@ -30,14 +30,17 @@ function SelectMap() {
    */
   const judgeFoundLocation = useCallback(() => {
     if (foundLocation && longitude && latitude) {
+      const tempLongitude = parseFloat(longitude as string);
+      const tempLatitude = parseFloat(latitude as string);
       setCoordinate({
-        longitude: parseFloat(longitude as string),
-        latitude: parseFloat(latitude as string),
+        longitude: tempLongitude,
+        latitude: tempLatitude,
       });
+      displayLocation(tempLongitude, tempLatitude);
     } else {
       getLocationFromGeolocation();
     }
-  }, []);
+  }, [geocoder]);
 
   /**
    * geolocation으로부터 위치를 얻어오는 함수
@@ -88,10 +91,6 @@ function SelectMap() {
     []
   );
 
-  const fuck: DragEventHandler<HTMLDivElement> = (
-    event: React.DragEvent<HTMLDivElement>
-  ) => {};
-
   /**
    * 줌 할 때 좌표값 변경
    */
@@ -106,21 +105,7 @@ function SelectMap() {
    * 드래그가 끝나면 좌표값을 가지고 텍스트로 변환 후 표시
    */
   const onDragEnd = useCallback(() => {
-    geocoder?.coord2Address(
-      coordinate.longitude,
-      coordinate.latitude,
-      (
-        result: {
-          address: kakao.maps.services.Address;
-          road_address: kakao.maps.services.RoadAaddress | null;
-        }[],
-        status: kakao.maps.services.Status
-      ) => {
-        const address = result[0].address;
-        setTextLocation(`${address.address_name}`);
-        setLocationLoaded(true);
-      }
-    );
+    displayLocation(coordinate.longitude, coordinate.latitude);
   }, [geocoder, coordinate]);
 
   /**
@@ -151,6 +136,30 @@ function SelectMap() {
     document.documentElement.style.setProperty('--vh', `${vh - 56}px`);
   }, []);
 
+  /**
+   * 현재 주소를 주소창에 표시하는 함수
+   */
+  const displayLocation = useCallback(
+    (longitude: number, latitude: number) => {
+      geocoder?.coord2Address(
+        longitude,
+        latitude,
+        (
+          result: {
+            address: kakao.maps.services.Address;
+            road_address: kakao.maps.services.RoadAaddress | null;
+          }[],
+          status: kakao.maps.services.Status
+        ) => {
+          const address = result[0].address;
+          setTextLocation(`${address.address_name}`);
+          setLocationLoaded(true);
+        }
+      );
+    },
+    [geocoder, coordinate]
+  );
+
   useEffect(() => {
     /**
      * /search로부터 정보를 받아오지 못했다면
@@ -168,7 +177,6 @@ function SelectMap() {
       setGeocoder(new kakao.maps.services.Geocoder());
     });
 
-    judgeFoundLocation();
     setScreenSize();
     window.addEventListener('resize', () => setScreenSize());
   }, []);
@@ -177,21 +185,10 @@ function SelectMap() {
    * 처음 로딩되면 좌표값을 가지고 텍스트로 변환 후 표시
    */
   useEffect(() => {
-    geocoder?.coord2Address(
-      coordinate.longitude,
-      coordinate.latitude,
-      (
-        result: {
-          address: kakao.maps.services.Address;
-          road_address: kakao.maps.services.RoadAaddress | null;
-        }[],
-        status: kakao.maps.services.Status
-      ) => {
-        const address = result[0].address;
-        setTextLocation(`${address.address_name}`);
-        setLocationLoaded(true);
-      }
-    );
+    // geocoder가 정상적으로 로딩되었는지 확인
+    if (geocoder?.coord2Address) {
+      judgeFoundLocation();
+    }
   }, [geocoder]);
 
   return (
