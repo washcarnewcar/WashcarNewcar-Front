@@ -6,10 +6,7 @@
     font-size: 18px;
     font-weight: bold;
   }
-
-
 }
-
 
 .item_container {
   margin: 10px 20px;
@@ -50,4 +47,18 @@
   font-size: small;
   height: 40px;
   width: 90px;
+}
+
+.except_wrapper {
+  margin: 20px 20px;
+
+  .except_plus_button {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .except_plus_icon {
+      margin-right: 5px;
+    }
+  }
 }

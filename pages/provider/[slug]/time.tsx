@@ -1,6 +1,21 @@
 import classNames from 'classnames';
-import React, { SyntheticEvent, useCallback, useEffect, useState } from 'react';
-import { Button, Form, Tab, Tabs } from 'react-bootstrap';
+import React, {
+  InputHTMLAttributes,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import {
+  Button,
+  Form,
+  ListGroup,
+  ListGroupItem,
+  Tab,
+  Tabs,
+} from 'react-bootstrap';
+import { Calendar } from 'react-calendar';
+import { IoAdd } from 'react-icons/io5';
 import Header from '../../../components/header';
 import Seperator from '../../../components/seperator';
 import styles from '../../../styles/ProviderTime.module.scss';
@@ -108,11 +123,9 @@ export default function ProviderTime() {
             <TimeListItem dayOfWeek="saturday" setDayOfWeek={setDayOfWeek} />
           </Tab>
 
-          <Tab
-            eventKey="except"
-            title="예외 일자"
-            tabClassName={styles.tab}
-          ></Tab>
+          <Tab eventKey="except" title="예외 일자" tabClassName={styles.tab}>
+            <Except />
+          </Tab>
         </Tabs>
       </div>
     </>
@@ -231,5 +244,63 @@ function TimeListItemSelect({
         {generateTime()}
       </Form.Select>
     </>
+  );
+}
+
+interface ExceptData {
+  start: string;
+  end: string;
+}
+
+function Except() {
+  const [exceptList, setExceptList] = useState<ExceptData[]>([]);
+
+  const onClick = useCallback(() => {
+    const newList = [...exceptList];
+    newList.push({ start: '', end: '' });
+    setExceptList(newList);
+  }, [exceptList]);
+
+  useEffect(() => {
+    console.log(`hello`);
+  }, [exceptList]);
+
+  return (
+    <div className={styles.except_wrapper}>
+      <Button className={styles.except_plus_button} onClick={onClick}>
+        <IoAdd size={20} className={styles.except_plus_icon} />
+        예외 일자 추가
+      </Button>
+
+      <ListGroup>
+        {exceptList.map((exceptListItem, index) => (
+          <ListGroupItem key={index}>
+            <ExceptItem />
+          </ListGroupItem>
+        ))}
+      </ListGroup>
+    </div>
+  );
+}
+
+interface ExceptItemProps {}
+
+function ExceptItem() {
+  const [isAllDay, setIsAllDay] = useState(false);
+
+  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsAllDay(e.target.checked);
+  }, []);
+
+  return (
+    <div>
+      <Form.Check
+        type="switch"
+        label="하루종일"
+        onChange={onChange}
+        defaultChecked
+      />
+      {isAllDay ? 'hello' : 'goodbye'}
+    </div>
   );
 }

@@ -29,7 +29,10 @@ function SelectMap() {
    * /search에서 위치를 찾고 왔는지 확인
    */
   const judgeFoundLocation = useCallback(() => {
-    if (foundLocation && longitude && latitude) {
+    const boolFoundLocation = JSON.parse(foundLocation as string);
+    if (boolFoundLocation && longitude && latitude) {
+      console.log(`found`);
+
       const tempLongitude = parseFloat(longitude as string);
       const tempLatitude = parseFloat(latitude as string);
       setCoordinate({
@@ -38,6 +41,7 @@ function SelectMap() {
       });
       displayLocation(tempLongitude, tempLatitude);
     } else {
+      console.log(`not found`);
       getLocationFromGeolocation();
     }
   }, [geocoder]);
@@ -50,18 +54,22 @@ function SelectMap() {
       positionCallback,
       positionErrorCallback
     );
-  }, []);
+  }, [geocoder]);
 
   /**
    * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
    */
-  const positionCallback = useCallback((position: GeolocationPosition) => {
-    // 좌표 State에 저장
-    setCoordinate({
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    });
-  }, []);
+  const positionCallback = useCallback(
+    (position: GeolocationPosition) => {
+      // 좌표 State에 저장
+      setCoordinate({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+      displayLocation(position.coords.longitude, position.coords.latitude);
+    },
+    [geocoder]
+  );
 
   /**
    * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
@@ -115,7 +123,7 @@ function SelectMap() {
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       getLocationFromGeolocation();
     },
-    []
+    [geocoder]
   );
 
   /**
@@ -126,7 +134,7 @@ function SelectMap() {
       pathname: '/search',
       query: { longitude: coordinate.longitude, latitude: coordinate.latitude },
     });
-  }, []);
+  }, [coordinate]);
 
   /**
    * 현재 스크린 사이즈를 계산하여 css에 적용
@@ -166,6 +174,8 @@ function SelectMap() {
      * (정상 시나리오가 아니라면)
      * 루트로 보낸다
      */
+    console.log(longitude, latitude);
+
     if (!longitude || !latitude) {
       router.push('/');
     }
