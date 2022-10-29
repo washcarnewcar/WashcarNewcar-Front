@@ -39,7 +39,9 @@ function Login() {
             >
               로그인
             </Button>
-            <a href={process.env.REACT_APP_API + '/oauth2/authorization/kakao'}>
+            <a
+              href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}
+            >
               <Image
                 src="/kakao_login_large_wide.png"
                 alt="카카오 로그인"
