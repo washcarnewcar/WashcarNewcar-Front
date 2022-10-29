@@ -15,7 +15,6 @@ import {
   Tab,
   Tabs,
 } from 'react-bootstrap';
-import { Calendar } from 'react-calendar';
 import { IoAdd, IoTrash } from 'react-icons/io5';
 import Header from '../../../components/header';
 import Seperator from '../../../components/seperator';
