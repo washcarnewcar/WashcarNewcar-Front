@@ -84,12 +84,16 @@ export default function Provider() {
         <div className={styles.menus_container}>
           <div className={styles.title}>매장 관리</div>
           <div className={styles.buttongroup}>
-            <Button className={styles.button} variant="outline-primary">
-              매장 정보 설정
-            </Button>
-            <Button className={styles.button} variant="outline-primary">
-              메뉴 관리
-            </Button>
+            <Link href={`/provider/${slug}/store`}>
+              <Button className={styles.button} variant="outline-primary">
+                매장 정보 설정
+              </Button>
+            </Link>
+            <Link href={`/provider/${slug}/menu`}>
+              <Button className={styles.button} variant="outline-primary">
+                메뉴 관리
+              </Button>
+            </Link>
             <Link href={`/provider/${slug}/time`}>
               <Button className={styles.button} variant="outline-primary">
                 매장 운영 시간 설정

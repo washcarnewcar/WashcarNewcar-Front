@@ -1,12 +1,5 @@
 import classNames from 'classnames';
-import moment, { min } from 'moment';
-import React, {
-  InputHTMLAttributes,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Form,
@@ -92,10 +85,6 @@ export default function ProviderTime() {
     }
     setTime(Object.assign({}, time, { [dayOfWeek]: oneDay }));
   }
-
-  useEffect(() => {
-    console.log(time);
-  }, [time]);
 
   return (
     <>
@@ -281,8 +270,6 @@ function Except() {
       newList[index].allDay = allday;
       newList[index].start = start;
       newList[index].end = end;
-      console.log(newList);
-
       setExceptList(newList);
     },
     [exceptList]

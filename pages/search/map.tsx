@@ -1,16 +1,10 @@
 import styles from '../../styles/SelectMap.module.scss';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import Header from '../../components/header';
-import React, {
-  DragEventHandler,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { BiCurrentLocation } from 'react-icons/bi';
 import { useRouter } from 'next/router';
-import Script from 'next/script';
 
 function SelectMap() {
   const router = useRouter();
