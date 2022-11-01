@@ -1,4 +1,4 @@
-const API_SERVER = process.env.REACT_APP_API;
+const API_SERVER = process.env.NEXT_PUBLIC_API;
 
 export const checkLogin = async (): Promise<boolean> => {
   const localToken = localStorage.getItem('token');

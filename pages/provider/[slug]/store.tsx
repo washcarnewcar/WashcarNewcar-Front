@@ -9,12 +9,16 @@ import { Button, Form, InputGroup } from 'react-bootstrap';
 import styles from '../../../styles/StoreEdit.module.scss';
 import Header from '../../../components/header';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
-import { S3Client } from '@aws-sdk/client-s3';
+import {
+  PutObjectCommand,
+  PutObjectCommandInput,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import Image from 'next/image';
 import { IoClose } from 'react-icons/io5';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
-import { IoIosArrowForward } from 'react-icons/io';
 import { BeatLoader } from 'react-spinners';
+import { requestWithToken } from '../../../functions/request';
 
 const credentials = {
   accessKeyId: process.env.NEXT_PUBLIC_ACCESSKEY
@@ -32,7 +36,7 @@ const s3Client = new S3Client({
 
 const bucket = process.env.NEXT_PUBLIC_BUCKET_NAME;
 
-interface IProfileImage {
+interface IPreviewImage {
   file: null | File;
   previewUrl: string;
 }
@@ -47,10 +51,10 @@ function EditStore() {
     name: '',
     tel: '',
     slug: '',
-    route: '',
-    info: '',
+    wayto: '',
+    description: '',
   });
-  const { name, tel, slug, route, info } = textInputs;
+  const { name, tel, slug, wayto, description } = textInputs;
 
   const [address, setAddress] = useState({
     address: '',
@@ -63,11 +67,11 @@ function EditStore() {
   const [isMapLoad, setIsMapLoad] = useState(false);
   const [geocoder, setGeocoder] = useState<kakao.maps.services.Geocoder>();
 
-  const [profileImage, setProfileImage] = useState<IProfileImage>({
+  const [previewImage, setPreviewImage] = useState<IPreviewImage>({
     file: null,
     previewUrl: '',
   });
-  const profileImageInput = useRef<HTMLInputElement>(null);
+  const previewImageInput = useRef<HTMLInputElement>(null);
 
   const [storeImage, setStoreImage] = useState<IStoreImage>({
     files: [],
@@ -75,6 +79,12 @@ function EditStore() {
   });
 
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [validate, setValidate] = useState({
+    name: false,
+    tel: false,
+    slug: false,
+    address: false,
+  });
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -165,8 +175,6 @@ function EditStore() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       const newValue = value.replace(/[^a-zA-Z0-9_]/g, '');
-      console.log(newValue);
-
       const newInputs = {
         ...textInputs,
         slug: newValue,
@@ -179,7 +187,7 @@ function EditStore() {
   /**
    * 프로필 사진이 삽입되었을 때
    */
-  const onProfileImageChange = useCallback(
+  const onPreviewImageChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const inputFile = e.target;
       const files = e.target.files;
@@ -208,7 +216,7 @@ function EditStore() {
         file: files[0],
         previewUrl: URL.createObjectURL(files[0]),
       };
-      setProfileImage(newProfileImage);
+      setPreviewImage(newProfileImage);
     },
     []
   );
@@ -216,10 +224,10 @@ function EditStore() {
   /**
    * 프로필 사진의 x버튼을 눌렀을 때
    */
-  const onProfileImageCloseClick = useCallback(() => {
-    setProfileImage({ file: null, previewUrl: '' });
-    if (profileImageInput.current) {
-      profileImageInput.current.value = '';
+  const onPreviewImageCloseClick = useCallback(() => {
+    setPreviewImage({ file: null, previewUrl: '' });
+    if (previewImageInput.current) {
+      previewImageInput.current.value = '';
     }
   }, []);
 
@@ -284,7 +292,6 @@ function EditStore() {
    */
   const onStoreImageCloseClick = useCallback(
     (index: number) => {
-      console.log(`delete ${index}index`);
       const files = storeImage.files;
       files.splice(index, 1);
 
@@ -300,9 +307,165 @@ function EditStore() {
     [storeImage]
   );
 
-  const onSubmitClick = useCallback(() => {
-    setSubmitLoading(!submitLoading);
-  }, [textInputs, address, profileImage, storeImage, submitLoading]);
+  const validateForm = useCallback(() => {
+    let pass = true;
+    const newValidate = {
+      name: false,
+      tel: false,
+      slug: false,
+      address: false,
+    };
+    if (textInputs.name === '') {
+      newValidate.name = true;
+      pass = false;
+    }
+    if (textInputs.tel === '') {
+      newValidate.tel = true;
+      pass = false;
+    }
+    if (textInputs.slug === '') {
+      newValidate.slug = true;
+      pass = false;
+    }
+    if (address.address === '') {
+      newValidate.address = true;
+      pass = false;
+    }
+    setValidate(newValidate);
+    return pass;
+  }, [textInputs, address, validate]);
+
+  /**
+   * 프로필 이미지 전송
+   */
+  const uploadProfileImage = useCallback(async () => {
+    // 파일 없으면 전송하지 않음
+    if (!previewImage.file) return { status: 'success', url: '' };
+
+    const fileName = `profileImages/${crypto.randomUUID()}${
+      previewImage.file.name
+    }`;
+    console.log(fileName);
+
+    const command: PutObjectCommandInput = {
+      Bucket: bucket,
+      Key: fileName,
+      Body: previewImage.file,
+      ContentType: previewImage.file.type,
+      ACL: 'public-read',
+    };
+
+    try {
+      // 파일 전송
+      await s3Client.send(new PutObjectCommand(command));
+
+      // 성공
+      return { status: 'success', url: fileName };
+    } catch (err) {
+      console.error(err);
+      return { status: 'failed', url: '' };
+    }
+  }, [previewImage]);
+
+  /**
+   * 매장 이미지 전송
+   */
+  const uploadStoreImage = useCallback(async () => {
+    // 파일 없으면 전송하지 않음
+    if (storeImage.files.length === 0) return { status: 'success', url: [] };
+
+    const urls: string[] = [];
+
+    for (let i = 0; i < storeImage.files.length; i++) {
+      const fileName = `storeImages/${crypto.randomUUID()}${
+        storeImage.files[i].name
+      }`;
+      console.log(fileName);
+
+      const command: PutObjectCommandInput = {
+        Bucket: bucket,
+        Key: fileName,
+        Body: storeImage.files[i],
+        ContentType: storeImage.files[i].type,
+        ACL: 'public-read',
+      };
+
+      try {
+        // 파일 전송
+        await s3Client.send(new PutObjectCommand(command));
+
+        // 성공
+        urls.push(fileName);
+      } catch (err) {
+        console.error(err);
+        return { status: 'failed', url: [] };
+      }
+    }
+    return { status: 'success', url: urls };
+  }, [storeImage]);
+
+  /**
+   * 백엔드에 정보 전송
+   */
+  const postToApi = useCallback(
+    async (previewImageUrl: string, storeImageUrls: string[]) => {
+      const data = {
+        name: name,
+        tel: tel,
+        coordinate: {
+          longitude: address.longitude,
+          latitude: address.latitude,
+        },
+        address: `${address.address} ${address.addressDetail}`,
+        slug: slug,
+        wayto: wayto,
+        description: description,
+        preview_image: previewImageUrl,
+        store_image: storeImageUrls,
+      };
+
+      requestWithToken('/provider/new', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+    },
+    [textInputs, address, previewImage, storeImage]
+  );
+
+  /**
+   * 승인 요청 버튼을 눌렀을 때
+   */
+  const onSubmitClick = useCallback(
+    async (e: React.FormEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      setSubmitLoading(true);
+
+      if (!validateForm()) {
+        setSubmitLoading(false);
+        return;
+      }
+
+      const previewResult = await uploadProfileImage();
+      console.log(previewResult);
+      if (previewResult.status === 'failed') {
+        setSubmitLoading(false);
+        return;
+      }
+      const profileImageUrl = previewResult.url;
+
+      const storeResult = await uploadStoreImage();
+      console.log(storeResult);
+      if (storeResult.status === 'failed') {
+        setSubmitLoading(false);
+        return;
+      }
+      const storeImageUrls = storeResult.url;
+
+      await postToApi(profileImageUrl, storeImageUrls);
+    },
+    [textInputs, address, previewImage, storeImage]
+  );
 
   useEffect(() => {
     kakao.maps.load(() => {
@@ -316,253 +479,209 @@ function EditStore() {
       <Header type={1} />
       <div className={styles.container}>
         <div className={styles.title}>매장 정보 변경</div>
-
-        {/* 매장 이름 */}
-        <Form.Group className={styles.form_group}>
-          <Form.Label>매장 이름 *</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="매장 이름을 입력해주세요"
-            name="name"
-            value={name}
-            onChange={onChange}
-          />
-        </Form.Group>
-
-        {/* 매장 전화번호 */}
-        <Form.Group className={styles.form_group}>
-          <Form.Label>매장 전화번호 *</Form.Label>
-          <Form.Control
-            type="tel"
-            placeholder="010-0000-0000"
-            name="tel"
-            value={tel}
-            onChange={onTelChange}
-          />
-          <Form.Text>
-            확인을 위해 연락을 취할 수 있으니 정확하게 적어주시기 바랍니다.
-          </Form.Text>
-        </Form.Group>
-
-        {/* 매장 주소 */}
-        <Form.Group className={styles.form_group}>
-          <Form.Label>매장 주소 *</Form.Label>
-          <InputGroup>
+        <Form>
+          {/* 매장 이름 */}
+          <Form.Group className={styles.form_group}>
+            <Form.Label>매장 이름 *</Form.Label>
             <Form.Control
               type="text"
-              placeholder="주소 찾기를 눌러주세요"
-              value={address.address}
-              readOnly
-              onClick={onAddressClick}
+              placeholder="매장 이름을 입력해주세요"
+              name="name"
+              value={name}
+              onChange={onChange}
+              isInvalid={validate.name}
             />
-            <Button onClick={onAddressClick}>주소 찾기</Button>
-          </InputGroup>
-          <Form.Control
-            type="text"
-            placeholder="상세 주소를 입력해주세요"
-            value={address.addressDetail}
-            onChange={onAddressDetailChange}
-            disabled={!address.isAddressFound}
-            className={styles.address_detail}
-          />
-          {isMapLoad ? (
-            <Map
-              center={{ lat: address.latitude, lng: address.longitude }}
-              className={styles.map}
-            >
-              {address.isAddressFound ? (
-                <MapMarker
-                  position={{ lat: address.latitude, lng: address.longitude }}
-                />
-              ) : null}
-            </Map>
-          ) : null}
-        </Form.Group>
+            <Form.Control.Feedback type="invalid">
+              매장 이름은 필수항목입니다.
+            </Form.Control.Feedback>
+          </Form.Group>
 
-        {/* 매장 홈페이지 주소 */}
-        <Form.Group className={styles.form_group}>
-          <Form.Label>매장 홈페이지 주소 *</Form.Label>
-          <InputGroup>
-            <InputGroup.Text>wcnc.co.kr/</InputGroup.Text>
+          {/* 매장 전화번호 */}
+          <Form.Group className={styles.form_group}>
+            <Form.Label>매장 전화번호 *</Form.Label>
+            <Form.Control
+              type="tel"
+              placeholder="010-0000-0000"
+              name="tel"
+              value={tel}
+              onChange={onTelChange}
+              isInvalid={validate.tel}
+            />
+            <Form.Control.Feedback type="invalid">
+              전화번호는 필수항목입니다.
+            </Form.Control.Feedback>
+            <Form.Text>
+              확인을 위해 연락을 취할 수 있으니 정확하게 적어주시기 바랍니다.
+            </Form.Text>
+          </Form.Group>
+
+          {/* 매장 주소 */}
+          <Form.Group className={styles.form_group}>
+            <Form.Label>매장 주소 *</Form.Label>
+            <InputGroup>
+              <Form.Control
+                type="text"
+                placeholder="주소 찾기를 눌러주세요"
+                value={address.address}
+                readOnly
+                onClick={onAddressClick}
+                isInvalid={validate.address}
+              />
+              <Button onClick={onAddressClick}>주소 찾기</Button>
+            </InputGroup>
+            <Form.Control.Feedback type="invalid">
+              매장주소는 필수항목입니다.
+            </Form.Control.Feedback>
             <Form.Control
               type="text"
-              placeholder="사용할 홈페이지 주소"
-              value={slug}
-              onChange={onSlugChange}
+              placeholder="상세 주소를 입력해주세요"
+              value={address.addressDetail}
+              onChange={onAddressDetailChange}
+              disabled={!address.isAddressFound}
+              className={styles.address_detail}
             />
-          </InputGroup>
-          <Form.Text>
-            영문 대소문자와 숫자, 언더바(_)만 입력 가능합니다.
-          </Form.Text>
-        </Form.Group>
+            {isMapLoad ? (
+              <Map
+                center={{ lat: address.latitude, lng: address.longitude }}
+                className={styles.map}
+              >
+                {address.isAddressFound ? (
+                  <MapMarker
+                    position={{
+                      lat: address.latitude,
+                      lng: address.longitude,
+                    }}
+                  />
+                ) : null}
+              </Map>
+            ) : null}
+          </Form.Group>
 
-        {/* 찾아오는 길 */}
-        <Form.Group className={styles.form_group}>
-          <Form.Label>찾아오는 길</Form.Label>
-          <Form.Control
-            as="textarea"
-            placeholder="찾아오는 길을 입력해주세요"
-            rows={5}
-            name="route"
-            value={route}
-            onChange={onChange}
-          />
-        </Form.Group>
+          {/* 매장 홈페이지 주소 */}
+          <Form.Group className={styles.form_group}>
+            <Form.Label>매장 홈페이지 주소 *</Form.Label>
+            <InputGroup>
+              <InputGroup.Text>wcnc.co.kr/</InputGroup.Text>
+              <Form.Control
+                type="text"
+                placeholder="사용할 홈페이지 주소"
+                value={slug}
+                onChange={onSlugChange}
+                isInvalid={validate.slug}
+              />
+              <Form.Control.Feedback type="invalid">
+                매장 홈페이지 주소는 필수항목입니다.
+              </Form.Control.Feedback>
+            </InputGroup>
+            <Form.Text>
+              영문 대소문자와 숫자, 언더바(_)만 입력 가능합니다.
+            </Form.Text>
+          </Form.Group>
 
-        {/* 매장 설명 */}
-        <Form.Group className={styles.form_group}>
-          <Form.Label>매장 설명</Form.Label>
-          <Form.Control
-            as="textarea"
-            placeholder="매장 설명을 입력해주세요"
-            rows={5}
-            name="info"
-            value={info}
-            onChange={onChange}
-          />
-        </Form.Group>
+          {/* 찾아오는 길 */}
+          <Form.Group className={styles.form_group}>
+            <Form.Label>찾아오는 길</Form.Label>
+            <Form.Control
+              as="textarea"
+              placeholder="찾아오는 길을 입력해주세요"
+              rows={5}
+              name="wayto"
+              value={wayto}
+              onChange={onChange}
+            />
+          </Form.Group>
 
-        {/* 프로필 사진 */}
-        <Form.Group className={styles.form_group}>
-          <Form.Label>프로필 사진</Form.Label>
-          <Form.Control
-            type="file"
-            onChange={onProfileImageChange}
-            accept="image/png, image/jpeg"
-            ref={profileImageInput}
-          />
-          {/* 프로필 이미지 표시 */}
-          {profileImage.previewUrl === '' ? null : (
-            <div className={styles.image_container}>
-              <div className={styles.image_wrapper}>
-                <button
-                  className={styles.close_wrapper}
-                  onClick={onProfileImageCloseClick}
-                >
-                  <IoClose />
-                </button>
-                <Image
-                  src={profileImage.previewUrl}
-                  width={100}
-                  height={100}
-                  className={styles.image}
-                />
-              </div>
-            </div>
-          )}
-        </Form.Group>
+          {/* 매장 설명 */}
+          <Form.Group className={styles.form_group}>
+            <Form.Label>매장 설명</Form.Label>
+            <Form.Control
+              as="textarea"
+              placeholder="매장 설명을 입력해주세요"
+              rows={5}
+              name="description"
+              value={description}
+              onChange={onChange}
+            />
+          </Form.Group>
 
-        {/* 매장 사진 */}
-        <Form.Group className={styles.form_group}>
-          <Form.Label>매장 사진</Form.Label>
-          <Form.Control
-            type="file"
-            multiple
-            accept="image/png, image/jpeg"
-            onChange={onStoreImageChange}
-          />
-          {/* 프로필 이미지 표시 */}
-          {storeImage.previewUrls.length === 0 ? null : (
-            <div className={styles.image_container}>
-              {storeImage.previewUrls.map((previewUrl, index) => (
-                <div key={index} className={styles.image_wrapper}>
+          {/* 프로필 사진 */}
+          <Form.Group className={styles.form_group}>
+            <Form.Label>프로필 사진</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={onPreviewImageChange}
+              accept="image/png, image/jpeg"
+              ref={previewImageInput}
+            />
+            {/* 프로필 이미지 표시 */}
+            {previewImage.previewUrl === '' ? null : (
+              <div className={styles.image_container}>
+                <div className={styles.image_wrapper}>
                   <button
                     className={styles.close_wrapper}
-                    onClick={() => onStoreImageCloseClick(index)}
+                    onClick={onPreviewImageCloseClick}
                   >
                     <IoClose />
                   </button>
                   <Image
-                    src={previewUrl}
+                    src={previewImage.previewUrl}
                     width={100}
                     height={100}
                     className={styles.image}
                   />
                 </div>
-              ))}
-            </div>
-          )}
-        </Form.Group>
+              </div>
+            )}
+          </Form.Group>
 
-        <Button className={styles.submit_button} onClick={onSubmitClick}>
-          {submitLoading ? (
-            <BeatLoader color="white" size="10px" />
-          ) : (
-            '승인 요청'
-          )}
-        </Button>
+          {/* 매장 사진 */}
+          <Form.Group className={styles.form_group}>
+            <Form.Label>매장 사진</Form.Label>
+            <Form.Control
+              type="file"
+              multiple
+              accept="image/png, image/jpeg"
+              onChange={onStoreImageChange}
+            />
+            {/* 프로필 이미지 표시 */}
+            {storeImage.previewUrls.length === 0 ? null : (
+              <div className={styles.image_container}>
+                {storeImage.previewUrls.map((previewUrl, index) => (
+                  <div key={index} className={styles.image_wrapper}>
+                    <button
+                      className={styles.close_wrapper}
+                      onClick={() => onStoreImageCloseClick(index)}
+                    >
+                      <IoClose />
+                    </button>
+                    <Image
+                      src={previewUrl}
+                      width={100}
+                      height={100}
+                      className={styles.image}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </Form.Group>
+
+          <Button
+            type="submit"
+            className={styles.submit_button}
+            onClick={onSubmitClick}
+            disabled={submitLoading}
+          >
+            {submitLoading ? (
+              <BeatLoader color="white" size="10px" />
+            ) : (
+              '승인 요청'
+            )}
+          </Button>
+        </Form>
       </div>
     </>
   );
 }
 
 export default EditStore;
-
-/*
-const config = {
-  bucketName: process.env.NEXT_PUBLIC_BUCKET_NAME,
-  dirName: process.env.NEXT_PUBLIC_DIR_NAME,
-  region: process.env.NEXT_PUBLIC_REGION,
-  accessKeyId: process.env.NEXT_PUBLIC_ACCESSKEY,
-  secretAccessKey: process.env.NEXT_PUBLIC_SECRET_ACCESSKEY,
-};
-
-const uploadImage = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
-  const inputFile = e.target;
-  const files = e.target.files;
-
-  // 예외처리
-  // 파일을 넣지 않은 경우
-  if (!files || files.length < 1) {
-    inputFile.value = '';
-    return;
-  }
-  // 파일이 용량을 넘은 경우
-  else if (files[0].size > 1024 * 1024 * 5) {
-    alert('5MB 이하의 이미지만 업로드 가능합니다.');
-    inputFile.value = '';
-    return;
-  }
-  // 이미지 형식이 아닌 경우
-  else if (!(files[0].type === 'image/jpeg' || files[0].type === 'image/png')) {
-    alert('jpg, png 파일만 업로드 가능합니다.');
-    inputFile.value = '';
-    return;
-  }
-
-  const fileName = `profileImages/${crypto.randomUUID()}${files[0].name}`;
-  console.log(fileName);
-
-  const command: PutObjectCommandInput = {
-    Bucket: bucket,
-    Key: fileName,
-    Body: files[0],
-    ContentType: files[0].type,
-    ACL: 'public-read',
-  };
-
-  try {
-    const results = await s3Client.send(new PutObjectCommand(command));
-    console.log(results);
-  } catch (err) {
-    console.error(err);
-    inputFile.value = '';
-  }
-}, []);
-
-const onClick = async () => {
-  const request = await requestWithToken('/provider/store', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(textInputs),
-  });
-};
-
-const onTestClick = useCallback(() => {
-  console.log(crypto.randomUUID() + new Date().getTime().toString());
-}, []);
-
-useEffect(() => {}, []);
-*/
