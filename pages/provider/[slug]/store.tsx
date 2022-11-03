@@ -19,6 +19,9 @@ import { IoClose } from 'react-icons/io5';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import { BeatLoader } from 'react-spinners';
 import { requestWithToken } from '../../../functions/request';
+import Compressor from 'compressorjs';
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/router';
 
 const credentials = {
   accessKeyId: process.env.NEXT_PUBLIC_ACCESSKEY
@@ -47,6 +50,7 @@ interface IStoreImage {
 }
 
 function EditStore() {
+  const router = useRouter();
   const [textInputs, setTextInputs] = useState({
     name: '',
     tel: '',
@@ -185,10 +189,29 @@ function EditStore() {
   );
 
   /**
+   * 이미지를 5MB 이하의 크기로 압축하는 함수
+   */
+  const compressImage = useCallback((file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      if (!file) reject('파일이 없음');
+
+      new Compressor(file, {
+        convertSize: 5000000,
+        success(file: File) {
+          resolve(file);
+        },
+        error(error) {
+          reject('압축 도중 오류 발생');
+        },
+      });
+    });
+  }, []);
+
+  /**
    * 프로필 사진이 삽입되었을 때
    */
   const onPreviewImageChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
+    async (e: ChangeEvent<HTMLInputElement>) => {
       const inputFile = e.target;
       const files = e.target.files;
 
@@ -197,26 +220,32 @@ function EditStore() {
         inputFile.value = '';
         return;
       }
-      // 파일이 용량을 넘은 경우
-      else if (files[0].size > 1024 * 1024 * 5) {
-        alert('5MB 이하의 이미지만 업로드 가능합니다.');
-        inputFile.value = '';
-        return;
-      }
+
+      let file = files[0];
+
       // 이미지 형식이 아닌 경우
-      else if (
-        !(files[0].type === 'image/jpeg' || files[0].type === 'image/png')
-      ) {
+      if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
         alert('jpg, png 파일만 업로드 가능합니다.');
         inputFile.value = '';
         return;
       }
 
-      const newProfileImage = {
-        file: files[0],
+      // 파일이 5MB를 넘은 경우 => 압축
+      if (file.size > 1024 * 1024 * 5) {
+        try {
+          file = await compressImage(file);
+        } catch (error) {
+          alert('압축 과정에서 오류가 발생했습니다.');
+          inputFile.value = '';
+          return;
+        }
+      }
+
+      const newPreviewImage = {
+        file: file,
         previewUrl: URL.createObjectURL(files[0]),
       };
-      setPreviewImage(newProfileImage);
+      setPreviewImage(newPreviewImage);
     },
     []
   );
@@ -235,7 +264,7 @@ function EditStore() {
    * 매장 사진이 삽입되었을 때
    */
   const onStoreImageChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
+    async (e: ChangeEvent<HTMLInputElement>) => {
       const inputFile = e.target;
       const fileList = e.target.files;
 
@@ -245,44 +274,46 @@ function EditStore() {
         return;
       }
 
-      for (let i = 0; i < fileList.length; i++) {
-        const files = storeImage.files;
-        const previewUrls = storeImage.previewUrls;
+      const files = storeImage.files;
+      const previewUrls = storeImage.previewUrls;
 
-        // 최대 업로드 개수를 초과한 경우
+      for (let i = 0; i < fileList.length; i++) {
+        // 최대 업로드 개수를 초과한 경우 => 반복문 탈출
         if (files.length >= 6) {
           alert('최대 6개까지 업로드 가능합니다.');
           break;
         }
 
-        // 파일이 용량을 넘은 경우
-        if (fileList[i].size > 1024 * 1024 * 5) {
-          alert('5MB 이하의 이미지만 업로드 가능합니다.');
-          inputFile.value = '';
-          continue;
-        }
-        // 이미지 형식이 아닌 경우
-        else if (
-          !(
-            fileList[i].type === 'image/jpeg' ||
-            fileList[i].type === 'image/png'
-          )
-        ) {
+        let file = fileList[i];
+
+        // 이미지 형식이 아닌 경우 => 넘어가고 다음 파일 처리
+        if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
           alert('jpg, png 파일만 업로드 가능합니다.');
           inputFile.value = '';
           continue;
         }
 
-        // 파일 추가
-        files.push(fileList[i]);
-        previewUrls.push(URL.createObjectURL(fileList[i]));
+        // 파일이 5MB를 넘은 경우 => 압축
+        if (file.size > 1024 * 1024 * 5) {
+          try {
+            file = await compressImage(file);
+          } catch (error) {
+            alert('압축 과정에서 오류가 발생했습니다.');
+            inputFile.value = '';
+            continue;
+          }
+        }
 
-        const newStoreImage = {
-          files: files,
-          previewUrls: previewUrls,
-        };
-        setStoreImage(newStoreImage);
+        // 파일 추가
+        files.push(file);
+        previewUrls.push(URL.createObjectURL(file));
       }
+
+      const newStoreImage = {
+        files: files,
+        previewUrls: previewUrls,
+      };
+      setStoreImage(newStoreImage);
     },
     [storeImage]
   );
@@ -338,11 +369,11 @@ function EditStore() {
   /**
    * 프로필 이미지 전송
    */
-  const uploadProfileImage = useCallback(async () => {
+  const uploadPreviewImage = useCallback(async () => {
     // 파일 없으면 전송하지 않음
-    if (!previewImage.file) return { status: 'success', url: '' };
+    if (!previewImage.file) return '';
 
-    const fileName = `profileImages/${crypto.randomUUID()}${
+    const fileName = `previewImages/${crypto.randomUUID()}${
       previewImage.file.name
     }`;
     console.log(fileName);
@@ -355,16 +386,11 @@ function EditStore() {
       ACL: 'public-read',
     };
 
-    try {
-      // 파일 전송
-      await s3Client.send(new PutObjectCommand(command));
+    // 파일 전송 (예외 발생 가능)
+    await s3Client.send(new PutObjectCommand(command));
 
-      // 성공
-      return { status: 'success', url: fileName };
-    } catch (err) {
-      console.error(err);
-      return { status: 'failed', url: '' };
-    }
+    // 성공
+    return fileName;
   }, [previewImage]);
 
   /**
@@ -372,7 +398,7 @@ function EditStore() {
    */
   const uploadStoreImage = useCallback(async () => {
     // 파일 없으면 전송하지 않음
-    if (storeImage.files.length === 0) return { status: 'success', url: [] };
+    if (storeImage.files.length === 0) return [];
 
     const urls: string[] = [];
 
@@ -390,18 +416,14 @@ function EditStore() {
         ACL: 'public-read',
       };
 
-      try {
-        // 파일 전송
-        await s3Client.send(new PutObjectCommand(command));
+      // 파일 전송 (예외 발생 가능)
+      await s3Client.send(new PutObjectCommand(command));
 
-        // 성공
-        urls.push(fileName);
-      } catch (err) {
-        console.error(err);
-        return { status: 'failed', url: [] };
-      }
+      // 성공
+      urls.push(fileName);
     }
-    return { status: 'success', url: urls };
+
+    return urls;
   }, [storeImage]);
 
   /**
@@ -424,10 +446,9 @@ function EditStore() {
         store_image: storeImageUrls,
       };
 
-      requestWithToken('/provider/new', {
+      await requestWithToken(router, '/provider/new', {
         method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        data: data,
       });
     },
     [textInputs, address, previewImage, storeImage]
@@ -441,28 +462,34 @@ function EditStore() {
       e.preventDefault();
       setSubmitLoading(true);
 
-      if (!validateForm()) {
+      // 필수 항목 체크
+      // if (!validateForm()) {
+      //   setSubmitLoading(false);
+      //   return;
+      // }
+
+      // aws 이미지 업로드
+      let previewImageUrl, storeImageUrls;
+      try {
+        previewImageUrl = await uploadPreviewImage();
+        console.log(previewImageUrl);
+
+        storeImageUrls = await uploadStoreImage();
+        console.log(storeImageUrls);
+      } catch (error) {
+        alert('오류가 발생했습니다.\n다시 시도해주세요.');
         setSubmitLoading(false);
         return;
       }
 
-      const previewResult = await uploadProfileImage();
-      console.log(previewResult);
-      if (previewResult.status === 'failed') {
+      // 서버에 정보 저장
+      try {
+        await postToApi(previewImageUrl, storeImageUrls);
+      } catch (error) {
+        alert('오류가 발생했습니다.\n다시 시도해주세요.');
         setSubmitLoading(false);
         return;
       }
-      const profileImageUrl = previewResult.url;
-
-      const storeResult = await uploadStoreImage();
-      console.log(storeResult);
-      if (storeResult.status === 'failed') {
-        setSubmitLoading(false);
-        return;
-      }
-      const storeImageUrls = storeResult.url;
-
-      await postToApi(profileImageUrl, storeImageUrls);
     },
     [textInputs, address, previewImage, storeImage]
   );
@@ -518,7 +545,7 @@ function EditStore() {
           {/* 매장 주소 */}
           <Form.Group className={styles.form_group}>
             <Form.Label>매장 주소 *</Form.Label>
-            <InputGroup>
+            <InputGroup hasValidation>
               <Form.Control
                 type="text"
                 placeholder="주소 찾기를 눌러주세요"
@@ -528,10 +555,10 @@ function EditStore() {
                 isInvalid={validate.address}
               />
               <Button onClick={onAddressClick}>주소 찾기</Button>
+              <Form.Control.Feedback type="invalid">
+                매장주소는 필수항목입니다.
+              </Form.Control.Feedback>
             </InputGroup>
-            <Form.Control.Feedback type="invalid">
-              매장주소는 필수항목입니다.
-            </Form.Control.Feedback>
             <Form.Control
               type="text"
               placeholder="상세 주소를 입력해주세요"
@@ -560,7 +587,7 @@ function EditStore() {
           {/* 매장 홈페이지 주소 */}
           <Form.Group className={styles.form_group}>
             <Form.Label>매장 홈페이지 주소 *</Form.Label>
-            <InputGroup>
+            <InputGroup hasValidation>
               <InputGroup.Text>wcnc.co.kr/</InputGroup.Text>
               <Form.Control
                 type="text"
