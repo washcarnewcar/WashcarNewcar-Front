@@ -31,27 +31,27 @@ export default function Provider() {
     // getCalendarList();
   }, []);
 
-  const getCalendarList = async () => {
-    const response = await requestWithToken('/provider/calendar/list');
-    if (response.ok) {
-      const json: ResponseJson = await response.json();
+  // const getCalendarList = async () => {
+  //   const response = await requestWithToken(router, '/provider/calendar/list');
+  //   if (response.ok) {
+  //     const json: ResponseJson = await response.json();
 
-      if (json.first) {
-        // 처음 매장 생성
-        router.replace('/provider/store');
-      } else {
-        setMenuList(json.menus);
-        setReady(true);
-        console.log(json);
-      }
-    } else if (response.status === 401) {
-      router.replace('/login');
-    } else if (response.status === 403) {
-      router.replace('/contact');
-    } else {
-      router.replace('/error');
-    }
-  };
+  //     if (json.first) {
+  //       // 처음 매장 생성
+  //       router.replace('/provider/store');
+  //     } else {
+  //       setMenuList(json.menus);
+  //       setReady(true);
+  //       console.log(json);
+  //     }
+  //   } else if (response.status === 401) {
+  //     router.replace('/login');
+  //   } else if (response.status === 403) {
+  //     router.replace('/contact');
+  //   } else {
+  //     router.replace('/error');
+  //   }
+  // };
 
   if (!ready) {
     return (

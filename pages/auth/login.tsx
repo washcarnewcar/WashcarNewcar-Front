@@ -99,6 +99,9 @@ function Login() {
             password: '아이디 또는 비밀번호가 틀렸습니다.',
           };
           setErrors(newErrors);
+        } else {
+          alert('알 수 없는 오류가 발생했습니다.');
+          console.error(error);
         }
       }
     },
