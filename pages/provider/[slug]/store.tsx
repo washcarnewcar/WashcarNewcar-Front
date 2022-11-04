@@ -20,7 +20,6 @@ import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import { BeatLoader } from 'react-spinners';
 import { requestWithToken } from '../../../functions/request';
 import Compressor from 'compressorjs';
-import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 
 const credentials = {
@@ -463,10 +462,10 @@ function EditStore() {
       setSubmitLoading(true);
 
       // 필수 항목 체크
-      // if (!validateForm()) {
-      //   setSubmitLoading(false);
-      //   return;
-      // }
+      if (!validateForm()) {
+        setSubmitLoading(false);
+        return;
+      }
 
       // aws 이미지 업로드
       let previewImageUrl, storeImageUrls;
