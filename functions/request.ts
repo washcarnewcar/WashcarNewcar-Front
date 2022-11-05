@@ -45,11 +45,13 @@ export const requestWithToken = async (
     if (error instanceof AxiosError) {
       // 로그인되지 않음 => 로그인화면 이동
       if (error.response?.status === 401) {
+        alert('로그인 후 이용해주세요');
         router.replace('/auth/login');
         return null;
       }
       // 권한 없음 => 홈화면 이동
       else if (error.response?.status === 403) {
+        alert('권한이 없습니다');
         router.replace('/');
         return null;
       }

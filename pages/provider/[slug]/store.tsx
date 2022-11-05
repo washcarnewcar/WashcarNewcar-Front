@@ -51,6 +51,7 @@ interface IStoreImage {
 
 function EditStore() {
   const router = useRouter();
+  const { router: routerSlug } = router.query;
   const [textInputs, setTextInputs] = useState({
     name: '',
     tel: '',
@@ -213,7 +214,7 @@ function EditStore() {
 
       // slug가 사용가능할 때
       // if (status === 1400) {
-      if (status === 1400) {
+      if (status === 0) {
         setError({
           ...error,
           slug: '',
@@ -501,10 +502,28 @@ function EditStore() {
         store_image: storeImageUrls,
       };
 
-      await requestWithToken(router, '/provider/new', {
-        method: 'post',
-        data: data,
-      });
+      const response = await requestWithToken(
+        router,
+        `/provider/${routerSlug}/store`,
+        {
+          method: 'post',
+          data: data,
+        }
+      );
+
+      if (response) {
+        const status = response.data.status;
+        if (status === 2500) {
+          alert('성공적으로 적용되었습니다.');
+          router.replace(`/provider/${routerSlug}`);
+        } else if (status === 2501) {
+          alert('필수 정보가 입력되지 않았습니다.');
+        } else if (status === 2502) {
+          alert('홈페이지 주소가 중복되었습니다.');
+        } else {
+          alert('알 수 없는 오류가 발생했습니다.');
+        }
+      }
     },
     [address, description, name, router, slug, tel, wayto]
   );
@@ -515,7 +534,6 @@ function EditStore() {
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      e.currentTarget.checkValidity();
 
       // 필수 항목 체크
       if (!(await validateForm())) {
