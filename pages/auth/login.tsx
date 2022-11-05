@@ -105,7 +105,7 @@ function Login() {
         }
       }
     },
-    [inputs]
+    [inputs, validate, router]
   );
 
   return (

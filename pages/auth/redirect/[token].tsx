@@ -1,19 +1,23 @@
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 export default function Redirect() {
   const router = useRouter();
   const { token } = router.query;
 
-  useEffect(() => {
+  const redirect = useCallback(() => {
     if (!token || typeof token !== 'string') {
-      router.push('/');
+      router.replace('/');
     } else {
       localStorage.clear();
       localStorage.setItem('token', token);
-      router.push('/');
+      router.replace('/');
     }
-  }, []);
+  }, [token, router]);
+
+  useEffect(() => {
+    redirect();
+  }, [redirect]);
 
   return <></>;
 }

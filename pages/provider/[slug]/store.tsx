@@ -21,6 +21,7 @@ import { BeatLoader } from 'react-spinners';
 import { requestWithToken } from '../../../functions/request';
 import Compressor from 'compressorjs';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const credentials = {
   accessKeyId: process.env.NEXT_PUBLIC_ACCESSKEY
@@ -82,12 +83,15 @@ function EditStore() {
   });
 
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [validate, setValidate] = useState({
-    name: false,
-    tel: false,
-    slug: false,
-    address: false,
+  const [error, setError] = useState({
+    name: '',
+    tel: '',
+    slug: '',
+    address: '',
   });
+  const [isSlugCheckClick, setIsSlugCheckClick] = useState(false);
+  // 사용 가능 메시지를 저장할 state
+  const [slugSuccess, setSlugSuccess] = useState('');
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -154,7 +158,7 @@ function EditStore() {
     };
 
     addressOpen({ onComplete: handleComplete });
-  }, [address, geocoder]);
+  }, [address, geocoder, addressOpen]);
 
   /**
    * 상세주소 입력을 처리하는 함수
@@ -176,6 +180,7 @@ function EditStore() {
    */
   const onSlugChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      setIsSlugCheckClick(false);
       const value = e.target.value;
       const newValue = value.replace(/[^a-zA-Z0-9_]/g, '');
       const newInputs = {
@@ -186,6 +191,55 @@ function EditStore() {
     },
     [textInputs]
   );
+
+  const handleSlugCheck = useCallback(async () => {
+    setIsSlugCheckClick(true);
+    // slug를 입력하지 않았을 때
+    if (slug === '') {
+      setError({
+        ...error,
+        slug: '홈페이지 주소를 입력해주세요.',
+      });
+      setSlugSuccess('');
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/provider/check-slug/${slug}`
+      );
+
+      const status: number = response.data.status;
+
+      // slug가 사용가능할 때
+      // if (status === 1400) {
+      if (status === 1400) {
+        setError({
+          ...error,
+          slug: '',
+        });
+        setSlugSuccess('사용 가능한 홈페이지 주소입니다.');
+        return;
+      }
+      // slug가 중복일 때
+      else if (status === 1401) {
+        setError({
+          ...error,
+          slug: '중복된 홈페이지 주소입니다.',
+        });
+        setSlugSuccess('');
+        return;
+      }
+      // 알 수 없는 응답을 반환했을 때
+      else {
+        console.error('알 수 없는 상태코드');
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      return;
+    }
+  }, [slug, error]);
 
   /**
    * 이미지를 5MB 이하의 크기로 압축하는 함수
@@ -246,7 +300,7 @@ function EditStore() {
       };
       setPreviewImage(newPreviewImage);
     },
-    []
+    [compressImage]
   );
 
   /**
@@ -314,7 +368,7 @@ function EditStore() {
       };
       setStoreImage(newStoreImage);
     },
-    [storeImage]
+    [storeImage, compressImage]
   );
 
   /**
@@ -337,33 +391,35 @@ function EditStore() {
     [storeImage]
   );
 
-  const validateForm = useCallback(() => {
+  const validateForm = useCallback(async () => {
     let pass = true;
-    const newValidate = {
-      name: false,
-      tel: false,
-      slug: false,
-      address: false,
-    };
+    const newError = { ...error };
     if (textInputs.name === '') {
-      newValidate.name = true;
+      newError.name = '매장 이름은 필수항목입니다.';
       pass = false;
     }
     if (textInputs.tel === '') {
-      newValidate.tel = true;
+      newError.tel = '매장 전화번호는 필수항목입니다.';
       pass = false;
     }
-    if (textInputs.slug === '') {
-      newValidate.slug = true;
+
+    if (!isSlugCheckClick) {
+      newError.slug = '홈페이지 주소 중복 체크를 해주세요.';
+      setSlugSuccess('');
+      pass = false;
+    } else if (!slugSuccess) {
+      newError.slug = '사용 불가능한 홈페이지 주소입니다.';
+      setSlugSuccess('');
       pass = false;
     }
+
     if (address.address === '') {
-      newValidate.address = true;
+      newError.address = '매장 주소는 필수항목입니다.';
       pass = false;
     }
-    setValidate(newValidate);
+    setError(newError);
     return pass;
-  }, [textInputs, address, validate]);
+  }, [textInputs, address, error, isSlugCheckClick, slugSuccess]);
 
   /**
    * 프로필 이미지 전송
@@ -450,22 +506,22 @@ function EditStore() {
         data: data,
       });
     },
-    [textInputs, address, previewImage, storeImage]
+    [address, description, name, router, slug, tel, wayto]
   );
 
   /**
    * 승인 요청 버튼을 눌렀을 때
    */
-  const onSubmitClick = useCallback(
-    async (e: React.FormEvent<HTMLButtonElement>) => {
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      setSubmitLoading(true);
+      e.currentTarget.checkValidity();
 
       // 필수 항목 체크
-      if (!validateForm()) {
-        setSubmitLoading(false);
+      if (!(await validateForm())) {
         return;
       }
+      setSubmitLoading(true);
 
       // aws 이미지 업로드
       let previewImageUrl, storeImageUrls;
@@ -490,7 +546,7 @@ function EditStore() {
         return;
       }
     },
-    [textInputs, address, previewImage, storeImage]
+    [postToApi, uploadPreviewImage, uploadStoreImage, validateForm]
   );
 
   useEffect(() => {
@@ -505,7 +561,7 @@ function EditStore() {
       <Header type={1} />
       <div className={styles.container}>
         <div className={styles.title}>매장 정보 변경</div>
-        <Form>
+        <Form noValidate onSubmit={handleSubmit}>
           {/* 매장 이름 */}
           <Form.Group className={styles.form_group}>
             <Form.Label>매장 이름 *</Form.Label>
@@ -515,10 +571,10 @@ function EditStore() {
               name="name"
               value={name}
               onChange={onChange}
-              isInvalid={validate.name}
+              isInvalid={!!error.name}
             />
             <Form.Control.Feedback type="invalid">
-              매장 이름은 필수항목입니다.
+              {error.name}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -531,10 +587,10 @@ function EditStore() {
               name="tel"
               value={tel}
               onChange={onTelChange}
-              isInvalid={validate.tel}
+              isInvalid={!!error.tel}
             />
             <Form.Control.Feedback type="invalid">
-              전화번호는 필수항목입니다.
+              {error.tel}
             </Form.Control.Feedback>
             <Form.Text>
               확인을 위해 연락을 취할 수 있으니 정확하게 적어주시기 바랍니다.
@@ -551,11 +607,11 @@ function EditStore() {
                 value={address.address}
                 readOnly
                 onClick={onAddressClick}
-                isInvalid={validate.address}
+                isInvalid={!!error.address}
               />
               <Button onClick={onAddressClick}>주소 찾기</Button>
               <Form.Control.Feedback type="invalid">
-                매장주소는 필수항목입니다.
+                {error.address}
               </Form.Control.Feedback>
             </InputGroup>
             <Form.Control
@@ -590,14 +646,22 @@ function EditStore() {
               <InputGroup.Text>wcnc.co.kr/</InputGroup.Text>
               <Form.Control
                 type="text"
-                placeholder="사용할 홈페이지 주소"
+                placeholder="example"
                 value={slug}
                 onChange={onSlugChange}
-                isInvalid={validate.slug}
+                isValid={!!slugSuccess}
+                isInvalid={!!error.slug}
               />
-              <Form.Control.Feedback type="invalid">
-                매장 홈페이지 주소는 필수항목입니다.
-              </Form.Control.Feedback>
+              <Button onClick={handleSlugCheck}>중복 확인</Button>
+              {error.slug && !slugSuccess ? (
+                <Form.Control.Feedback type="invalid">
+                  {error.slug}
+                </Form.Control.Feedback>
+              ) : (
+                <Form.Control.Feedback type="valid">
+                  {slugSuccess}
+                </Form.Control.Feedback>
+              )}
             </InputGroup>
             <Form.Text>
               영문 대소문자와 숫자, 언더바(_)만 입력 가능합니다.
@@ -630,7 +694,7 @@ function EditStore() {
             />
           </Form.Group>
 
-          {/* 프로필 사진 */}
+          {/* 미리보기 사진 */}
           <Form.Group className={styles.form_group}>
             <Form.Label>프로필 사진</Form.Label>
             <Form.Control
@@ -639,7 +703,7 @@ function EditStore() {
               accept="image/png, image/jpeg"
               ref={previewImageInput}
             />
-            {/* 프로필 이미지 표시 */}
+            {/* 미리보기 사진 표시 */}
             {previewImage.previewUrl === '' ? null : (
               <div className={styles.image_container}>
                 <div className={styles.image_wrapper}>
@@ -650,6 +714,7 @@ function EditStore() {
                     <IoClose />
                   </button>
                   <Image
+                    alt="미리보기 이미지"
                     src={previewImage.previewUrl}
                     width={100}
                     height={100}
@@ -669,7 +734,7 @@ function EditStore() {
               accept="image/png, image/jpeg"
               onChange={onStoreImageChange}
             />
-            {/* 프로필 이미지 표시 */}
+            {/* 매장 사진 표시 */}
             {storeImage.previewUrls.length === 0 ? null : (
               <div className={styles.image_container}>
                 {storeImage.previewUrls.map((previewUrl, index) => (
@@ -681,6 +746,7 @@ function EditStore() {
                       <IoClose />
                     </button>
                     <Image
+                      alt="매장 이미지"
                       src={previewUrl}
                       width={100}
                       height={100}
@@ -695,7 +761,6 @@ function EditStore() {
           <Button
             type="submit"
             className={styles.submit_button}
-            onClick={onSubmitClick}
             disabled={submitLoading}
           >
             {submitLoading ? (
