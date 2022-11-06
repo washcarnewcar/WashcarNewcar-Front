@@ -50,10 +50,12 @@ export default function MenuList() {
       <div className={styles.container}>
         <div className={styles.title}>메뉴 관리</div>
         <div className={styles.plus_button_wrapper}>
-          <Button className={styles.plus_button}>
-            <IoAdd size={20} className={styles.plus_icon} />
-            메뉴 추가
-          </Button>
+          <Link href={`/provider/${slug}/menu/new`}>
+            <Button className={styles.plus_button}>
+              <IoAdd size={20} className={styles.plus_icon} />
+              메뉴 추가
+            </Button>
+          </Link>
         </div>
         <ListGroup>
           {tempData.menu.map((menuItem) => (
