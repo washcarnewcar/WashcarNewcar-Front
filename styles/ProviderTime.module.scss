@@ -62,22 +62,48 @@
 
     .except_item_container {
 
-      .form_wrapper {
+      .allday_form_wrapper {
         display: flex;
         align-items: center;
         gap: 10px;
       }
 
-      .trash_wrapper {
+      .allday_trash_wrapper {
         display: flex;
         align-items: center;
 
-        .trash {
+        .allday_trash {
           padding: 0;
           border: none;
           background-color: #ffffff00;
         }
       }
+
+      .partday_form_container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 10px;
+
+        .partday_form_wrapper {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+        }
+
+        .partday_trash_wrapper {
+          display: flex;
+          align-items: center;
+
+          .partday_trash {
+            padding: 0;
+            border: none;
+            background-color: #ffffff00;
+          }
+        }
+      }
+
     }
   }
 }

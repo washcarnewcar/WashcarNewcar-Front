@@ -57,7 +57,7 @@
       flex: 0 0 90px;
 
       .image {
-        background-color: gray;
+        background-color: lightgray;
         object-fit: cover;
         border-radius: 10px;
       }
@@ -73,7 +73,6 @@
 
       .menu_detail {
         font-size: 14px;
-        color: gray;
 
         // \n 줄바꿈 처리
         white-space: pre-line;
@@ -91,5 +90,11 @@
         font-weight: bold;
       }
     }
+  }
+}
+
+.link:not(:hover) {
+  .menu_detail {
+    color: gray;
   }
 }
