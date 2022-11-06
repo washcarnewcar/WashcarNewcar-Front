@@ -283,18 +283,16 @@ function Except() {
       </Button>
 
       <ListGroup>
-        {exceptList.map((except, index) => {
-          return (
-            <ListGroupItem key={index}>
-              <ExceptItem
-                exceptList={exceptList}
-                index={index}
-                deleteItem={deleteItem}
-                setData={setData}
-              />
-            </ListGroupItem>
-          );
-        })}
+        {exceptList.map((except, index) => (
+          <ListGroupItem key={index}>
+            <ExceptItem
+              exceptList={exceptList}
+              index={index}
+              deleteItem={deleteItem}
+              setData={setData}
+            />
+          </ListGroupItem>
+        ))}
       </ListGroup>
     </div>
   );

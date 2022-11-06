@@ -525,7 +525,7 @@ function EditStore() {
         }
       }
     },
-    [address, description, name, router, slug, tel, wayto]
+    [address, description, name, router, slug, tel, wayto, routerSlug]
   );
 
   /**

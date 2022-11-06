@@ -111,11 +111,11 @@ export default function Store() {
 
       <Tabs defaultActiveKey="wash" className={styles.tabs} justify id="tabs">
         <Tab eventKey="wash" title="세차" tabClassName={styles.tab}>
-          {menuTempData.menu.map((menuItem) => (
-            <>
+          {menuTempData.menu.map((menuItem, index) => (
+            <div key={index}>
               <MenuItem slug={slug as string} data={menuItem} />
               <Seperator />
-            </>
+            </div>
           ))}
         </Tab>
 

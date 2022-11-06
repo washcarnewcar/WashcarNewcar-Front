@@ -120,7 +120,7 @@ export default function MenuNew() {
       };
       setInputs(newInputs);
     },
-    [inputs]
+    [inputs, compressImage]
   );
 
   /**

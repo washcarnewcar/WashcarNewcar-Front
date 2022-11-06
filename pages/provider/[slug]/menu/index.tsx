@@ -58,8 +58,8 @@ export default function MenuList() {
           </Link>
         </div>
         <ListGroup>
-          {tempData.menu.map((menuItem) => (
-            <ListGroupItem>
+          {tempData.menu.map((menuItem, index) => (
+            <ListGroupItem key={index}>
               <MenuItem slug={slug as string} data={menuItem} />
             </ListGroupItem>
           ))}
