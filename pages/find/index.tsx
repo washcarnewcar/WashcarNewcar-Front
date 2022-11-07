@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import Header from '../../components/header';
+import Header from '../../components/Header';
 import styles from '../../styles/Find.module.scss';
 
 function Find() {

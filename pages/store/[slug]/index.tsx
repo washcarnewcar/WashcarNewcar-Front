@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Carousel, Tab, Tabs } from 'react-bootstrap';
-import Header from '../../../components/header';
-import Seperator from '../../../components/seperator';
+import Header from '../../../components/Header';
+import Seperator from '../../../components/Seperator';
 import styles from '../../../styles/Store.module.scss';
 import {
   IoCallOutline,

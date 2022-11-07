@@ -1,9 +1,9 @@
 import styles from '../../styles/Search.module.scss';
 import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../components/header';
+import Header from '../../components/Header';
 import { useCallback, useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
-import Seperator from '../../components/seperator';
+import Seperator from '../../components/Seperator';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Image from 'next/image';

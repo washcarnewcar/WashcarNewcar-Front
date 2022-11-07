@@ -3,7 +3,7 @@ import moment from 'moment';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, ListGroup } from 'react-bootstrap';
-import Header from '../../components/header';
+import Header from '../../components/Header';
 import styles from '../../styles/Reservation.module.scss';
 
 interface State {

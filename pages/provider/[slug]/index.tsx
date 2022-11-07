@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Alert, Button, ButtonGroup, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../../components/header';
-import Loading from '../../../components/loading';
+import Header from '../../../components/Header';
+import Loading from '../../../components/Loading';
 import { requestWithToken } from '../../../functions/request';
 import styles from '../../../styles/Provider.module.scss';
 

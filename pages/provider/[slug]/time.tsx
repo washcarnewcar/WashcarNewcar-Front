@@ -9,8 +9,8 @@ import {
   Tabs,
 } from 'react-bootstrap';
 import { IoAdd, IoTrash } from 'react-icons/io5';
-import Header from '../../../components/header';
-import Seperator from '../../../components/seperator';
+import Header from '../../../components/Header';
+import Seperator from '../../../components/Seperator';
 import styles from '../../../styles/ProviderTime.module.scss';
 
 interface Time {

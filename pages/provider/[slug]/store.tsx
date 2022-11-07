@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import styles from '../../../styles/StoreEdit.module.scss';
-import Header from '../../../components/header';
+import Header from '../../../components/Header';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import {
   PutObjectCommand,
