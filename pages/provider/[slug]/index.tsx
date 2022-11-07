@@ -55,11 +55,9 @@ export default function Provider() {
 
   if (!ready) {
     return (
-      <>
-        <div style={{ width: '100%', height: '100vh' }}>
-          <Loading />
-        </div>
-      </>
+      <div style={{ width: '100%', height: '100vh' }}>
+        <Loading />
+      </div>
     );
   }
 

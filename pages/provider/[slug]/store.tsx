@@ -398,10 +398,15 @@ function EditStore() {
     if (textInputs.name === '') {
       newError.name = '매장 이름은 필수항목입니다.';
       pass = false;
+    } else {
+      newError.name = '';
     }
+
     if (textInputs.tel === '') {
       newError.tel = '매장 전화번호는 필수항목입니다.';
       pass = false;
+    } else {
+      newError.tel = '';
     }
 
     if (!isSlugCheckClick) {
@@ -412,11 +417,15 @@ function EditStore() {
       newError.slug = '사용 불가능한 홈페이지 주소입니다.';
       setSlugSuccess('');
       pass = false;
+    } else {
+      newError.slug = '';
     }
 
     if (address.address === '') {
       newError.address = '매장 주소는 필수항목입니다.';
       pass = false;
+    } else {
+      newError.address = '';
     }
     setError(newError);
     return pass;

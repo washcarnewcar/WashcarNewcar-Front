@@ -1,12 +1,18 @@
 import Compressor from 'compressorjs';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
-import { IoImage } from 'react-icons/io5';
+import { IoClose, IoImage } from 'react-icons/io5';
 import styles from '../styles/MenuForm.module.scss';
+import Loading from './Loading';
 
-interface Data {}
+interface Data {
+  image: string;
+  name: string;
+  detail: string;
+  price: number;
+}
 
 interface MenuFormProps {
   slug: string;
@@ -18,7 +24,7 @@ interface Inputs {
   imageUrl: string;
   name: string;
   detail: string;
-  price: string;
+  price: number;
 }
 
 interface Errors {
@@ -30,13 +36,14 @@ interface Errors {
 
 export default function MenuForm({ slug, data }: MenuFormProps) {
   const router = useRouter();
+  const inputFile = useRef<HTMLInputElement>(null);
 
   const [inputs, setInputs] = useState<Inputs>({
     image: null,
     imageUrl: '',
     name: '',
     detail: '',
-    price: '',
+    price: 0,
   });
 
   const [error, setError] = useState<Errors>({
@@ -45,6 +52,8 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
     detail: '',
     price: '',
   });
+
+  const [ready, setReady] = useState(false);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +84,33 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
       });
     });
   }, []);
+
+  const validateForm = useCallback(() => {
+    let pass = true;
+    const newError = { ...error };
+
+    if (!inputs.name) {
+      newError.name = '메뉴 이름을 입력해주세요';
+      pass = false;
+    } else {
+      newError.name = '';
+    }
+
+    if (!inputs.detail) {
+      newError.detail = '메뉴 설명을 입력해주세요';
+      pass = false;
+    } else {
+      newError.detail = '';
+    }
+
+    if (!inputs.price) {
+      newError.price = '메뉴 가격을 입력해주세요';
+      pass = false;
+    } else {
+      newError.price = '';
+    }
+    setError(newError);
+  }, [inputs, error]);
 
   /**
    * 이미지를 선택했을 때
@@ -126,14 +162,61 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
   const handleSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      validateForm();
       console.log(inputs);
     },
     [inputs]
   );
 
+  /**
+   * 취소 버튼 눌렀을 때
+   */
   const handleCancelClick = useCallback(() => {
     router.push(`/provider/${slug}/menu`);
   }, [router]);
+
+  /**
+   * 사진 삭제 버튼을 눌렀을 때
+   */
+  const handleDeleteClick = useCallback(() => {
+    const newInputs = {
+      ...inputs,
+      image: null,
+      imageUrl: '',
+    };
+    setInputs(newInputs);
+    inputFile.current ? (inputFile.current.value = '') : null;
+  }, [inputs]);
+
+  /**
+   * data가 null일때는 new => 바로 띄움
+   * data가 undifind일때는 데이터 로딩중
+   * data가 둘 다 아닐 때에는 로딩 되었음 => 띄움
+   */
+  useEffect(() => {
+    const setData = (data: Data) => {
+      setInputs({
+        image: null,
+        imageUrl: data.image ? data.image : '',
+        name: data.name ? data.name : '',
+        detail: data.detail ? data.detail : '',
+        price: data.price,
+      });
+    };
+
+    if (data === null) {
+      setReady(true);
+    } else if (data) {
+      setData(data);
+      setReady(true);
+    }
+  }, [data]);
+
+  if (!ready) {
+    <div style={{ width: '100%', height: '100vh' }}>
+      <Loading />
+    </div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -145,6 +228,12 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
                 <label htmlFor="file" className={styles.change_wrapper}>
                   <IoImage size="100%" />
                 </label>
+                <button
+                  className={styles.delete_button}
+                  onClick={handleDeleteClick}
+                >
+                  <IoClose />
+                </button>
                 <Image
                   src={inputs.imageUrl}
                   alt="menu_image"
@@ -165,6 +254,7 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
               id="file"
               style={{ display: 'none' }}
               onChange={handleImageInput}
+              ref={inputFile}
             />
           </div>
         </div>
