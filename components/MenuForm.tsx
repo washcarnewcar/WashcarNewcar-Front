@@ -6,6 +6,13 @@ import { Button, Form, InputGroup } from 'react-bootstrap';
 import { IoImage } from 'react-icons/io5';
 import styles from '../styles/MenuForm.module.scss';
 
+interface Data {}
+
+interface MenuFormProps {
+  slug: string;
+  data?: Data | null;
+}
+
 interface Inputs {
   image: File | null;
   imageUrl: string;
@@ -21,7 +28,7 @@ interface Errors {
   price: string;
 }
 
-export default function MenuForm() {
+export default function MenuForm({ slug, data }: MenuFormProps) {
   const router = useRouter();
 
   const [inputs, setInputs] = useState<Inputs>({
@@ -124,6 +131,10 @@ export default function MenuForm() {
     [inputs]
   );
 
+  const handleCancelClick = useCallback(() => {
+    router.push(`/provider/${slug}/menu`);
+  }, [router]);
+
   return (
     <div className={styles.container}>
       <Form onSubmit={handleSubmit}>
@@ -211,9 +222,18 @@ export default function MenuForm() {
           </InputGroup>
         </Form.Group>
 
-        <Button type="submit" className={styles.submit_button}>
-          등록하기
-        </Button>
+        <div className={styles.button_wrapper}>
+          <Button
+            className={styles.submit_button}
+            variant="outline-danger"
+            onClick={handleCancelClick}
+          >
+            취소
+          </Button>
+          <Button type="submit" className={styles.submit_button}>
+            등록하기
+          </Button>
+        </div>
       </Form>
     </div>
   );

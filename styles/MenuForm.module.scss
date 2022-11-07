@@ -50,7 +50,12 @@
     margin: 20px 0px;
   }
 
-  .submit_button {
-    width: 100%;
+  .button_wrapper {
+    display: flex;
+    gap: 10px;
+
+    .submit_button {
+      width: 100%;
+    }
   }
 }

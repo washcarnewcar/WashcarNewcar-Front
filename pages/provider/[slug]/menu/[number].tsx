@@ -1,17 +1,39 @@
+import axios from 'axios';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '../../../../components/Header';
 import MenuForm from '../../../../components/MenuForm';
 import styles from '../../../../styles/MenuEdit.module.scss';
 
+interface Data {
+  image: string;
+  name: string;
+  detail: string;
+  price: number;
+}
+
 export default function MenuEdit() {
   const router = useRouter();
-  const { slug } = router.query;
+  const { slug, number } = router.query;
+  const [data, setData] = useState<Data | undefined>();
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/store/${slug}/menu/${number}`
+      );
+      const responseData: Data = response.data;
+      console.log(response.data);
+      setData(responseData);
+    };
+
+    getData();
+  }, []);
 
   return (
     <>
       <Header type={1} />
-      <MenuForm />
+      <MenuForm slug={slug as string} data={data} />
     </>
   );
 }

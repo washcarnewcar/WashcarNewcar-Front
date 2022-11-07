@@ -11,7 +11,7 @@ export default function MenuNew() {
   return (
     <>
       <Header type={1} />
-      <MenuForm />
+      <MenuForm slug={slug as string} data={null} />
     </>
   );
 }
