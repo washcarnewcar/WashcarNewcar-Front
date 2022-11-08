@@ -1,12 +1,14 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Alert, Button, ButtonGroup, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../../components/Header';
 import Loading from '../../../components/Loading';
+import UserContext from '../../../components/UserProvider';
 import { requestWithToken } from '../../../functions/request';
 import styles from '../../../styles/Provider.module.scss';
 
@@ -23,35 +25,26 @@ interface Menu {
 export default function Provider() {
   // 임시로 true
   const router = useRouter();
+  const { user, setUser } = useContext(UserContext);
   const { slug } = router.query;
   const [ready, setReady] = useState(true);
   const [menuList, setMenuList] = useState(new Array<Menu>());
 
+  const getCalendarList = useCallback(async () => {
+    if (router && slug) {
+      const response = await requestWithToken(
+        router,
+        setUser,
+        `/provider/${slug}/schedule`,
+        { method: 'GET' }
+      );
+      console.log(response);
+    }
+  }, [router, slug, setUser]);
+
   useEffect(() => {
-    // getCalendarList();
-  }, []);
-
-  // const getCalendarList = async () => {
-  //   const response = await requestWithToken(router, '/provider/calendar/list');
-  //   if (response.ok) {
-  //     const json: ResponseJson = await response.json();
-
-  //     if (json.first) {
-  //       // 처음 매장 생성
-  //       router.replace('/provider/store');
-  //     } else {
-  //       setMenuList(json.menus);
-  //       setReady(true);
-  //       console.log(json);
-  //     }
-  //   } else if (response.status === 401) {
-  //     router.replace('/login');
-  //   } else if (response.status === 403) {
-  //     router.replace('/contact');
-  //   } else {
-  //     router.replace('/error');
-  //   }
-  // };
+    getCalendarList();
+  }, [getCalendarList]);
 
   if (!ready) {
     return (
@@ -164,3 +157,21 @@ function List() {
     </ListGroup>
   );
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  console.log('hello');
+
+  return {
+    paths: [{ params: { slug: 'hello' } }],
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async () => {
+  console.log('hello');
+  return {
+    props: {
+      posts: 'hello',
+    },
+  };
+};

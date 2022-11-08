@@ -1,6 +1,6 @@
 import React, {
   ChangeEvent,
-  useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
@@ -22,6 +22,7 @@ import { requestWithToken } from '../../../functions/request';
 import Compressor from 'compressorjs';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import UserContext from '../../../components/UserProvider';
 
 const credentials = {
   accessKeyId: process.env.NEXT_PUBLIC_ACCESSKEY
@@ -51,7 +52,8 @@ interface IStoreImage {
 
 function EditStore() {
   const router = useRouter();
-  const { router: routerSlug } = router.query;
+  const { slug: routerSlug } = router.query;
+  const { user, setUser } = useContext(UserContext);
   const [textInputs, setTextInputs] = useState({
     name: '',
     tel: '',
@@ -94,44 +96,40 @@ function EditStore() {
   // 사용 가능 메시지를 저장할 state
   const [slugSuccess, setSlugSuccess] = useState('');
 
-  const onChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const newInputs = {
-        ...textInputs,
-        [e.target.name]: e.target.value,
-      };
-      setTextInputs(newInputs);
-    },
-    [textInputs]
-  );
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const newInputs = {
+      ...textInputs,
+      [e.target.name]: e.target.value,
+    };
+    setTextInputs(newInputs);
+  };
 
   /**
    * 전화번호에 (-) 붙여주는 함수
    */
-  const onTelChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      const newValue = value
-        .replace(/[^0-9]/g, '')
-        .replace(
-          /(^02|^0505|^1[0-9]{3}|^0[0-9]{2})([0-9]+)?([0-9]{4})$/,
-          '$1-$2-$3'
-        )
-        .replace('--', '-');
+  const handleTelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const newValue = value
+      .replace(/[^0-9]/g, '')
+      .replace(
+        /(^02|^0505|^1[0-9]{3}|^0[0-9]{2})([0-9]+)?([0-9]{4})$/,
+        '$1-$2-$3'
+      )
+      .replace('--', '-');
 
-      const newInputs = {
-        ...textInputs,
-        tel: newValue,
-      };
-      setTextInputs(newInputs);
-    },
-    [textInputs]
-  );
+    const newInputs = {
+      ...textInputs,
+      tel: newValue,
+    };
+    setTextInputs(newInputs);
+  };
 
   /**
    * 주소 팝업창 처리하는 함수
    */
-  const onAddressClick = useCallback(() => {
+  const handleAddressClick = () => {
     const handleComplete = (data: Address) => {
       // geocoder가 정상적으로 로딩 되었을 때만 처리하기.
       // geocoder가 없으면 좌표를 얻어오지 못해서 안된다!!
@@ -159,41 +157,37 @@ function EditStore() {
     };
 
     addressOpen({ onComplete: handleComplete });
-  }, [address, geocoder, addressOpen]);
+  };
 
   /**
    * 상세주소 입력을 처리하는 함수
    */
-  const onAddressDetailChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      const newAddress = {
-        ...address,
-        addressDetail: value,
-      };
-      setAddress(newAddress);
-    },
-    [address]
-  );
+  const handleAddressDetailChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    const newAddress = {
+      ...address,
+      addressDetail: value,
+    };
+    setAddress(newAddress);
+  };
 
   /**
    * 슬러그에 유효성을 체크하는 함수
    */
-  const onSlugChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setIsSlugCheckClick(false);
-      const value = e.target.value;
-      const newValue = value.replace(/[^a-zA-Z0-9_]/g, '');
-      const newInputs = {
-        ...textInputs,
-        slug: newValue,
-      };
-      setTextInputs(newInputs);
-    },
-    [textInputs]
-  );
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsSlugCheckClick(false);
+    const value = e.target.value;
+    const newValue = value.replace(/[^a-zA-Z0-9_]/g, '');
+    const newInputs = {
+      ...textInputs,
+      slug: newValue,
+    };
+    setTextInputs(newInputs);
+  };
 
-  const handleSlugCheck = useCallback(async () => {
+  const handleSlugCheck = async () => {
     setIsSlugCheckClick(true);
     // slug를 입력하지 않았을 때
     if (slug === '') {
@@ -213,8 +207,7 @@ function EditStore() {
       const status: number = response.data.status;
 
       // slug가 사용가능할 때
-      // if (status === 1400) {
-      if (status === 0) {
+      if (status === 1400) {
         setError({
           ...error,
           slug: '',
@@ -240,12 +233,12 @@ function EditStore() {
       console.error(error);
       return;
     }
-  }, [slug, error]);
+  };
 
   /**
    * 이미지를 5MB 이하의 크기로 압축하는 함수
    */
-  const compressImage = useCallback((file: File): Promise<File> => {
+  const compressImage = (file: File): Promise<File> => {
     return new Promise((resolve, reject) => {
       if (!file) reject('파일이 없음');
 
@@ -259,29 +252,88 @@ function EditStore() {
         },
       });
     });
-  }, []);
+  };
 
   /**
    * 프로필 사진이 삽입되었을 때
    */
-  const onPreviewImageChange = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
-      const inputFile = e.target;
-      const files = e.target.files;
+  const handlePreviewImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const inputFile = e.target;
+    const files = e.target.files;
 
-      // 파일을 넣지 않은 경우
-      if (!files || files.length < 1) {
+    // 파일을 넣지 않은 경우
+    if (!files || files.length < 1) {
+      inputFile.value = '';
+      return;
+    }
+
+    let file = files[0];
+
+    // 이미지 형식이 아닌 경우
+    if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
+      alert('jpg, png 파일만 업로드 가능합니다.');
+      inputFile.value = '';
+      return;
+    }
+
+    // 파일이 5MB를 넘은 경우 => 압축
+    if (file.size > 1024 * 1024 * 5) {
+      try {
+        file = await compressImage(file);
+      } catch (error) {
+        alert('압축 과정에서 오류가 발생했습니다.');
         inputFile.value = '';
         return;
       }
+    }
 
-      let file = files[0];
+    const newPreviewImage = {
+      file: file,
+      previewUrl: URL.createObjectURL(files[0]),
+    };
+    setPreviewImage(newPreviewImage);
+  };
 
-      // 이미지 형식이 아닌 경우
+  /**
+   * 프로필 사진의 x버튼을 눌렀을 때
+   */
+  const handlePreviewImageCloseClick = () => {
+    setPreviewImage({ file: null, previewUrl: '' });
+    if (previewImageInput.current) {
+      previewImageInput.current.value = '';
+    }
+  };
+
+  /**
+   * 매장 사진이 삽입되었을 때
+   */
+  const handleStoreImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const inputFile = e.target;
+    const fileList = e.target.files;
+
+    // 파일을 넣지 않은 경우
+    if (!fileList || fileList.length === 0) {
+      inputFile.value = '';
+      return;
+    }
+
+    const files = storeImage.files;
+    const previewUrls = storeImage.previewUrls;
+
+    for (let i = 0; i < fileList.length; i++) {
+      // 최대 업로드 개수를 초과한 경우 => 반복문 탈출
+      if (files.length >= 6) {
+        alert('최대 6개까지 업로드 가능합니다.');
+        break;
+      }
+
+      let file = fileList[i];
+
+      // 이미지 형식이 아닌 경우 => 넘어가고 다음 파일 처리
       if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
         alert('jpg, png 파일만 업로드 가능합니다.');
         inputFile.value = '';
-        return;
+        continue;
       }
 
       // 파일이 5MB를 넘은 경우 => 압축
@@ -291,108 +343,40 @@ function EditStore() {
         } catch (error) {
           alert('압축 과정에서 오류가 발생했습니다.');
           inputFile.value = '';
-          return;
-        }
-      }
-
-      const newPreviewImage = {
-        file: file,
-        previewUrl: URL.createObjectURL(files[0]),
-      };
-      setPreviewImage(newPreviewImage);
-    },
-    [compressImage]
-  );
-
-  /**
-   * 프로필 사진의 x버튼을 눌렀을 때
-   */
-  const onPreviewImageCloseClick = useCallback(() => {
-    setPreviewImage({ file: null, previewUrl: '' });
-    if (previewImageInput.current) {
-      previewImageInput.current.value = '';
-    }
-  }, []);
-
-  /**
-   * 매장 사진이 삽입되었을 때
-   */
-  const onStoreImageChange = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
-      const inputFile = e.target;
-      const fileList = e.target.files;
-
-      // 파일을 넣지 않은 경우
-      if (!fileList || fileList.length === 0) {
-        inputFile.value = '';
-        return;
-      }
-
-      const files = storeImage.files;
-      const previewUrls = storeImage.previewUrls;
-
-      for (let i = 0; i < fileList.length; i++) {
-        // 최대 업로드 개수를 초과한 경우 => 반복문 탈출
-        if (files.length >= 6) {
-          alert('최대 6개까지 업로드 가능합니다.');
-          break;
-        }
-
-        let file = fileList[i];
-
-        // 이미지 형식이 아닌 경우 => 넘어가고 다음 파일 처리
-        if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
-          alert('jpg, png 파일만 업로드 가능합니다.');
-          inputFile.value = '';
           continue;
         }
-
-        // 파일이 5MB를 넘은 경우 => 압축
-        if (file.size > 1024 * 1024 * 5) {
-          try {
-            file = await compressImage(file);
-          } catch (error) {
-            alert('압축 과정에서 오류가 발생했습니다.');
-            inputFile.value = '';
-            continue;
-          }
-        }
-
-        // 파일 추가
-        files.push(file);
-        previewUrls.push(URL.createObjectURL(file));
       }
 
-      const newStoreImage = {
-        files: files,
-        previewUrls: previewUrls,
-      };
-      setStoreImage(newStoreImage);
-    },
-    [storeImage, compressImage]
-  );
+      // 파일 추가
+      files.push(file);
+      previewUrls.push(URL.createObjectURL(file));
+    }
+
+    const newStoreImage = {
+      files: files,
+      previewUrls: previewUrls,
+    };
+    setStoreImage(newStoreImage);
+  };
 
   /**
    * 매장 사진의 x버튼을 눌렀을 때
    */
-  const onStoreImageCloseClick = useCallback(
-    (index: number) => {
-      const files = storeImage.files;
-      files.splice(index, 1);
+  const handleStoreImageCloseClick = (index: number) => {
+    const files = storeImage.files;
+    files.splice(index, 1);
 
-      const previewUrls = storeImage.previewUrls;
-      previewUrls.splice(index, 1);
+    const previewUrls = storeImage.previewUrls;
+    previewUrls.splice(index, 1);
 
-      const newStoreImage = {
-        files: files,
-        previewUrls: previewUrls,
-      };
-      setStoreImage(newStoreImage);
-    },
-    [storeImage]
-  );
+    const newStoreImage = {
+      files: files,
+      previewUrls: previewUrls,
+    };
+    setStoreImage(newStoreImage);
+  };
 
-  const validateForm = useCallback(async () => {
+  const validateForm = async () => {
     let pass = true;
     const newError = { ...error };
     if (textInputs.name === '') {
@@ -429,12 +413,12 @@ function EditStore() {
     }
     setError(newError);
     return pass;
-  }, [textInputs, address, error, isSlugCheckClick, slugSuccess]);
+  };
 
   /**
    * 프로필 이미지 전송
    */
-  const uploadPreviewImage = useCallback(async () => {
+  const uploadPreviewImage = async () => {
     // 파일 없으면 전송하지 않음
     if (!previewImage.file) return '';
 
@@ -456,12 +440,12 @@ function EditStore() {
 
     // 성공
     return fileName;
-  }, [previewImage]);
+  };
 
   /**
    * 매장 이미지 전송
    */
-  const uploadStoreImage = useCallback(async () => {
+  const uploadStoreImage = async () => {
     // 파일 없으면 전송하지 않음
     if (storeImage.files.length === 0) return [];
 
@@ -489,92 +473,91 @@ function EditStore() {
     }
 
     return urls;
-  }, [storeImage]);
+  };
 
   /**
    * 백엔드에 정보 전송
    */
-  const postToApi = useCallback(
-    async (previewImageUrl: string, storeImageUrls: string[]) => {
-      const data = {
-        name: name,
-        tel: tel,
-        coordinate: {
-          longitude: address.longitude,
-          latitude: address.latitude,
-        },
-        address: `${address.address} ${address.addressDetail}`,
-        slug: slug,
-        wayto: wayto,
-        description: description,
-        preview_image: previewImageUrl,
-        store_image: storeImageUrls,
-      };
+  const postToApi = async (
+    previewImageUrl: string,
+    storeImageUrls: string[]
+  ) => {
+    const data = {
+      name: name,
+      tel: tel,
+      coordinate: {
+        longitude: address.longitude,
+        latitude: address.latitude,
+      },
+      address: `${address.address} ${address.addressDetail}`,
+      slug: slug,
+      wayto: wayto,
+      description: description,
+      preview_image: previewImageUrl,
+      store_image: storeImageUrls,
+    };
 
-      const response = await requestWithToken(
-        router,
-        `/provider/${routerSlug}/store`,
-        {
-          method: 'post',
-          data: data,
-        }
-      );
-
-      if (response) {
-        const status = response.data.status;
-        if (status === 2500) {
-          alert('성공적으로 적용되었습니다.');
-          router.replace(`/provider/${routerSlug}`);
-        } else if (status === 2501) {
-          alert('필수 정보가 입력되지 않았습니다.');
-        } else if (status === 2502) {
-          alert('홈페이지 주소가 중복되었습니다.');
-        } else {
-          alert('알 수 없는 오류가 발생했습니다.');
-        }
+    const response = await requestWithToken(
+      router,
+      setUser,
+      `/provider/${routerSlug}/store`,
+      {
+        method: 'post',
+        data: data,
       }
-    },
-    [address, description, name, router, slug, tel, wayto, routerSlug]
-  );
+    );
+
+    if (response) {
+      const status = response.data.status;
+      if (status === 2500) {
+        alert('성공적으로 적용되었습니다.');
+        router.replace(`/provider/${routerSlug}`);
+      } else if (status === 2501) {
+        alert('필수 정보가 입력되지 않았습니다.');
+      } else if (status === 2502) {
+        alert('홈페이지 주소가 중복되었습니다.');
+      } else {
+        alert('알 수 없는 오류가 발생했습니다.');
+      }
+    }
+  };
 
   /**
    * 승인 요청 버튼을 눌렀을 때
    */
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      // 필수 항목 체크
-      if (!(await validateForm())) {
-        return;
-      }
-      setSubmitLoading(true);
+    // 필수 항목 체크
+    if (!(await validateForm())) {
+      return;
+    }
+    setSubmitLoading(true);
 
-      // aws 이미지 업로드
-      let previewImageUrl, storeImageUrls;
-      try {
-        previewImageUrl = await uploadPreviewImage();
-        console.log(previewImageUrl);
+    // aws 이미지 업로드
+    let previewImageUrl, storeImageUrls;
+    try {
+      previewImageUrl = await uploadPreviewImage();
+      console.log(previewImageUrl);
 
-        storeImageUrls = await uploadStoreImage();
-        console.log(storeImageUrls);
-      } catch (error) {
-        alert('오류가 발생했습니다.\n다시 시도해주세요.');
-        setSubmitLoading(false);
-        return;
-      }
+      storeImageUrls = await uploadStoreImage();
+      console.log(storeImageUrls);
+    } catch (error) {
+      alert('이미지 업로드에 오류가 발생했습니다.\n다시 시도해주세요.');
+      setSubmitLoading(false);
+      return;
+    }
 
-      // 서버에 정보 저장
-      try {
-        await postToApi(previewImageUrl, storeImageUrls);
-      } catch (error) {
-        alert('오류가 발생했습니다.\n다시 시도해주세요.');
-        setSubmitLoading(false);
-        return;
-      }
-    },
-    [postToApi, uploadPreviewImage, uploadStoreImage, validateForm]
-  );
+    // 서버에 정보 저장
+    try {
+      await postToApi(previewImageUrl, storeImageUrls);
+    } catch (error) {
+      console.error(error);
+      alert('서버에 전송하는 도중 오류가 발생했습니다.\n다시 시도해주세요.');
+      setSubmitLoading(false);
+      return;
+    }
+  };
 
   useEffect(() => {
     kakao.maps.load(() => {
@@ -597,7 +580,7 @@ function EditStore() {
               placeholder="매장 이름을 입력해주세요"
               name="name"
               value={name}
-              onChange={onChange}
+              onChange={handleChange}
               isInvalid={!!error.name}
             />
             <Form.Control.Feedback type="invalid">
@@ -613,7 +596,7 @@ function EditStore() {
               placeholder="010-0000-0000"
               name="tel"
               value={tel}
-              onChange={onTelChange}
+              onChange={handleTelChange}
               isInvalid={!!error.tel}
             />
             <Form.Control.Feedback type="invalid">
@@ -633,10 +616,10 @@ function EditStore() {
                 placeholder="주소 찾기를 눌러주세요"
                 value={address.address}
                 readOnly
-                onClick={onAddressClick}
+                onClick={handleAddressClick}
                 isInvalid={!!error.address}
               />
-              <Button onClick={onAddressClick}>주소 찾기</Button>
+              <Button onClick={handleAddressClick}>주소 찾기</Button>
               <Form.Control.Feedback type="invalid">
                 {error.address}
               </Form.Control.Feedback>
@@ -645,7 +628,7 @@ function EditStore() {
               type="text"
               placeholder="상세 주소를 입력해주세요"
               value={address.addressDetail}
-              onChange={onAddressDetailChange}
+              onChange={handleAddressDetailChange}
               disabled={!address.isAddressFound}
               className={styles.address_detail}
             />
@@ -675,7 +658,7 @@ function EditStore() {
                 type="text"
                 placeholder="example"
                 value={slug}
-                onChange={onSlugChange}
+                onChange={handleSlugChange}
                 isValid={!!slugSuccess}
                 isInvalid={!!error.slug}
               />
@@ -704,7 +687,7 @@ function EditStore() {
               rows={5}
               name="wayto"
               value={wayto}
-              onChange={onChange}
+              onChange={handleChange}
             />
           </Form.Group>
 
@@ -717,7 +700,7 @@ function EditStore() {
               rows={5}
               name="description"
               value={description}
-              onChange={onChange}
+              onChange={handleChange}
             />
           </Form.Group>
 
@@ -726,7 +709,7 @@ function EditStore() {
             <Form.Label>프로필 사진</Form.Label>
             <Form.Control
               type="file"
-              onChange={onPreviewImageChange}
+              onChange={handlePreviewImageChange}
               accept="image/png, image/jpeg"
               ref={previewImageInput}
             />
@@ -736,7 +719,7 @@ function EditStore() {
                 <div className={styles.image_wrapper}>
                   <button
                     className={styles.close_wrapper}
-                    onClick={onPreviewImageCloseClick}
+                    onClick={handlePreviewImageCloseClick}
                   >
                     <IoClose />
                   </button>
@@ -759,7 +742,7 @@ function EditStore() {
               type="file"
               multiple
               accept="image/png, image/jpeg"
-              onChange={onStoreImageChange}
+              onChange={handleStoreImageChange}
             />
             {/* 매장 사진 표시 */}
             {storeImage.previewUrls.length === 0 ? null : (
@@ -768,7 +751,7 @@ function EditStore() {
                   <div key={index} className={styles.image_wrapper}>
                     <button
                       className={styles.close_wrapper}
-                      onClick={() => onStoreImageCloseClick(index)}
+                      onClick={() => handleStoreImageCloseClick(index)}
                     >
                       <IoClose />
                     </button>

@@ -29,11 +29,12 @@
 
     .link_container {
       width: 100%;
-      align-items: center;
       display: flex;
 
       .image_wrapper {
         flex: 0 0 90px;
+        display: flex;
+        align-items: center;
 
         .image {
           background-color: gray;

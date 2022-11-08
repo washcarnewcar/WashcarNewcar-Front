@@ -2,12 +2,16 @@ import styles from '../styles/Header.module.scss';
 import { Container, Nav, Navbar, Offcanvas } from 'react-bootstrap';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useContext } from 'react';
+import UserContext from './UserProvider';
 
 interface HeaderProps {
   type: number;
 }
 
 export default function Header({ type }: HeaderProps) {
+  const { user, setUser } = useContext(UserContext);
+
   if (type === 1) {
     return (
       <Navbar sticky="top" bg="white" expand={false} id={styles.container}>
@@ -29,10 +33,13 @@ export default function Header({ type }: HeaderProps) {
               <Offcanvas.Title>세차새차</Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              <Link href="/auth/login">
-                <a>로그인</a>
-              </Link>
-              <Nav.Link>로그아웃</Nav.Link>
+              {user?.isLogined ? (
+                <Nav.Link>로그아웃</Nav.Link>
+              ) : (
+                <Link href="/auth/login">
+                  <a>로그인</a>
+                </Link>
+              )}
             </Offcanvas.Body>
           </Navbar.Offcanvas>
         </Container>

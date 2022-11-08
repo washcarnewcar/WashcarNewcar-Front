@@ -2,9 +2,10 @@ import axios, { AxiosError } from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
+import UserContext from '../../components/UserProvider';
 import styles from '../../styles/Login.module.scss';
 
 interface IForm {
@@ -19,6 +20,7 @@ interface IFormValidate {
 
 function Login() {
   const router = useRouter();
+  const { user, setUser } = useContext(UserContext);
   const [inputs, setInputs] = useState<IForm>({
     id: '',
     password: '',
@@ -29,19 +31,16 @@ function Login() {
     password: '',
   });
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const name = e.target.name;
-      const newInputs = {
-        ...inputs,
-        [name]: e.target.value,
-      };
-      setInputs(newInputs);
-    },
-    [inputs]
-  );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.name;
+    const newInputs = {
+      ...inputs,
+      [name]: e.target.value,
+    };
+    setInputs(newInputs);
+  };
 
-  const validate = useCallback(() => {
+  const validate = () => {
     let validated = true;
     const newErrors: IFormValidate = {
       id: '',
@@ -60,53 +59,52 @@ function Login() {
 
     setErrors(newErrors);
     return validated;
-  }, [inputs]);
+  };
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      // 검증
-      if (!validate()) return;
+    // 검증
+    if (!validate()) return;
 
-      setSubmitting(true);
+    setSubmitting(true);
 
-      // form data 생성
-      const form = new FormData();
-      form.append('id', inputs.id);
-      form.append('password', inputs.password);
+    // form data 생성
+    const form = new FormData();
+    form.append('id', inputs.id);
+    form.append('password', inputs.password);
 
-      // 로그인 요청
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API}/login`,
-          form
-        );
+    // 로그인 요청
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/login`,
+        form
+      );
 
-        // 토큰 저장
-        const token = response.data.access_token;
-        const refToken = response.data.refresh_token;
-        localStorage.setItem('token', token);
-        localStorage.setItem('refresh_token', refToken);
+      // 토큰 저장
+      const token = response.data.access_token;
+      const refToken = response.data.refresh_token;
+      localStorage.setItem('token', token);
+      localStorage.setItem('refresh_token', refToken);
 
-        // 홈화면으로
-        router.replace('/');
-      } catch (error) {
-        // 사용자 정보가 없을 시
-        if (error instanceof AxiosError && error.request.status === 401) {
-          const newErrors = {
-            id: ' ',
-            password: '아이디 또는 비밀번호가 틀렸습니다.',
-          };
-          setErrors(newErrors);
-        } else {
-          alert('알 수 없는 오류가 발생했습니다.');
-          console.error(error);
-        }
+      setUser({ nickname: '', isLogined: true });
+
+      // 홈화면으로
+      router.replace('/');
+    } catch (error) {
+      // 사용자 정보가 없을 시
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        const newErrors = {
+          id: ' ',
+          password: '아이디 또는 비밀번호가 틀렸습니다.',
+        };
+        setErrors(newErrors);
+      } else {
+        alert('알 수 없는 오류가 발생했습니다.');
+        console.error(error);
       }
-    },
-    [inputs, validate, router]
-  );
+    }
+  };
 
   return (
     <>

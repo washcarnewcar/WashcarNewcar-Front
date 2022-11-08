@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Form,
@@ -70,36 +70,38 @@ function TimeList() {
     null,
   ]);
 
-  const setDayOfWeek = useCallback(
-    (dayOfWeek: number, startEnd: string, date: Date | null) => {
-      let oneDay = timeList[dayOfWeek];
+  const setDayOfWeek = (
+    dayOfWeek: number,
+    startEnd: string,
+    date: Date | null
+  ) => {
+    let oneDay = timeList[dayOfWeek];
 
-      // 시작 시간을 입력했을 때
-      if (startEnd === 'start' && date !== null && oneDay !== null) {
-        oneDay.start = date;
-      }
-      // 종료 시간을 입력했을 때
-      else if (startEnd === 'end' && date !== null && oneDay !== null) {
-        oneDay.end = date;
-      }
-      // 초기화를 했을 때
-      else if (startEnd === 'on') {
-        oneDay = {
-          start: new Date('1970-1-1 00:00'),
-          end: new Date('1970-1-1 00:00'),
-        };
-      }
-      // 비활성화를 했을 때
-      else if (startEnd === 'off') {
-        oneDay = null;
-      }
+    // 시작 시간을 입력했을 때
+    if (startEnd === 'start' && date !== null && oneDay !== null) {
+      oneDay.start = date;
+    }
+    // 종료 시간을 입력했을 때
+    else if (startEnd === 'end' && date !== null && oneDay !== null) {
+      oneDay.end = date;
+    }
+    // 초기화를 했을 때
+    else if (startEnd === 'on') {
+      oneDay = {
+        start: new Date('1970-1-1 00:00'),
+        end: new Date('1970-1-1 00:00'),
+      };
+    }
+    // 비활성화를 했을 때
+    else if (startEnd === 'off') {
+      oneDay = null;
+    }
 
-      const newTimeList = [...timeList];
-      newTimeList[dayOfWeek] = oneDay;
-      setTimeList(newTimeList);
-    },
-    [timeList]
-  );
+    const newTimeList = [...timeList];
+    newTimeList[dayOfWeek] = oneDay;
+    setTimeList(newTimeList);
+  };
+
   return (
     <>
       {timeList.map((time, index) => (
@@ -127,32 +129,26 @@ interface TimeListItemProps {
 }
 
 function TimeListItem({ time, dayOfWeek, setDayOfWeek }: TimeListItemProps) {
-  const displayDayOfWeek = useCallback(() => {
+  const displayDayOfWeek = () => {
     const name = ['일', '월', '화', '수', '목', '금', '토'];
     return name[dayOfWeek];
-  }, [dayOfWeek]);
+  };
 
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
     if (time) {
       setDayOfWeek(dayOfWeek, 'off', null);
     } else {
       setDayOfWeek(dayOfWeek, 'on', null);
     }
-  }, [time, setDayOfWeek, dayOfWeek]);
+  };
 
-  const handleStartChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setDayOfWeek(dayOfWeek, 'start', new Date('1970-1-1 ' + e.target.value));
-    },
-    [dayOfWeek, setDayOfWeek]
-  );
+  const handleStartChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDayOfWeek(dayOfWeek, 'start', new Date('1970-1-1 ' + e.target.value));
+  };
 
-  const handleEndChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setDayOfWeek(dayOfWeek, 'end', new Date('1970-1-1 ' + e.target.value));
-    },
-    [dayOfWeek, setDayOfWeek]
-  );
+  const handleEndChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDayOfWeek(dayOfWeek, 'end', new Date('1970-1-1 ' + e.target.value));
+  };
 
   return (
     <div className={styles.item_container}>
@@ -184,7 +180,7 @@ function TimeListItemSelect({
   onStartChange,
   onEndChange,
 }: TimeListItemSelectProps) {
-  const generateTime = useCallback(() => {
+  const generateTime = () => {
     const arr = [];
     for (let h = 0; h <= 24; h++) {
       for (let m = 0; m < 60; m += 30) {
@@ -199,7 +195,7 @@ function TimeListItemSelect({
       }
     }
     return arr;
-  }, []);
+  };
 
   return (
     <>
@@ -226,31 +222,30 @@ interface ExceptData {
 function Except() {
   const [exceptList, setExceptList] = useState<ExceptData[]>([]);
 
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
     const newList = [...exceptList];
     newList.push({ allDay: true, start: '', end: '' });
     setExceptList(newList);
-  }, [exceptList]);
+  };
 
-  const deleteItem = useCallback(
-    (index: number) => {
-      const newList = [...exceptList];
-      newList.splice(index, 1);
-      setExceptList(newList);
-    },
-    [exceptList]
-  );
+  const deleteItem = (index: number) => {
+    const newList = [...exceptList];
+    newList.splice(index, 1);
+    setExceptList(newList);
+  };
 
-  const setData = useCallback(
-    (index: number, allday: boolean, start: string, end: string) => {
-      const newList = [...exceptList];
-      newList[index].allDay = allday;
-      newList[index].start = start;
-      newList[index].end = end;
-      setExceptList(newList);
-    },
-    [exceptList]
-  );
+  const setData = (
+    index: number,
+    allday: boolean,
+    start: string,
+    end: string
+  ) => {
+    const newList = [...exceptList];
+    newList[index].allDay = allday;
+    newList[index].start = start;
+    newList[index].end = end;
+    setExceptList(newList);
+  };
 
   return (
     <div className={styles.except_wrapper}>
@@ -285,78 +280,61 @@ interface ExceptItemProps {
  * 예외일자 아이템 하나의 컴포넌트
  */
 function ExceptItem({ except, index, deleteItem, setData }: ExceptItemProps) {
-  const handleAllDayChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setData(index, !except.allDay, except.start, except.end);
-    },
-    [setData, index, except]
-  );
+  const handleAllDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData(index, !except.allDay, except.start, except.end);
+  };
 
-  const handleStartChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setData(index, except.allDay, e.target.value, except.end);
-    },
-    [setData, index, except]
-  );
+  const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData(index, except.allDay, e.target.value, except.end);
+  };
 
-  const handleEndChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setData(index, except.allDay, except.start, e.target.value);
-    },
-    [setData, index, except]
-  );
+  const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData(index, except.allDay, except.start, e.target.value);
+  };
 
-  const handleTrashClick = useCallback(() => {
+  const handleTrashClick = () => {
     deleteItem(index);
-  }, [deleteItem, index]);
+  };
 
-  const renderAllDay = useCallback(() => {
-    return (
-      <div className={styles.allday_form_wrapper}>
+  const renderAllDay = () => (
+    <div className={styles.allday_form_wrapper}>
+      <Form.Control
+        type="date"
+        value={except.start}
+        onChange={handleStartChange}
+      />
+      ~
+      <Form.Control type="date" value={except.end} onChange={handleEndChange} />
+      <div className={styles.allday_trash_wrapper}>
+        <button className={styles.allday_trash} onClick={handleTrashClick}>
+          <IoTrash size={20} />
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderPartDay = () => (
+    <div className={styles.partday_form_container}>
+      <div className={styles.partday_form_wrapper}>
         <Form.Control
-          type="date"
+          type="datetime-local"
           value={except.start}
           onChange={handleStartChange}
         />
         ~
         <Form.Control
-          type="date"
+          type="datetime-local"
           value={except.end}
           onChange={handleEndChange}
         />
-        <div className={styles.allday_trash_wrapper}>
-          <button className={styles.allday_trash} onClick={handleTrashClick}>
-            <IoTrash size={20} />
-          </button>
-        </div>
       </div>
-    );
-  }, [except, handleStartChange, handleEndChange, handleTrashClick]);
-
-  const renderPartDay = useCallback(() => {
-    return (
-      <div className={styles.partday_form_container}>
-        <div className={styles.partday_form_wrapper}>
-          <Form.Control
-            type="datetime-local"
-            value={except.start}
-            onChange={handleStartChange}
-          />
-          ~
-          <Form.Control
-            type="datetime-local"
-            value={except.end}
-            onChange={handleEndChange}
-          />
-        </div>
-        <div className={styles.partday_trash_wrapper}>
-          <button className={styles.partday_trash} onClick={handleTrashClick}>
-            <IoTrash size={20} />
-          </button>
-        </div>
+      <div className={styles.partday_trash_wrapper}>
+        <button className={styles.partday_trash} onClick={handleTrashClick}>
+          <IoTrash size={20} />
+        </button>
       </div>
-    );
-  }, [except, handleStartChange, handleEndChange, handleTrashClick]);
+    </div>
+  );
 
   return (
     <div className={styles.except_item_container}>

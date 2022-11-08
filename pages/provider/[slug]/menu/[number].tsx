@@ -17,18 +17,20 @@ export default function MenuEdit() {
   const { slug, number } = router.query;
   const [data, setData] = useState<Data | undefined>();
 
-  useEffect(() => {
-    const getData = async () => {
+  const getData = useCallback(async () => {
+    if (slug && number) {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API}/store/${slug}/menu/${number}`
       );
       const responseData: Data = response.data;
       console.log(response.data);
       setData(responseData);
-    };
+    }
+  }, [number, slug]);
 
+  useEffect(() => {
     getData();
-  }, []);
+  }, [getData]);
 
   return (
     <>

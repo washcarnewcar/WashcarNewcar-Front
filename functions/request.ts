@@ -1,5 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { NextRouter } from 'next/router';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
+import { User } from '../components/UserProvider';
 
 const API_SERVER = process.env.NEXT_PUBLIC_API;
 
@@ -22,12 +24,22 @@ export const checkLogin = async (): Promise<boolean> => {
 
 export const requestWithToken = async (
   router: NextRouter,
+  setIsLogined: React.Dispatch<React.SetStateAction<User | null>>,
   path: string,
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse | null> => {
-  const token = {
-    Authorization: 'Bearer ' + localStorage.getItem('token'),
-  };
+  const token = localStorage.getItem('token')
+    ? {
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
+      }
+    : null;
+
+  if (!token) {
+    alert('로그인 후 이용해주세요');
+    router.replace('/auth/login');
+    setIsLogined({ nickname: '', isLogined: false });
+    return null;
+  }
 
   const headers = {
     ...options?.headers,
@@ -47,6 +59,7 @@ export const requestWithToken = async (
       if (error.response?.status === 401) {
         alert('로그인 후 이용해주세요');
         router.replace('/auth/login');
+        setIsLogined({ nickname: '', isLogined: false });
         return null;
       }
       // 권한 없음 => 홈화면 이동
