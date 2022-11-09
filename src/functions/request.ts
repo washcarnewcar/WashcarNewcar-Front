@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { NextRouter } from 'next/router';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
-import { User } from '../components/UserProvider';
+import { User } from '../contexts/UserProvider';
 
 const API_SERVER = process.env.NEXT_PUBLIC_API;
 

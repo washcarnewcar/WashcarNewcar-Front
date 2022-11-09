@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import React from 'react';
-import Header from '../../../../components/Header';
-import MenuForm from '../../../../components/MenuForm';
+import Header from '../../../../src/components/Header';
+import MenuForm from '../../../../src/components/MenuForm';
 import styles from '../../../../styles/MenuNew.module.scss';
 
 export default function MenuNew() {

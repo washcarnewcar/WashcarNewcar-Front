@@ -1,28 +1,4 @@
-#container {
+.container {
   box-shadow: 0px 15px 10px -20px #000000;
 
-  .text_logo {
-    margin-left: 5px;
-    font-family: "TmonMonsori";
-    font-size: x-large;
-    color: var(--main-color);
-  }
-}
-
-#container2 {
-  height: 50px;
-  box-shadow: 0px 15px 10px -20px #000000;
-
-  .logo_container {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .main_logo {
-    height: 30px;
-  }
-
-  .text_logo {
-    height: 15px;
-  }
 }

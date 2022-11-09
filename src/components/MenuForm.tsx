@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { IoClose, IoImage } from 'react-icons/io5';
-import styles from '../styles/MenuForm.module.scss';
+import styles from '../../styles/MenuForm.module.scss';
 import Loading from './Loading';
 
 interface Data {

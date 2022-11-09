@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useContext, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
-import UserContext from '../../components/UserProvider';
+import UserContext from '../../src/contexts/UserProvider';
 import styles from '../../styles/Login.module.scss';
 
 interface IForm {

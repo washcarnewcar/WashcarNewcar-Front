@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Header from '../components/Header';
+import Header from '../src/components/Header';
 import styles from '../styles/Home.module.scss';
 
 export default function Home() {

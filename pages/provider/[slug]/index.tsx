@@ -6,10 +6,10 @@ import { useRouter } from 'next/router';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Alert, Button, ButtonGroup, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../../components/Header';
-import Loading from '../../../components/Loading';
-import UserContext from '../../../components/UserProvider';
-import { requestWithToken } from '../../../functions/request';
+import Header from '../../../src/components/Header';
+import Loading from '../../../src/components/Loading';
+import UserContext from '../../../src/contexts/UserProvider';
+import { requestWithToken } from '../../../src/functions/request';
 import styles from '../../../styles/Provider.module.scss';
 
 interface ResponseJson {

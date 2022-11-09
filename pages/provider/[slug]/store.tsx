@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import styles from '../../../styles/StoreEdit.module.scss';
-import Header from '../../../components/Header';
+import Header from '../../../src/components/Header';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import {
   PutObjectCommand,
@@ -18,11 +18,11 @@ import Image from 'next/image';
 import { IoClose } from 'react-icons/io5';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import { BeatLoader } from 'react-spinners';
-import { requestWithToken } from '../../../functions/request';
+import { requestWithToken } from '../../../src/functions/request';
 import Compressor from 'compressorjs';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import UserContext from '../../../components/UserProvider';
+import UserContext from '../../../src/contexts/UserProvider';
 
 const credentials = {
   accessKeyId: process.env.NEXT_PUBLIC_ACCESSKEY

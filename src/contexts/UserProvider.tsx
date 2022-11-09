@@ -41,15 +41,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
-          console.error('token expired');
+          // TODO: 토큰 만료 로직 삽입
           setUser({ nickname: '', isLogined: false });
-          return;
-        } else if (error.response?.status === 404) {
-          console.error("Can't find API");
           return;
         }
       }
-      throw error;
+      console.error(error);
     }
   };
 

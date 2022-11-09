@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-import Header from '../../../../components/Header';
-import MenuForm from '../../../../components/MenuForm';
+import Header from '../../../../src/components/Header';
+import MenuForm from '../../../../src/components/MenuForm';
 import styles from '../../../../styles/MenuEdit.module.scss';
 
 interface Data {
