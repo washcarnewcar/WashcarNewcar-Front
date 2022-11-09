@@ -1,13 +1,15 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Alert, Button, ButtonGroup, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../../components/header';
-import Loading from '../../../components/loading';
-import { requestWithToken } from '../../../functions/request';
+import Header from '../../../src/components/Header';
+import Loading from '../../../src/components/Loading';
+import UserContext from '../../../src/contexts/UserProvider';
+import { requestWithToken } from '../../../src/functions/request';
 import styles from '../../../styles/Provider.module.scss';
 
 interface ResponseJson {
@@ -23,43 +25,32 @@ interface Menu {
 export default function Provider() {
   // 임시로 true
   const router = useRouter();
+  const { user, setUser } = useContext(UserContext);
   const { slug } = router.query;
   const [ready, setReady] = useState(true);
   const [menuList, setMenuList] = useState(new Array<Menu>());
 
-  useEffect(() => {
-    // getCalendarList();
-  }, []);
-
-  const getCalendarList = async () => {
-    const response = await requestWithToken('/provider/calendar/list');
-    if (response.ok) {
-      const json: ResponseJson = await response.json();
-
-      if (json.first) {
-        // 처음 매장 생성
-        router.replace('/provider/store');
-      } else {
-        setMenuList(json.menus);
-        setReady(true);
-        console.log(json);
-      }
-    } else if (response.status === 401) {
-      router.replace('/login');
-    } else if (response.status === 403) {
-      router.replace('/contact');
-    } else {
-      router.replace('/error');
+  const getCalendarList = useCallback(async () => {
+    if (router && slug) {
+      const response = await requestWithToken(
+        router,
+        setUser,
+        `/provider/${slug}/schedule`,
+        { method: 'GET' }
+      );
+      console.log(response);
     }
-  };
+  }, [router, slug, setUser]);
+
+  useEffect(() => {
+    getCalendarList();
+  }, [getCalendarList]);
 
   if (!ready) {
     return (
-      <>
-        <div style={{ width: '100%', height: '100vh' }}>
-          <Loading />
-        </div>
-      </>
+      <div style={{ width: '100%', height: '100vh' }}>
+        <Loading />
+      </div>
     );
   }
 
@@ -84,12 +75,16 @@ export default function Provider() {
         <div className={styles.menus_container}>
           <div className={styles.title}>매장 관리</div>
           <div className={styles.buttongroup}>
-            <Button className={styles.button} variant="outline-primary">
-              매장 정보 설정
-            </Button>
-            <Button className={styles.button} variant="outline-primary">
-              메뉴 관리
-            </Button>
+            <Link href={`/provider/${slug}/store`}>
+              <Button className={styles.button} variant="outline-primary">
+                매장 정보 설정
+              </Button>
+            </Link>
+            <Link href={`/provider/${slug}/menu`}>
+              <Button className={styles.button} variant="outline-primary">
+                메뉴 관리
+              </Button>
+            </Link>
             <Link href={`/provider/${slug}/time`}>
               <Button className={styles.button} variant="outline-primary">
                 매장 운영 시간 설정
@@ -162,3 +157,21 @@ function List() {
     </ListGroup>
   );
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  console.log('hello');
+
+  return {
+    paths: [{ params: { slug: 'hello' } }],
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async () => {
+  console.log('hello');
+  return {
+    props: {
+      posts: 'hello',
+    },
+  };
+};

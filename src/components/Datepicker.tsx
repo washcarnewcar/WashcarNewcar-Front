@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import moment from 'moment';
 import { useMemo, useState } from 'react';
-import styles from '../styles/Datepicker.module.scss';
+import styles from '../../styles/Datepicker.module.scss';
 
 interface DatePickerProps {
   onClickDate: Function;

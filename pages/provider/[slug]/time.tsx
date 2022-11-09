@@ -1,68 +1,89 @@
 import classNames from 'classnames';
-import React, { SyntheticEvent, useCallback, useEffect, useState } from 'react';
-import { Button, Form, Tab, Tabs } from 'react-bootstrap';
-import Header from '../../../components/header';
-import Seperator from '../../../components/seperator';
+import React, { useState } from 'react';
+import {
+  Button,
+  Form,
+  ListGroup,
+  ListGroupItem,
+  Tab,
+  Tabs,
+} from 'react-bootstrap';
+import { IoAdd, IoTrash } from 'react-icons/io5';
+import Header from '../../../src/components/Header';
+import Seperator from '../../../src/components/Seperator';
 import styles from '../../../styles/ProviderTime.module.scss';
 
-interface ITime {
-  [index: string]: { [index: string]: Date; start: Date; end: Date } | null;
-  sunday: { [index: string]: Date; start: Date; end: Date } | null;
-  monday: { [index: string]: Date; start: Date; end: Date } | null;
-  thusday: { [index: string]: Date; start: Date; end: Date } | null;
-  wednesday: { [index: string]: Date; start: Date; end: Date } | null;
-  thursday: { [index: string]: Date; start: Date; end: Date } | null;
-  friday: { [index: string]: Date; start: Date; end: Date } | null;
-  saturday: { [index: string]: Date; start: Date; end: Date } | null;
+interface Time {
+  start: Date;
+  end: Date;
 }
 
 export default function ProviderTime() {
-  const [time, setTime] = useState<ITime>({
-    sunday: null,
-    monday: {
-      start: new Date('1970-1-1 00:00'),
-      end: new Date('1970-1-1 00:00'),
-    },
-    thusday: {
-      start: new Date('1970-1-1 00:00'),
-      end: new Date('1970-1-1 00:00'),
-    },
-    wednesday: {
-      start: new Date('1970-1-1 00:00'),
-      end: new Date('1970-1-1 00:00'),
-    },
-    thursday: {
-      start: new Date('1970-1-1 00:00'),
-      end: new Date('1970-1-1 00:00'),
-    },
-    friday: {
-      start: new Date('1970-1-1 00:00'),
-      end: new Date('1970-1-1 00:00'),
-    },
-    saturday: null,
-  });
+  return (
+    <>
+      <Header type={1} />
+      <div className={styles.container}>
+        <div className={styles.title}>매장 운영 시간 설정</div>
+        <Tabs defaultActiveKey="time" className={styles.tabs} justify id="tabs">
+          {/* 요일별 영업시간 렌더링 */}
+          <Tab
+            eventKey="time"
+            title="요일별 영업 시간"
+            tabClassName={styles.tab}
+          >
+            <TimeList />
+          </Tab>
+          {/* 예외 일자 렌더링 */}
+          <Tab eventKey="except" title="예외 일자" tabClassName={styles.tab}>
+            <Except />
+          </Tab>
+        </Tabs>
+      </div>
+    </>
+  );
+}
 
-  function setDayOfWeek(
-    dayOfWeek: string,
+function TimeList() {
+  // 0번부터 일요일 ~ 6번까지 토요일
+  const [timeList, setTimeList] = useState<(Time | null)[]>([
+    null,
+    {
+      start: new Date('1970-1-1 00:00'),
+      end: new Date('1970-1-1 00:00'),
+    },
+    {
+      start: new Date('1970-1-1 00:00'),
+      end: new Date('1970-1-1 00:00'),
+    },
+    {
+      start: new Date('1970-1-1 00:00'),
+      end: new Date('1970-1-1 00:00'),
+    },
+    {
+      start: new Date('1970-1-1 00:00'),
+      end: new Date('1970-1-1 00:00'),
+    },
+    {
+      start: new Date('1970-1-1 00:00'),
+      end: new Date('1970-1-1 00:00'),
+    },
+    null,
+  ]);
+
+  const setDayOfWeek = (
+    dayOfWeek: number,
     startEnd: string,
     date: Date | null
-  ) {
-    let oneDay = time[dayOfWeek];
+  ) => {
+    let oneDay = timeList[dayOfWeek];
+
     // 시작 시간을 입력했을 때
-    if (startEnd === 'start' && date !== null) {
-      if (oneDay !== null) {
-        oneDay['start'] = date;
-      } else {
-        oneDay = { start: date, end: new Date('1970-1-1 00:00') };
-      }
+    if (startEnd === 'start' && date !== null && oneDay !== null) {
+      oneDay.start = date;
     }
     // 종료 시간을 입력했을 때
-    else if (startEnd === 'end' && date !== null) {
-      if (oneDay !== null) {
-        oneDay['end'] = date;
-      } else {
-        oneDay = { start: new Date('1970-1-1 00:00'), end: date };
-      }
+    else if (startEnd === 'end' && date !== null && oneDay !== null) {
+      oneDay.end = date;
     }
     // 초기화를 했을 때
     else if (startEnd === 'on') {
@@ -75,120 +96,75 @@ export default function ProviderTime() {
     else if (startEnd === 'off') {
       oneDay = null;
     }
-    setTime(Object.assign({}, time, { [dayOfWeek]: oneDay }));
-  }
 
-  useEffect(() => {
-    console.log(time);
-  }, [time]);
+    const newTimeList = [...timeList];
+    newTimeList[dayOfWeek] = oneDay;
+    setTimeList(newTimeList);
+  };
 
   return (
     <>
-      <Header type={1} />
-      <div className={styles.container}>
-        <div className={styles.title}>매장 운영 시간 설정</div>
-        <Tabs defaultActiveKey="time" className={styles.tabs} justify id="tabs">
-          <Tab
-            eventKey="time"
-            title="요일별 영업 시간"
-            tabClassName={styles.tab}
-          >
-            <TimeListItem dayOfWeek="sunday" setDayOfWeek={setDayOfWeek} />
-            <Seperator />
-            <TimeListItem dayOfWeek="monday" setDayOfWeek={setDayOfWeek} />
-            <Seperator />
-            <TimeListItem dayOfWeek="thusday" setDayOfWeek={setDayOfWeek} />
-            <Seperator />
-            <TimeListItem dayOfWeek="wednesday" setDayOfWeek={setDayOfWeek} />
-            <Seperator />
-            <TimeListItem dayOfWeek="thursday" setDayOfWeek={setDayOfWeek} />
-            <Seperator />
-            <TimeListItem dayOfWeek="friday" setDayOfWeek={setDayOfWeek} />
-            <Seperator />
-            <TimeListItem dayOfWeek="saturday" setDayOfWeek={setDayOfWeek} />
-          </Tab>
-
-          <Tab
-            eventKey="except"
-            title="예외 일자"
-            tabClassName={styles.tab}
-          ></Tab>
-        </Tabs>
-      </div>
+      {timeList.map((time, index) => (
+        <div key={index}>
+          <TimeListItem
+            time={time}
+            dayOfWeek={index}
+            setDayOfWeek={setDayOfWeek}
+          />
+          <Seperator />
+        </div>
+      ))}
     </>
   );
 }
 
 interface TimeListItemProps {
-  dayOfWeek: string;
+  time: Time | null;
+  dayOfWeek: number;
   setDayOfWeek: (
-    dayOfWeek: string,
+    dayOfWeek: number,
     startEnd: string,
     date: Date | null
   ) => void;
 }
 
-function TimeListItem({ dayOfWeek, setDayOfWeek }: TimeListItemProps) {
-  /**
-   * 기본적으로 일요일과 토요일은 해제시켜놓는다.
-   */
-  const [activate, setActivate] = useState(
-    dayOfWeek === 'sunday' || dayOfWeek === 'saturday' ? false : true
-  );
+function TimeListItem({ time, dayOfWeek, setDayOfWeek }: TimeListItemProps) {
+  const displayDayOfWeek = () => {
+    const name = ['일', '월', '화', '수', '목', '금', '토'];
+    return name[dayOfWeek];
+  };
 
-  function displayDayOfWeek() {
-    switch (dayOfWeek) {
-      case 'sunday':
-        return '일';
-      case 'monday':
-        return '월';
-      case 'thusday':
-        return '화';
-      case 'wednesday':
-        return '수';
-      case 'thursday':
-        return '목';
-      case 'friday':
-        return '금';
-      case 'saturday':
-        return '토';
-    }
-  }
-
-  useEffect(() => {
-    if (activate) {
-      setDayOfWeek(dayOfWeek, 'on', null);
-    } else {
+  const handleClick = () => {
+    if (time) {
       setDayOfWeek(dayOfWeek, 'off', null);
+    } else {
+      setDayOfWeek(dayOfWeek, 'on', null);
     }
-  }, [activate]);
+  };
 
-  function onClick() {
-    setActivate(!activate);
-  }
-
-  function onStartChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  const handleStartChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDayOfWeek(dayOfWeek, 'start', new Date('1970-1-1 ' + e.target.value));
-  }
+  };
 
-  function onEndChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  const handleEndChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDayOfWeek(dayOfWeek, 'end', new Date('1970-1-1 ' + e.target.value));
-  }
+  };
+
   return (
     <div className={styles.item_container}>
       <button
         className={classNames(
           styles.day_of_week,
-          activate ? styles.day_of_week_activate : styles.day_of_week_deactivate
+          time ? styles.day_of_week_activate : styles.day_of_week_deactivate
         )}
-        onClick={onClick}
+        onClick={handleClick}
       >
         {displayDayOfWeek()}
       </button>
-      {activate ? (
+      {time ? (
         <TimeListItemSelect
-          onStartChange={onStartChange}
-          onEndChange={onEndChange}
+          onStartChange={handleStartChange}
+          onEndChange={handleEndChange}
         />
       ) : null}
     </div>
@@ -204,7 +180,7 @@ function TimeListItemSelect({
   onStartChange,
   onEndChange,
 }: TimeListItemSelectProps) {
-  function generateTime() {
+  const generateTime = () => {
     const arr = [];
     for (let h = 0; h <= 24; h++) {
       for (let m = 0; m < 60; m += 30) {
@@ -219,7 +195,7 @@ function TimeListItemSelect({
       }
     }
     return arr;
-  }
+  };
 
   return (
     <>
@@ -231,5 +207,144 @@ function TimeListItemSelect({
         {generateTime()}
       </Form.Select>
     </>
+  );
+}
+
+interface ExceptData {
+  allDay: boolean;
+  start: string;
+  end: string;
+}
+
+/**
+ * 예외일자 컴포넌트
+ */
+function Except() {
+  const [exceptList, setExceptList] = useState<ExceptData[]>([]);
+
+  const handleClick = () => {
+    const newList = [...exceptList];
+    newList.push({ allDay: true, start: '', end: '' });
+    setExceptList(newList);
+  };
+
+  const deleteItem = (index: number) => {
+    const newList = [...exceptList];
+    newList.splice(index, 1);
+    setExceptList(newList);
+  };
+
+  const setData = (
+    index: number,
+    allday: boolean,
+    start: string,
+    end: string
+  ) => {
+    const newList = [...exceptList];
+    newList[index].allDay = allday;
+    newList[index].start = start;
+    newList[index].end = end;
+    setExceptList(newList);
+  };
+
+  return (
+    <div className={styles.except_wrapper}>
+      <Button className={styles.except_plus_button} onClick={handleClick}>
+        <IoAdd size={20} className={styles.except_plus_icon} />
+        예외 일자 추가
+      </Button>
+
+      <ListGroup>
+        {exceptList.map((except, index) => (
+          <ListGroupItem key={index}>
+            <ExceptItem
+              except={except}
+              index={index}
+              deleteItem={deleteItem}
+              setData={setData}
+            />
+          </ListGroupItem>
+        ))}
+      </ListGroup>
+    </div>
+  );
+}
+
+interface ExceptItemProps {
+  except: ExceptData;
+  index: number;
+  deleteItem: (index: number) => void;
+  setData: (index: number, allday: boolean, start: string, end: string) => void;
+}
+/**
+ * 예외일자 아이템 하나의 컴포넌트
+ */
+function ExceptItem({ except, index, deleteItem, setData }: ExceptItemProps) {
+  const handleAllDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData(index, !except.allDay, except.start, except.end);
+  };
+
+  const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData(index, except.allDay, e.target.value, except.end);
+  };
+
+  const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData(index, except.allDay, except.start, e.target.value);
+  };
+
+  const handleTrashClick = () => {
+    deleteItem(index);
+  };
+
+  const renderAllDay = () => (
+    <div className={styles.allday_form_wrapper}>
+      <Form.Control
+        type="date"
+        value={except.start}
+        onChange={handleStartChange}
+      />
+      ~
+      <Form.Control type="date" value={except.end} onChange={handleEndChange} />
+      <div className={styles.allday_trash_wrapper}>
+        <button className={styles.allday_trash} onClick={handleTrashClick}>
+          <IoTrash size={20} />
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderPartDay = () => (
+    <div className={styles.partday_form_container}>
+      <div className={styles.partday_form_wrapper}>
+        <Form.Control
+          type="datetime-local"
+          value={except.start}
+          onChange={handleStartChange}
+        />
+        ~
+        <Form.Control
+          type="datetime-local"
+          value={except.end}
+          onChange={handleEndChange}
+        />
+      </div>
+      <div className={styles.partday_trash_wrapper}>
+        <button className={styles.partday_trash} onClick={handleTrashClick}>
+          <IoTrash size={20} />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className={styles.except_item_container}>
+      <Form.Check
+        type="switch"
+        label="하루종일"
+        onChange={handleAllDayChange}
+        checked={except.allDay}
+      />
+      {except.allDay ? renderAllDay() : renderPartDay()}
+    </div>
   );
 }

@@ -2,8 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../components/header';
-import Seperator from '../../components/seperator';
+import Header from '../../src/components/Header';
+import Seperator from '../../src/components/Seperator';
 import styles from '../../styles/FindList.module.scss';
 
 const tempData = [

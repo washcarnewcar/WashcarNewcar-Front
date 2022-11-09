@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Carousel, Tab, Tabs } from 'react-bootstrap';
-import Header from '../../../components/header';
-import Seperator from '../../../components/seperator';
+import Header from '../../../src/components/Header';
+import Seperator from '../../../src/components/Seperator';
 import styles from '../../../styles/Store.module.scss';
 import {
   IoCallOutline,
@@ -32,6 +32,33 @@ const tempData = {
 자세한 문의사항은 010.4465.6111 으로 문의주시면 친절히 답변해드리겠습니다.`,
 };
 
+const menuTempData = {
+  menu: [
+    {
+      number: 1,
+      image: 'S3 URL',
+      name: '외부 세차',
+      detail:
+        '세차에 대한 설명dfasffsdfsdfdsfs\n두줄 정도 표시할까 ㅇ라넝라너dfsafdsds',
+      price: 80000,
+    },
+    {
+      number: 2,
+      image: 'S3 URL',
+      name: '내부 세차',
+      detail: '세차에 대한 설명\n두줄 정도 표시할까 생각중',
+      price: 70000,
+    },
+    {
+      number: 3,
+      image: 'S3 URL',
+      name: '내부 세차',
+      detail: '한줄은 어때요?',
+      price: 70000,
+    },
+  ],
+};
+
 export default function Store() {
   const router = useRouter();
   const { slug } = router.query;
@@ -41,21 +68,27 @@ export default function Store() {
       <Header type={1} />
       <Carousel>
         <Carousel.Item className={styles.carousel_item}>
-          <img
+          <Image
+            width={350}
+            height={200}
             className={styles.image}
             src="/sample_store_image.png"
             alt="sample"
           />
         </Carousel.Item>
         <Carousel.Item className={styles.carousel_item}>
-          <img
+          <Image
+            width={350}
+            height={200}
             className={styles.image}
             src="/sample_store_image.png"
             alt="sample"
           />
         </Carousel.Item>
         <Carousel.Item className={styles.carousel_item}>
-          <img
+          <Image
+            width={350}
+            height={200}
             className={styles.image}
             src="/sample_store_image.png"
             alt="sample"
@@ -78,13 +111,12 @@ export default function Store() {
 
       <Tabs defaultActiveKey="wash" className={styles.tabs} justify id="tabs">
         <Tab eventKey="wash" title="세차" tabClassName={styles.tab}>
-          <MenuItem slug={slug as string} number={'1'} />
-          <Seperator />
-          <MenuItem slug={slug as string} number={'2'} />
-          <Seperator />
-          <MenuItem slug={slug as string} number={'3'} />
-          <Seperator />
-          <MenuItem slug={slug as string} number={'4'} />
+          {menuTempData.menu.map((menuItem, index) => (
+            <div key={index}>
+              <MenuItem slug={slug as string} data={menuItem} />
+              <Seperator />
+            </div>
+          ))}
         </Tab>
 
         <Tab eventKey="info" title="정보" tabClassName={styles.tab}>
@@ -154,31 +186,39 @@ function InfoItem({ type, data }: InfoItemProps) {
   }
 }
 
-interface MenuItemProps {
-  slug: string;
-  number: string;
+interface IData {
+  image: string;
+  name: string;
+  detail: string;
+  price: number;
+  number: number;
 }
 
-function MenuItem({ slug, number }: MenuItemProps) {
+interface MenuItemProps {
+  data: IData;
+  slug: string;
+}
+
+function MenuItem({ slug, data }: MenuItemProps) {
   return (
-    <Link href={`/store/${slug}/menu/${number}`}>
+    <Link href={`/store/${slug}/menu/${data.number}`}>
       <a className={styles.link}>
         <div className={styles.container}>
-          <Image
-            width={90}
-            height={90}
-            className={styles.menu_image}
-            src="/style_carcare.jpg"
-            alt="menu_image"
-          />
+          <div className={styles.image_wrapper}>
+            <Image
+              width={90}
+              height={90}
+              className={styles.image}
+              src="/style_carcare.jpg"
+              alt="menu_image"
+            />
+          </div>
           <div className={styles.content}>
-            <div className={styles.menu_title}>외부 세차</div>
-            <div className={styles.menu_detail}>
-              세차에 대한 설명
-              <br />
-              두줄 정도 표시할까 생각중
+            <div className={styles.menu_title}>{data.name}</div>
+            <div className={styles.menu_detail}>{data.detail}</div>
+            <div className={styles.menu_price}>
+              {data.price.toLocaleString()}원
             </div>
-            <div className={styles.menu_price}>80,000원</div>
           </div>
         </div>
       </a>

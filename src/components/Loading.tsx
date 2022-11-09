@@ -1,6 +1,6 @@
 import { BeatLoader } from 'react-spinners';
 import { MAIN_COLOR } from '../functions/global_variables';
-import styles from '../styles/Loading.module.scss';
+import styles from '../../styles/Loading.module.scss';
 
 function Loading() {
   return (

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { Button, Form } from 'react-bootstrap';
-import Header from '../../../../../components/header';
+import Header from '../../../../../src/components/Header';
 import styles from '../../../../../styles/Reject.module.scss';
 
 export default function Reject() {

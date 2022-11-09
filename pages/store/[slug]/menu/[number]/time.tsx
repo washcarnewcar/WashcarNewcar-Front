@@ -4,8 +4,8 @@ import 'moment/locale/ko';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
-import Datepicker from '../../../../../components/datepicker';
-import Header from '../../../../../components/header';
+import Datepicker from '../../../../../src/components/Datepicker';
+import Header from '../../../../../src/components/Header';
 import styles from '../../../../../styles/MenuTime.module.scss';
 
 const amTimeList = [

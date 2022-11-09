@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { Accordion, Button, Form } from 'react-bootstrap';
-import Header from '../../../../../components/header';
-import Seperator from '../../../../../components/seperator';
+import Header from '../../../../../src/components/Header';
+import Seperator from '../../../../../src/components/Seperator';
 import styles from '../../../../../styles/Menu.module.scss';
 
 const tempData = {

@@ -1,12 +1,11 @@
 import styles from '../../styles/Search.module.scss';
 import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../components/header';
+import Header from '../../src/components/Header';
 import { useCallback, useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
-import Seperator from '../../components/seperator';
+import Seperator from '../../src/components/Seperator';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Script from 'next/script';
 import Image from 'next/image';
 
 export default function Search() {
@@ -19,115 +18,82 @@ export default function Search() {
   });
   const [textLocation, setTextLocation] = useState('');
   const [foundLocation, setFoundLocation] = useState(false);
-  const [geocoder, setGeocoder] = useState<
-    { coord2Address: Function } | undefined
-  >();
-
-  /**
-   * /search/map으로부터 받아온 위치 정보가 있는지 판단
-   * 없다면 GPS를 사용하여 위치 받아옴
-   */
-  const judgeIsState = useCallback(() => {
-    if (
-      longitude &&
-      latitude &&
-      typeof longitude === 'string' &&
-      typeof latitude === 'string'
-    ) {
-      console.log(`location으로부터 좌표값 받아옴`);
-      coord2Address(parseFloat(longitude), parseFloat(latitude));
-      setCoordinate({
-        longitude: parseFloat(longitude),
-        latitude: parseFloat(latitude),
-      });
-    } else {
-      console.log(`geolocation으로부터 좌표값 받아옴`);
-      getLocationFromGeolocation();
-    }
-  }, [geocoder]);
-
-  /**
-   * geolocation을 사용하여 위치를 받아오는 함수
-   */
-  const getLocationFromGeolocation = useCallback(() => {
-    navigator.geolocation.getCurrentPosition(
-      positionCallback,
-      positionErrorCallback
-    );
-  }, [geocoder]);
-
-  /**
-   * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
-   */
-  const positionCallback = useCallback(
-    (position: GeolocationPosition) => {
-      // 좌표를 주소 텍스트로 변환, 좌표 State에 저장
-      coord2Address(position.coords.longitude, position.coords.latitude);
-      setCoordinate({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      });
-    },
-    [geocoder]
-  );
-
-  /**
-   * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
-   */
-  const positionErrorCallback = useCallback(
-    (error: GeolocationPositionError) => {
-      if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
-        console.log('권한 없음');
-      } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
-        console.log('위치를 사용할 수 없음');
-      }
-    },
-    [geocoder]
-  );
 
   /**
    * 좌표를 주소로 변환하여 텍스트로 표시하는 함수
    */
-  const coord2Address = useCallback(
-    (longitude: number, latitude: number) => {
-      // 좌표를 주소로 변환
-      geocoder?.coord2Address(
-        longitude,
-        latitude,
-        (
-          result: {
-            address: kakao.maps.services.Address;
-            road_address: kakao.maps.services.RoadAaddress | null;
-          }[],
-          status: kakao.maps.services.Status
-        ) => {
-          if (status === kakao.maps.services.Status.OK) {
-            const address = result[0].address;
-            setTextLocation(
-              `${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
-            );
-          }
-          setFoundLocation(true);
+  const displayLocation = (
+    geocoder: kakao.maps.services.Geocoder,
+    longitude: number,
+    latitude: number
+  ) => {
+    geocoder.coord2Address(
+      longitude,
+      latitude,
+      (
+        result: {
+          address: kakao.maps.services.Address;
+          road_address: kakao.maps.services.RoadAaddress | null;
+        }[],
+        status: kakao.maps.services.Status
+      ) => {
+        if (status === kakao.maps.services.Status.OK) {
+          const address = result[0].address;
+          setTextLocation(
+            `${address.region_1depth_name} ${address.region_2depth_name} ${address.region_3depth_name}`
+          );
         }
-      );
-    },
-    [geocoder]
-  );
+        setFoundLocation(true);
+      }
+    );
+  };
 
   /**
-   * 스크립트를 받아오면 geocoder를 받아와 세팅한다.
+   * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
    */
-  useEffect(() => {
-    kakao?.maps?.load(() => {
-      setGeocoder(new kakao.maps.services.Geocoder());
+  const positionCallback = useCallback((position: GeolocationPosition) => {
+    const longitude = position.coords.longitude;
+    const latitude = position.coords.latitude;
+    setCoordinate({ longitude: longitude, latitude: latitude });
+    kakao.maps.load(() => {
+      const geocoder = new kakao.maps.services.Geocoder();
+      displayLocation(geocoder, longitude, latitude);
     });
   }, []);
 
-  useEffect(() => {
-    if (geocoder) {
-      judgeIsState();
+  /**
+   * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
+   */
+  const positionErrorCallback = (error: GeolocationPositionError) => {
+    if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
+      console.log('권한 없음');
+    } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+      console.log('위치를 사용할 수 없음');
     }
-  }, [geocoder]);
+  };
+
+  useEffect(() => {
+    /**
+     * url에 longitude와 latitude가 없을 시 gps를 통해 위치를 가져온다.
+     */
+    if (!longitude || !latitude) {
+      navigator.geolocation.getCurrentPosition(
+        positionCallback,
+        positionErrorCallback
+      );
+    } else {
+      console.log('found location!');
+
+      const parsedLongitude = parseFloat(longitude as string);
+      const parsedLatitude = parseFloat(latitude as string);
+      setCoordinate({ latitude: parsedLatitude, longitude: parsedLongitude });
+
+      kakao.maps.load(() => {
+        const geocoder = new kakao.maps.services.Geocoder();
+        displayLocation(geocoder, parsedLongitude, parsedLatitude);
+      });
+    }
+  }, [longitude, latitude, positionCallback]);
 
   return (
     <>
