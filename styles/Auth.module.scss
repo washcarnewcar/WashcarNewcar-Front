@@ -4,15 +4,9 @@
   align-items: center;
   flex-direction: column;
 
-  .logo_container {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-  }
-
   .form_container {
     margin-top: 100px;
-    max-width: 300px;
+    width: 300px;
 
     .title {
       font-size: xx-large;
@@ -25,27 +19,23 @@
       margin-top: 20px;
       gap: 12px;
 
-      .id_group {
-        .id {
-          height: 45px;
-        }
+      .inputs {
+        height: 45px;
+        width: 300px;
       }
 
-      .pw_group {
-        .pw {
-          height: 45px;
-        }
-      }
-
-      .login_button {
+      .submit_button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         height: 45px;
       }
 
-      .signup {
+      .change {
         display: flex;
         justify-content: space-between;
 
-        .signup_button {
+        .change_text {
           text-decoration: none;
         }
       }

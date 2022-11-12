@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, Toast, ToastContainer } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../src/components/AuthHeader';
@@ -28,7 +28,7 @@ const schema = object().shape({
   password: string().required('비밀번호를 입력해주세요'),
 });
 
-function Login() {
+export default function Password() {
   const router = useRouter();
   const { user, setUser } = useContext(UserContext);
 
@@ -40,7 +40,7 @@ function Login() {
 
     // form data 생성
     const form = new FormData();
-    form.append('email', values.email);
+    form.append('id', values.email);
     form.append('password', values.password);
 
     // 로그인 요청
@@ -87,10 +87,11 @@ function Login() {
         <AuthHeader />
 
         <div className={styles.form_container}>
-          <div className={styles.title}>로그인</div>
+          <div className={styles.title}>비밀번호 재설정</div>
 
           <Form className={styles.form} onSubmit={formik.handleSubmit}>
             <Form.Group>
+              <Form.Text>이메일 주소를 입력해주세요</Form.Text>
               <Form.Control
                 type="email"
                 className={styles.inputs}
@@ -104,20 +105,6 @@ function Login() {
                 {formik.errors.email}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group>
-              <Form.Control
-                type="password"
-                className={styles.inputs}
-                placeholder="비밀번호"
-                name="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                isInvalid={!!formik.errors.password && formik.touched.password}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.password}
-              </Form.Control.Feedback>
-            </Form.Group>
             <Button
               variant="primary"
               type="submit"
@@ -127,37 +114,19 @@ function Login() {
               {formik.isSubmitting ? (
                 <BeatLoader color="white" size={10} />
               ) : (
-                '로그인'
+                '메일 보내기'
               )}
             </Button>
-            <a
-              href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}
-            >
-              <Image
-                src="/kakao_login_large_wide.png"
-                alt="카카오 로그인"
-                height={45}
-                width={300}
-              />
-            </a>
-
-            <div className={styles.change}>
-              <div>아직 계정이 없으신가요?</div>
-              <Link href="/auth/signup">
-                <a className={styles.change_text}>회원가입</a>
-              </Link>
-            </div>
-            <div className={styles.change}>
-              <div>비밀번호를 잊으셨나요?</div>
-              <Link href="/auth/password">
-                <a className={styles.change_text}>비밀번호 재설정</a>
-              </Link>
-            </div>
           </Form>
         </div>
       </div>
+
+      <ToastContainer position="bottom-end" className="p-3">
+        <Toast>
+          <Toast.Header>세차새차</Toast.Header>
+          <Toast.Body>안녕하세요</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </>
   );
 }
-
-export default Login;

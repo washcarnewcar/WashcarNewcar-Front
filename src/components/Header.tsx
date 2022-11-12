@@ -4,18 +4,21 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useContext } from 'react';
 import UserContext from '../contexts/UserProvider';
+import { useRouter } from 'next/router';
 
 interface HeaderProps {
   type: number;
 }
 
 export default function Header({ type }: HeaderProps) {
+  const router = useRouter();
   const { user, setUser } = useContext(UserContext);
 
   const handleLogoutClick = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refresh_token');
     setUser(null);
+    router.replace('/');
   };
 
   return (

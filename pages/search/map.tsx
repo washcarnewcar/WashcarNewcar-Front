@@ -45,7 +45,7 @@ function SelectMap() {
   /**
    * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
    */
-  const positionCallback = useCallback((position: GeolocationPosition) => {
+  const positionCallback = (position: GeolocationPosition) => {
     const longitude = position.coords.longitude;
     const latitude = position.coords.latitude;
     // 좌표 State에 저장
@@ -54,7 +54,7 @@ function SelectMap() {
       const geocoder = new kakao.maps.services.Geocoder();
       displayLocation(geocoder, longitude, latitude);
     });
-  }, []);
+  };
 
   /**
    * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
@@ -157,7 +157,7 @@ function SelectMap() {
 
     setScreenSize();
     window.addEventListener('resize', () => setScreenSize());
-  }, [longitude, latitude, foundLocation, router, positionCallback]);
+  }, [longitude, latitude, foundLocation, router]);
 
   useEffect(() => {
     kakao.maps.load(() => {

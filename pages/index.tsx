@@ -18,7 +18,7 @@ export default function Home() {
             <div className={styles.card_title}>예약 확인하기</div>
           </a>
         </Link>
-        <Link href="/provider/hello">
+        <Link href="/provider">
           <a className={styles.card_grid_item}>
             <div className={styles.card_title}>매장 관리하기</div>
             <div className={styles.card_content}>세차장 사장님이신가요?</div>

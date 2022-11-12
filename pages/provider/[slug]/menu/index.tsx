@@ -38,11 +38,11 @@ export default function MenuList() {
   const router = useRouter();
   const { slug } = router.query;
 
-  const getMenuList = useCallback(() => {}, []);
+  const getMenuList = () => {};
 
   useEffect(() => {
     getMenuList();
-  }, [getMenuList]);
+  }, []);
 
   return (
     <>

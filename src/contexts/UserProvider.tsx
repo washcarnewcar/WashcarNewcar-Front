@@ -2,7 +2,6 @@ import axios, { AxiosError } from 'axios';
 import React, { createContext, useEffect, useState } from 'react';
 
 export interface User {
-  nickname: string;
   isLogined: boolean;
 }
 
@@ -24,7 +23,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const token = localStorage.getItem('token');
     if (!token) {
       console.log('token not exist');
-      setUser({ nickname: '', isLogined: false });
+      setUser({ isLogined: false });
       return;
     }
 
@@ -36,13 +35,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       });
       if (response.status === 200) {
         console.log('logined');
-        setUser({ nickname: '', isLogined: true });
+        setUser({ isLogined: true });
       }
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
           // TODO: 토큰 만료 로직 삽입
-          setUser({ nickname: '', isLogined: false });
+          setUser({ isLogined: false });
           return;
         }
       }

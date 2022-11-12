@@ -10,57 +10,155 @@ import Header from '../../../src/components/Header';
 import Loading from '../../../src/components/Loading';
 import UserContext from '../../../src/contexts/UserProvider';
 import { requestWithToken } from '../../../src/functions/request';
-import styles from '../../../styles/Provider.module.scss';
+import styles from '../../../styles/ProviderDashboard.module.scss';
 
-interface ResponseJson {
-  first: boolean;
-  menus: Array<Menu>;
+interface Ready {
+  status: boolean;
+  request: boolean;
+  schedule: boolean;
 }
 
-interface Menu {
-  name: string;
-  code: string;
+interface Request {
+  reservationNumber: 1;
+  menu: string;
+  carNumbers: string;
+  carModel: string;
+  date: Date;
 }
 
-export default function Provider() {
-  // 임시로 true
+enum Status {
+  Loading,
+  Operation,
+  Waiting,
+  Abort,
+}
+
+export default function ProviderDashboard() {
   const router = useRouter();
-  const { user, setUser } = useContext(UserContext);
   const { slug } = router.query;
-  const [ready, setReady] = useState(true);
-  const [menuList, setMenuList] = useState(new Array<Menu>());
+  const { user, setUser } = useContext(UserContext);
+  // 임시로 true
+  const [storeStatus, setStoreStatus] = useState<Status>(Status.Loading);
+  const [storeRequests, setStoreRequests] = useState<Request[]>([]);
+  const [ready, setReady] = useState<Ready>({
+    status: false,
+    request: false,
+    schedule: false,
+  });
 
-  const getCalendarList = useCallback(async () => {
-    if (router && slug) {
+  const getStoreState = async () => {
+    try {
       const response = await requestWithToken(
         router,
         setUser,
-        `/provider/${slug}/schedule`,
-        { method: 'GET' }
+        `/provider/${slug}/approve`
       );
-      console.log(response);
+
+      const data = response?.data;
+      switch (data.status) {
+        // 세차장 승인, 페이지 운영중
+        case 1500:
+          setStoreStatus(Status.Operation);
+          setReady({
+            ...ready,
+            status: true,
+          });
+          return;
+        // 세차장 승인 대기중
+        case 1501:
+          setStoreStatus(Status.Waiting);
+          setReady({
+            ...ready,
+            status: true,
+          });
+          return;
+        // 세차장 승인 거부
+        case 1502:
+          setStoreStatus(Status.Abort);
+          setReady({
+            ...ready,
+            status: true,
+          });
+          return;
+        // 정상적인 접근 아님
+        default:
+          throw Error('정상적인 접근이 아닙니다.');
+      }
+    } catch (error) {
+      console.error(error);
+      // router.back();
     }
-  }, [router, slug, setUser]);
+  };
+
+  const getRequestList = async () => {
+    try {
+      const response = await requestWithToken(
+        router,
+        setUser,
+        `/provider/${slug}/request`
+      );
+
+      const list: Request[] = response?.data.list;
+      console.log(list);
+    } catch (error) {
+      console.error(error);
+      // router.back();
+    }
+  };
+
+  const getCalendarList = async () => {
+    const response = await requestWithToken(
+      router,
+      setUser,
+      `/provider/${slug}/schedule`,
+      { method: 'GET' }
+    );
+    console.log(response);
+  };
 
   useEffect(() => {
+    getStoreState();
     getCalendarList();
-  }, [getCalendarList]);
+  }, []);
 
-  if (!ready) {
-    return (
-      <div style={{ width: '100%', height: '100vh' }}>
-        <Loading />
-      </div>
-    );
-  }
+  const renderStatus = () => {
+    if (!ready.status) {
+      return (
+        <Alert className={styles.status}>
+          <Loading />
+        </Alert>
+      );
+    }
+
+    switch (storeStatus) {
+      case Status.Loading:
+        return null;
+      case Status.Operation:
+        return (
+          <Alert variant="success" className={styles.status}>
+            세차장이 승인되었으며, 운영중입니다.
+          </Alert>
+        );
+      case Status.Waiting:
+        return (
+          <Alert variant="primary" className={styles.status}>
+            세차장 승인 대기중입니다.
+          </Alert>
+        );
+      case Status.Abort:
+        return (
+          <Alert variant="danger" className={styles.status}>
+            세차장 승인 대기중입니다.
+          </Alert>
+        );
+    }
+  };
 
   return (
     <>
       <Header type={1} />
       <div className={styles.container}>
-        <div className={styles.status_container}>
-          <Alert className={styles.status}>매장 승인 대기중입니다.</Alert>
-        </div>
+        <div className={styles.status_container}>{renderStatus()}</div>
 
         <div className={styles.menus_container}>
           <div className={styles.title}>세차 예약 요청</div>
@@ -157,21 +255,3 @@ function List() {
     </ListGroup>
   );
 }
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  console.log('hello');
-
-  return {
-    paths: [{ params: { slug: 'hello' } }],
-    fallback: false,
-  };
-};
-
-export const getStaticProps: GetStaticProps = async () => {
-  console.log('hello');
-  return {
-    props: {
-      posts: 'hello',
-    },
-  };
-};

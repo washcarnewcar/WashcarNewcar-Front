@@ -51,7 +51,7 @@ export default function Search() {
   /**
    * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
    */
-  const positionCallback = useCallback((position: GeolocationPosition) => {
+  const positionCallback = (position: GeolocationPosition) => {
     const longitude = position.coords.longitude;
     const latitude = position.coords.latitude;
     setCoordinate({ longitude: longitude, latitude: latitude });
@@ -59,7 +59,7 @@ export default function Search() {
       const geocoder = new kakao.maps.services.Geocoder();
       displayLocation(geocoder, longitude, latitude);
     });
-  }, []);
+  };
 
   /**
    * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
@@ -93,7 +93,7 @@ export default function Search() {
         displayLocation(geocoder, parsedLongitude, parsedLatitude);
       });
     }
-  }, [longitude, latitude, positionCallback]);
+  }, [longitude, latitude]);
 
   return (
     <>
