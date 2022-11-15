@@ -54,7 +54,7 @@ function SignUpInfo() {
 
   useEffect(() => {
     if (email) {
-      formik.setValues({ ...formik.values, email: email as string });
+      formik.setValues((values) => ({ ...values, email: email as string }));
     }
   }, [email]);
 

@@ -11,6 +11,12 @@
   .form_group {
     margin: 20px 0px;
 
+    .tel_container {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
     .address_detail {
       margin: 10px 0px;
     }

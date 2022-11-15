@@ -44,23 +44,17 @@
   }
 }
 
-.option_header {
-  font-weight: bold;
-}
-
-.element {
+.form_group {
   margin: 10px 20px;
 
-  .element_title {
-    font-size: 16px;
+  .form_label {
     font-weight: bold;
-    margin-bottom: 10px;
   }
 
+  //////////////////////////////////////
   .date_input {
     text-decoration: none;
     display: flex;
-    margin-top: 10px;
     height: 60px;
     width: 100%;
     border-radius: 12px;
@@ -82,10 +76,10 @@
     color: gray;
   }
 
+  //////////////////////////////////////
   .select_wrapper {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
 
     .select {
       height: 40px;
@@ -94,36 +88,27 @@
     }
   }
 
-  .phone_group {
+  //////////////////////////////////////
 
-    .select {
-      max-width: 27%;
-      height: 45px;
-    }
-
-    .phone {
-      height: 45px;
-    }
-  }
-}
-
-.request {
-  margin: 10px 20px;
-
-  .request_title {
-    font-size: 16px;
-    font-weight: bold;
+  .tel_container {
+    display: flex;
+    gap: 5px;
+    align-items: center;
   }
 
+  //////////////////////////////////////
   .request_input {
     padding: 10px;
     border-radius: 12px;
-    margin-top: 10px;
-    margin-bottom: 90px;
     resize: none;
     height: 80px;
     width: 100%;
   }
+}
+
+.blank {
+  width: 100%;
+  height: 90px;
 }
 
 .result {
@@ -151,7 +136,6 @@
     font-weight: bold;
 
     border-radius: 40px;
-
   }
 
   .result_submit {
@@ -160,5 +144,4 @@
     border-radius: 40px;
     font-weight: bold;
   }
-
 }

@@ -1,11 +1,14 @@
+import axios from 'axios';
 import classNames from 'classnames';
+import { FormikHelpers, useFormik } from 'formik';
 import moment from 'moment';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Accordion, Button, Form } from 'react-bootstrap';
 import Header from '../../../../../src/components/Header';
+import Loading from '../../../../../src/components/Loading';
 import Seperator from '../../../../../src/components/Seperator';
 import styles from '../../../../../styles/Menu.module.scss';
 
@@ -58,85 +61,153 @@ const tempModelData = {
   ],
 };
 
+interface Values {
+  date: Date | null;
+  brandNumber: number;
+  modelNumber: number;
+  tel1: string;
+  tel2: string;
+  tel3: string;
+  request: string;
+}
+
+const initialValues: Values = {
+  date: null,
+  brandNumber: 0,
+  modelNumber: 0,
+  tel1: '',
+  tel2: '',
+  tel3: '',
+  request: '',
+};
+
+interface Errors {
+  date: string;
+  brandNumber: string;
+  modelNumber: string;
+  tel1: string;
+  tel2: string;
+  tel3: string;
+}
+
+interface Brand {
+  number: number;
+  name: string;
+}
+
+interface Model {
+  number: number;
+  name: string;
+}
+
+interface Ready {
+  brand: boolean;
+  model: boolean;
+}
+
+const readyInitialData: Ready = {
+  brand: false,
+  model: true,
+};
+
 export default function Menu() {
   const router = useRouter();
   const { slug, number, date } = router.query;
-  const [brands, setBrands] = useState([{ number: 0, name: '' }]);
-  const [models, setModels] = useState([{ number: 0, name: '' }]);
-  const [selectedBrandNumber, setSelectedBrandNumber] = useState('');
-  const [selectedCarNumber, setSelectedCarNumber] = useState('');
-  const [isSelectedDate, setIsSelectedDate] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [carrier, setCarrier] = useState('');
-  const [mobile, setMobile] = useState('');
-
-  useState(() => {
-    judgeSelectedDate();
-    getBrand();
-
-    /**
-     * 날짜 선택 페이지에서 날짜를 선택했는지 판단
-     */
-    function judgeSelectedDate() {
-      if (date) {
-        setIsSelectedDate(true);
-        setSelectedDate(new Date(date as string));
-      } else {
-        setIsSelectedDate(false);
-      }
-    }
-
-    function getBrand() {
-      setBrands(tempBrandData.brand);
-    }
-  });
-
-  function onBrandChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-    const index = e.target.selectedIndex;
-    const text = e.target.options[index].text;
-
-    if (index !== 0) {
-      setSelectedBrandNumber(value);
-      getCars(value);
-    }
-  }
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [models, setModels] = useState<Model[]>([]);
+  const [ready, setReady] = useState<Ready>(readyInitialData);
 
   /**
-   * 차 모델이 바뀌었을 때
+   * 차 브랜드를 받아오는 함수
    */
-  function onCarChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-    const index = e.target.selectedIndex;
-    const text = e.target.options[index].text;
-
-    if (index !== 0) {
-      setSelectedCarNumber(value);
+  const getBrand = async () => {
+    console.log('getBrand()');
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/car/brand`
+      );
+      console.log(response);
+      setBrands(response.data.brand);
+    } catch (error) {
+      console.error(error);
     }
-  }
+  };
 
   /**
    * 차 모델을 받아오는 함수
    */
-  function getCars(brandNumber: string) {
-    console.log(`getCar(${brandNumber})`);
-    setModels(tempModelData.model);
-  }
+  const getModel = async (brandNumber: string) => {
+    console.log(`getModel(${brandNumber})`);
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/car/brand${brandNumber}`
+      );
+      console.log(response);
+      setModels(response.data.model);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  function onCarrierSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    console.log(e.target.value);
-    setCarrier(e.target.value);
-  }
+  /**
+   * 차 모델이 바뀌었을 때
+   */
+  const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    const index = e.target.selectedIndex;
+    const text = e.target.options[index].text;
 
-  function onMobileSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    console.log(e.target.value);
-    setMobile(e.target.value);
-  }
+    if (index !== 0) {
+      formik.setValues((values) => ({
+        ...values,
+        brandNumber: Number.parseInt(value),
+      }));
+      getModel(value);
+    }
+  };
 
-  function onSubmitClick() {
-    console.log('서버로 예약 요청을 전송하는 로직');
-    router.push(`/reservation/${1}`);
-  }
+  /**
+   * 차 모델이 바뀌었을 때
+   */
+  const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    const index = e.target.selectedIndex;
+    const text = e.target.options[index].text;
+
+    if (index !== 0) {
+      formik.setValues((values) => ({
+        ...values,
+        modelNumber: Number.parseInt(value),
+      }));
+    }
+  };
+
+  const handleSubmit = (
+    values: Values,
+    { setSubmitting, setErrors }: FormikHelpers<Values>
+  ) => {
+    setSubmitting(true);
+
+    setSubmitting(false);
+  };
+
+  const formik = useFormik({
+    initialValues: initialValues,
+    onSubmit: handleSubmit,
+  });
+
+  useEffect(() => {
+    getBrand();
+  }, []);
+
+  useEffect(() => {
+    if (date && Date.parse(date as string)) {
+      formik.setValues((values) => ({
+        ...values,
+        date: new Date(date as string),
+      }));
+    }
+  }, [date]);
 
   return (
     <>
@@ -167,91 +238,112 @@ export default function Menu() {
 
       <Seperator />
 
-      <Accordion flush>
-        <Accordion.Item eventKey="0">
-          <Accordion.Header>
-            <div className={styles.option_header}>추가옵션 선택</div>
-          </Accordion.Header>
-          <Accordion.Body>
-            <div className={styles.option_body}>Hello World!!</div>
-          </Accordion.Body>
-        </Accordion.Item>
-      </Accordion>
+      <Form onSubmit={formik.handleSubmit}>
+        <Form.Group className={styles.form_group}>
+          <Form.Label className={styles.form_label}>예약날짜 선택</Form.Label>
+          <Link href={`/store/${slug}/menu/${number}/time`}>
+            <a
+              className={classNames(styles.date_input, {
+                [styles.date_input_selected]: formik.values.date,
+                [styles.date_input_unselected]: !formik.values.date,
+              })}
+            >
+              {formik.values.date
+                ? moment(formik.values.date).format('MM월 D일 a h시 mm분')
+                : '예약 날짜를 선택해주세요'}
+            </a>
+          </Link>
+        </Form.Group>
 
-      <Seperator />
+        <Seperator />
 
-      <div className={styles.element}>
-        <div className={styles.element_title}>예약날짜 선택</div>
-        <Link href={`/store/${slug}/menu/${number}/time`}>
-          <a
-            className={classNames(styles.date_input, {
-              [styles.date_input_selected]: isSelectedDate,
-              [styles.date_input_unselected]: !isSelectedDate,
-            })}
-          >
-            {isSelectedDate
-              ? moment(selectedDate).format('MM월 D일 a h시 mm분')
-              : '예약 날짜를 선택해주세요'}
-          </a>
-        </Link>
-      </div>
-
-      <Seperator />
-
-      <div className={styles.element}>
-        <div className={styles.element_title}>차량 선택</div>
-        <div className={styles.select_wrapper}>
-          <Form.Select className={styles.select} onChange={onBrandChange}>
-            <option value="select">브랜드 선택</option>
-            {brands.map((brand) => (
-              <option key={brand.number} value={brand.number}>
-                {brand.name}
-              </option>
-            ))}
-          </Form.Select>
-          <Form.Select className={styles.select} onChange={onCarChange}>
-            <option value="select">모델 선택</option>
-            {models.map((model) => (
-              <option key={model.number} value={model.number}>
-                {model.name}
-              </option>
-            ))}
-          </Form.Select>
-        </div>
-      </div>
-
-      <Seperator />
-
-      <div className={styles.element}>
-        <div className={styles.element_title}>휴대폰 번호</div>
-        <Form.Control
-          type="tel"
-          className={styles.phone}
-          placeholder="휴대폰 번호"
-        />
-      </div>
-
-      <Seperator />
-
-      <div className={styles.request}>
-        <div className={styles.request_title}>요청사항</div>
-        <Form.Control
-          as="textarea"
-          className={styles.request_input}
-        ></Form.Control>
-      </div>
-
-      <div className={styles.result}>
-        <div className={styles.result_price}>
-          <div className={styles.result_price_title}>총 결제 금액</div>
-          <div className={styles.result_price_value}>
-            {Intl.NumberFormat().format(tempData.price)}원
+        <Form.Group className={styles.form_group}>
+          <Form.Label className={styles.form_label}>차량 선택</Form.Label>
+          <div className={styles.select_wrapper}>
+            <Form.Select className={styles.select} onChange={handleBrandChange}>
+              <option value="select">브랜드 선택</option>
+              {brands.map((brand) => (
+                <option key={brand.number} value={brand.number}>
+                  {brand.name}
+                </option>
+              ))}
+            </Form.Select>
+            <Form.Select className={styles.select} onChange={handleModelChange}>
+              <option value="select">모델 선택</option>
+              {models.map((model) => (
+                <option key={model.number} value={model.number}>
+                  {model.name}
+                </option>
+              ))}
+            </Form.Select>
           </div>
+        </Form.Group>
+
+        <Seperator />
+
+        <Form.Group className={styles.form_group}>
+          <Form.Label className={styles.form_label}>휴대폰 번호</Form.Label>
+          <div className={styles.tel_container}>
+            <Form.Control
+              type="tel"
+              name="tel1"
+              placeholder="010"
+              maxLength={3}
+              value={formik.values.tel1}
+              onChange={formik.handleChange}
+              isInvalid={!!formik.errors.tel1 && formik.touched.tel1}
+            />
+            -
+            <Form.Control
+              type="tel"
+              name="tel2"
+              placeholder="0000"
+              maxLength={4}
+              value={formik.values.tel2}
+              onChange={formik.handleChange}
+              isInvalid={!!formik.errors.tel2 && formik.touched.tel2}
+            />
+            -
+            <Form.Control
+              type="tel"
+              name="tel3"
+              placeholder="0000"
+              maxLength={4}
+              value={formik.values.tel3}
+              onChange={formik.handleChange}
+              isInvalid={!!formik.errors.tel3 && formik.touched.tel3}
+            />
+          </div>
+        </Form.Group>
+
+        <Seperator />
+
+        <Form.Group className={styles.form_group}>
+          <Form.Label className={styles.form_label}>요청사항</Form.Label>
+          <Form.Control
+            as="textarea"
+            className={styles.request_input}
+          ></Form.Control>
+        </Form.Group>
+
+        <div className={styles.blank}></div>
+
+        <div className={styles.result}>
+          <div className={styles.result_price}>
+            <div className={styles.result_price_title}>총 결제 금액</div>
+            <div className={styles.result_price_value}>
+              {Intl.NumberFormat().format(tempData.price)}원
+            </div>
+          </div>
+          <Button
+            className={styles.result_submit}
+            type="submit"
+            disabled={formik.isSubmitting}
+          >
+            예약하기
+          </Button>
         </div>
-        <Button className={styles.result_submit} onClick={onSubmitClick}>
-          예약하기
-        </Button>
-      </div>
+      </Form>
     </>
   );
 }

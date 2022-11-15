@@ -38,14 +38,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setUser({ isLogined: true });
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          // TODO: 토큰 만료 로직 삽입
-          setUser({ isLogined: false });
-          return;
-        }
+      // 로그인 되지 않거나, 토큰 만료됨
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        console.log('token expired');
+        setUser({ isLogined: false });
+        return;
+      } else {
+        console.error(error);
       }
-      console.error(error);
     }
   };
 

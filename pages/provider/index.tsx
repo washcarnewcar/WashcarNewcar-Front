@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useContext, useEffect } from 'react';
 import UserContext from '../../src/contexts/UserProvider';
-import { requestWithToken } from '../../src/functions/request';
+import { authClient } from '../../src/functions/request';
 
 export default function ProviderCheck() {
   const router = useRouter();
@@ -10,12 +10,7 @@ export default function ProviderCheck() {
 
   const check = async () => {
     try {
-      const response = await requestWithToken(
-        router,
-        setUser,
-        `${process.env.NEXT_PUBLIC_API}/provider/slug`,
-        { method: 'GET' }
-      );
+      const response = await authClient.get(`/provider/slug`);
 
       const data = response?.data;
       if (data) {

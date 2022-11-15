@@ -83,26 +83,22 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
   };
 
   const validateForm = () => {
-    let pass = true;
     const newError = { ...error };
 
     if (!inputs.name) {
       newError.name = '메뉴 이름을 입력해주세요';
-      pass = false;
     } else {
       newError.name = '';
     }
 
     if (!inputs.detail) {
       newError.detail = '메뉴 설명을 입력해주세요';
-      pass = false;
     } else {
       newError.detail = '';
     }
 
     if (!inputs.price) {
       newError.price = '메뉴 가격을 입력해주세요';
-      pass = false;
     } else {
       newError.price = '';
     }

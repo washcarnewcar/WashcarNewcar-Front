@@ -9,7 +9,7 @@ import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../../src/components/Header';
 import Loading from '../../../src/components/Loading';
 import UserContext from '../../../src/contexts/UserProvider';
-import { requestWithToken } from '../../../src/functions/request';
+import { authClient } from '../../../src/functions/request';
 import styles from '../../../styles/ProviderDashboard.module.scss';
 
 interface Ready {
@@ -48,37 +48,33 @@ export default function ProviderDashboard() {
 
   const getStoreState = async () => {
     try {
-      const response = await requestWithToken(
-        router,
-        setUser,
-        `/provider/${slug}/approve`
-      );
+      const response = await authClient.get(`/provider/${slug}/approve`);
 
       const data = response?.data;
       switch (data.status) {
         // 세차장 승인, 페이지 운영중
         case 1500:
           setStoreStatus(Status.Operation);
-          setReady({
+          setReady((ready) => ({
             ...ready,
             status: true,
-          });
+          }));
           return;
         // 세차장 승인 대기중
         case 1501:
           setStoreStatus(Status.Waiting);
-          setReady({
+          setReady((ready) => ({
             ...ready,
             status: true,
-          });
+          }));
           return;
         // 세차장 승인 거부
         case 1502:
           setStoreStatus(Status.Abort);
-          setReady({
+          setReady((ready) => ({
             ...ready,
             status: true,
-          });
+          }));
           return;
         // 정상적인 접근 아님
         default:
@@ -92,11 +88,7 @@ export default function ProviderDashboard() {
 
   const getRequestList = async () => {
     try {
-      const response = await requestWithToken(
-        router,
-        setUser,
-        `/provider/${slug}/request`
-      );
+      const response = await authClient.get(`/provider/${slug}/request`);
 
       const list: Request[] = response?.data.list;
       console.log(list);
@@ -106,19 +98,14 @@ export default function ProviderDashboard() {
     }
   };
 
-  const getCalendarList = async () => {
-    const response = await requestWithToken(
-      router,
-      setUser,
-      `/provider/${slug}/schedule`,
-      { method: 'GET' }
-    );
+  const getScheduleList = async () => {
+    const response = await authClient.get(`/provider/${slug}/schedule`);
     console.log(response);
   };
 
   useEffect(() => {
     getStoreState();
-    getCalendarList();
+    getScheduleList();
   }, []);
 
   const renderStatus = () => {
