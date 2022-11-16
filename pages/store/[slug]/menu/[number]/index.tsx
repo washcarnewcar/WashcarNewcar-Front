@@ -1,4 +1,3 @@
-import axios from 'axios';
 import classNames from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import moment from 'moment';
@@ -6,10 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Accordion, Button, Form } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import Header from '../../../../../src/components/Header';
-import Loading from '../../../../../src/components/Loading';
 import Seperator from '../../../../../src/components/Seperator';
+import { client } from '../../../../../src/functions/request';
 import styles from '../../../../../styles/Menu.module.scss';
 
 const tempData = {
@@ -123,9 +122,7 @@ export default function Menu() {
   const getBrand = async () => {
     console.log('getBrand()');
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/car/brand`
-      );
+      const response = await client.get(`/car/brand`);
       console.log(response);
       setBrands(response.data.brand);
     } catch (error) {
@@ -139,9 +136,7 @@ export default function Menu() {
   const getModel = async (brandNumber: string) => {
     console.log(`getModel(${brandNumber})`);
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/car/brand${brandNumber}`
-      );
+      const response = await client.get(`/car/brand${brandNumber}`);
       console.log(response);
       setModels(response.data.model);
     } catch (error) {

@@ -1,9 +1,8 @@
-import axios from 'axios';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Header from '../../../../src/components/Header';
 import MenuForm from '../../../../src/components/MenuForm';
-import styles from '../../../../styles/MenuEdit.module.scss';
+import { client } from '../../../../src/functions/request';
 
 interface Data {
   image: string;
@@ -19,9 +18,7 @@ export default function MenuEdit() {
 
   const getData = useCallback(async () => {
     if (slug && number) {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/store/${slug}/menu/${number}`
-      );
+      const response = await client.get(`/store/${slug}/menu/${number}`);
       const responseData: Data = response.data;
       console.log(response.data);
       setData(responseData);

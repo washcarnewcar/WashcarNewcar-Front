@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useContext, useEffect } from 'react';
 import UserContext from '../../src/contexts/UserProvider';
@@ -19,14 +18,14 @@ export default function ProviderCheck() {
         if (status === 2600) {
           router.replace(`/provider/${slug}`);
         }
-        // 세차장 없음
+        // 세차장 없음 => 새로운 세차장 생성
         else if (status === 2601) {
           router.replace(`/provider/new`);
         } else {
           throw new Error('알 수 없는 상태코드');
         }
       } else {
-        throw new Error('데이터 오지 않음');
+        throw new Error('잘못된 응답');
       }
     } catch (error) {
       console.error(error);

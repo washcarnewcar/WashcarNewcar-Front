@@ -9,10 +9,12 @@ export default function NewStore() {
   const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
-    if (!user?.isLogined) {
-      router.replace('/auth/login');
+    if (user) {
+      if (!user.isLogined) {
+        router.replace('/auth/login');
+      }
     }
-  }, []);
+  }, [user]);
 
   return (
     <>

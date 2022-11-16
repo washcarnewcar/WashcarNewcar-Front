@@ -1,14 +1,15 @@
-import axios, { AxiosError } from 'axios';
-import { Formik, FormikHelpers, useFormik } from 'formik';
+import { AxiosError } from 'axios';
+import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../src/components/AuthHeader';
 import UserContext from '../../src/contexts/UserProvider';
+import { client } from '../../src/functions/request';
 import styles from '../../styles/Auth.module.scss';
 
 interface Values {
@@ -45,10 +46,7 @@ function Login() {
 
     // 로그인 요청
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API}/login`,
-        form
-      );
+      const response = await client.post(`/login`, form);
 
       // 토큰 저장
       const token = response.data.access_token;

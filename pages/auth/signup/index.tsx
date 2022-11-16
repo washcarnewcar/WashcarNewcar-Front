@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { Formik, FormikHelpers, useFormik } from 'formik';
+import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -7,6 +6,7 @@ import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../../src/components/AuthHeader';
+import { client } from '../../../src/functions/request';
 import styles from '../../../styles/Auth.module.scss';
 
 interface Values {
@@ -34,12 +34,9 @@ export default function SignUp() {
 
     console.log('submit!');
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/signup/check`,
-        {
-          params: { email: values.email },
-        }
-      );
+      const response = await client.get(`/signup/check`, {
+        params: { email: values.email },
+      });
       console.log(response);
       const status: number = response.data.status;
       // id 사용 가능

@@ -1,30 +1,21 @@
-import React, {
-  ChangeEvent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { Button, Form, InputGroup } from 'react-bootstrap';
-import styles from '../../styles/StoreForm.module.scss';
-import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import {
   PutObjectCommand,
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import Image from 'next/image';
-import { IoClose } from 'react-icons/io5';
-import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
-import { BeatLoader } from 'react-spinners';
 import Compressor from 'compressorjs';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import UserContext from '../../src/contexts/UserProvider';
 import { FormikHelpers, useFormik } from 'formik';
-import { number, object, string } from 'yup';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { Button, Form, InputGroup } from 'react-bootstrap';
+import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
+import { IoClose } from 'react-icons/io5';
+import { Map, MapMarker } from 'react-kakao-maps-sdk';
+import { BeatLoader } from 'react-spinners';
+import styles from '../../styles/StoreForm.module.scss';
+import { authClient, client } from '../functions/request';
 import Loading from './Loading';
-import { authClient } from '../functions/request';
 
 const credentials = {
   accessKeyId: process.env.NEXT_PUBLIC_ACCESSKEY
@@ -90,11 +81,9 @@ interface StoreFormProps {
 
 export default function StoreForm({ data }: StoreFormProps) {
   const router = useRouter();
-  const { user, setUser } = useContext(UserContext);
   const addressOpen = useDaumPostcodePopup();
 
-  // slug 관련
-  const [slug, setSlug] = useState('');
+  // slug 사용 가능 메시지
   const [slugValid, setSlugValid] = useState('');
 
   // 카카오맵 로딩되었는지 확인
@@ -156,11 +145,18 @@ export default function StoreForm({ data }: StoreFormProps) {
       });
       setSlugValid('');
       return;
+    } else if (formik.values.slug === 'new') {
+      formik.setErrors({
+        ...formik.errors,
+        slug: '사용할 수 없는 홈페이지 주소입니다.',
+      });
+      setSlugValid('');
+      return;
     }
 
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/provider/check-slug/${formik.values.slug}`
+      const response = await client.get(
+        `/provider/check-slug/${formik.values.slug}`
       );
 
       const status: number = response.data.status;
@@ -397,7 +393,7 @@ export default function StoreForm({ data }: StoreFormProps) {
         latitude: values.latitude,
       },
       address: `${values.address} ${values.address2}`,
-      slug: slug,
+      slug: values.slug,
       wayto: values.wayto,
       description: values.description,
       preview_image: previewImageUrl,
@@ -405,15 +401,15 @@ export default function StoreForm({ data }: StoreFormProps) {
     };
     console.log('sending data:\n' + data);
 
-    const response = await authClient.post(`/provider/new`, { data: data });
+    const response = await authClient.post(`/provider/new`, data);
 
-    console.log(response?.data);
+    console.log(response.data);
 
     if (response) {
       switch (response.data.status) {
         case 1300:
           alert('성공적으로 요청되었습니다.');
-          router.replace(`/provider/${slug}`);
+          router.replace(`/provider/${formik.values.slug}`);
           return;
         case 1301:
           alert('필수 정보가 입력되지 않았습니다.');
@@ -438,7 +434,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   ) => {
     // slug 유효한지 확인
     if (!slugValid) {
-      formik.setErrors({
+      setErrors({
         ...formik.errors,
         slug: '중복 확인을 해주세요.',
       });
@@ -504,7 +500,6 @@ export default function StoreForm({ data }: StoreFormProps) {
   const formik = useFormik({
     initialValues: initialValues,
     onSubmit: handleSubmit,
-    // validationSchema: schema,
     validate: validate,
   });
 
