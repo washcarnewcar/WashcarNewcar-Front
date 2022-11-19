@@ -1,124 +1,85 @@
-import Compressor from 'compressorjs';
+import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { IoClose, IoImage } from 'react-icons/io5';
+import { number, object, string } from 'yup';
 import styles from '../../styles/MenuForm.module.scss';
+import { MenuDto } from '../dto';
+import { compressImage } from '../function/processingImage';
 import Loading from './Loading';
-
-interface Data {
-  image: string;
-  name: string;
-  detail: string;
-  price: number;
-}
 
 interface MenuFormProps {
   slug: string;
-  data?: Data | null;
+  data: MenuDto | null | undefined;
 }
 
-interface Inputs {
-  image: File | null;
-  imageUrl: string;
+interface Values {
   name: string;
-  detail: string;
+  description: string;
   price: number;
 }
 
-interface Errors {
-  image: string;
-  name: string;
-  detail: string;
-  price: string;
+interface Images {
+  file: File | null;
+  uploaded: boolean;
+  previewUrl: string;
 }
+
+interface Errors {
+  image?: string;
+  name?: string;
+  description?: string;
+  price?: string;
+}
+
+const initialValues: Values = {
+  name: '',
+  description: '',
+  price: 0,
+};
+
+const schema = object().shape({
+  name: string().required('메뉴 이름을 입력해주세요'),
+  description: string().required('메뉴 설명을 입력해주세요'),
+  price: number().not([0], '메뉴 가격을 입력해주세요'),
+});
 
 export default function MenuForm({ slug, data }: MenuFormProps) {
   const router = useRouter();
   const inputFile = useRef<HTMLInputElement>(null);
-
-  const [inputs, setInputs] = useState<Inputs>({
-    image: null,
-    imageUrl: '',
-    name: '',
-    detail: '',
-    price: 0,
+  const [image, setImage] = useState<Images>({
+    file: null,
+    uploaded: false,
+    previewUrl: '',
   });
-
-  const [error, setError] = useState<Errors>({
-    image: '',
-    name: '',
-    detail: '',
-    price: '',
-  });
-
   const [ready, setReady] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newInputs = {
-      ...inputs,
-      [e.target.name]: e.target.value,
-    };
-    setInputs(newInputs);
+  const handleSubmit = (
+    values: Values,
+    { setErrors, setSubmitting }: FormikHelpers<Values>
+  ) => {
+    setSubmitting(true);
+
+    setSubmitting(false);
   };
 
-  /**
-   * 이미지를 5MB 이하의 크기로 압축하는 함수
-   */
-  const compressImage = (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      if (!file) reject('파일이 없음');
-
-      new Compressor(file, {
-        convertSize: 5000000,
-        success(file: File) {
-          resolve(file);
-        },
-        error(error) {
-          reject('압축 도중 오류 발생');
-        },
-      });
-    });
-  };
-
-  const validateForm = () => {
-    const newError = { ...error };
-
-    if (!inputs.name) {
-      newError.name = '메뉴 이름을 입력해주세요';
-    } else {
-      newError.name = '';
-    }
-
-    if (!inputs.detail) {
-      newError.detail = '메뉴 설명을 입력해주세요';
-    } else {
-      newError.detail = '';
-    }
-
-    if (!inputs.price) {
-      newError.price = '메뉴 가격을 입력해주세요';
-    } else {
-      newError.price = '';
-    }
-    setError(newError);
-  };
+  const formik = useFormik({
+    initialValues: initialValues,
+    onSubmit: handleSubmit,
+    validationSchema: schema,
+  });
 
   /**
    * 이미지를 선택했을 때
    */
-  const handleImageInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let file = e.target.files ? e.target.files[0] : null;
 
     // 파일을 넣지 않은 경우
     if (!file) {
-      const newInputs = {
-        ...inputs,
-        image: null,
-        imageUrl: '',
-      };
-      setInputs(newInputs);
+      setImage({ file: null, uploaded: false, previewUrl: '' });
       return;
     }
 
@@ -138,21 +99,22 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
       }
     }
 
-    const newInputs = {
-      ...inputs,
-      image: file,
-      imageUrl: URL.createObjectURL(file),
-    };
-    setInputs(newInputs);
+    setImage({
+      file: file,
+      uploaded: false,
+      previewUrl: URL.createObjectURL(file),
+    });
   };
 
   /**
-   * 등록하기를 눌렀을 때
+   * 사진 삭제 버튼을 눌렀을 때
    */
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    validateForm();
-    console.log(inputs);
+  const handleDeleteClick = () => {
+    setImage({
+      file: null,
+      uploaded: false,
+      previewUrl: '',
+    });
   };
 
   /**
@@ -162,27 +124,13 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
     router.back();
   };
 
-  /**
-   * 사진 삭제 버튼을 눌렀을 때
-   */
-  const handleDeleteClick = () => {
-    const newInputs = {
-      ...inputs,
-      image: null,
-      imageUrl: '',
-    };
-    setInputs(newInputs);
-    inputFile.current ? (inputFile.current.value = '') : null;
-  };
-
-  const setData = (data: Data) => {
-    setInputs({
-      image: null,
-      imageUrl: data.image ? data.image : '',
-      name: data.name ? data.name : '',
-      detail: data.detail ? data.detail : '',
+  const setData = (data: MenuDto) => {
+    formik.setValues({
+      name: data.name,
+      description: data.description,
       price: data.price,
     });
+    setImage({ file: null, uploaded: true, previewUrl: data.image });
   };
 
   /**
@@ -208,10 +156,10 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
 
   return (
     <div className={styles.container}>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={formik.handleSubmit}>
         <div className={styles.image_container}>
           <div className={styles.image_wrapper}>
-            {inputs.imageUrl ? (
+            {image.previewUrl ? (
               <>
                 <label htmlFor="file" className={styles.change_wrapper}>
                   <IoImage size="100%" />
@@ -223,7 +171,11 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
                   <IoClose />
                 </button>
                 <Image
-                  src={inputs.imageUrl}
+                  src={
+                    image.uploaded
+                      ? process.env.NEXT_PUBLIC_S3_URL + image.previewUrl
+                      : image.previewUrl
+                  }
                   alt="menu_image"
                   width={200}
                   height={200}
@@ -241,7 +193,7 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
               type="file"
               id="file"
               style={{ display: 'none' }}
-              onChange={handleImageInput}
+              onChange={handleImageChange}
               ref={inputFile}
             />
           </div>
@@ -254,12 +206,12 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
             type="text"
             placeholder="메뉴 이름을 입력해주세요"
             name="name"
-            value={inputs.name}
-            onChange={handleChange}
-            isInvalid={!!error.name}
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            isInvalid={!!formik.errors.name}
           />
           <Form.Control.Feedback type="invalid">
-            {error.name}
+            {formik.errors.name}
           </Form.Control.Feedback>
         </Form.Group>
 
@@ -270,13 +222,13 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
             as="textarea"
             rows={5}
             placeholder="메뉴의 설명을 입력해주세요"
-            name="detail"
-            value={inputs.detail}
-            onChange={handleChange}
-            isInvalid={!!error.detail}
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            isInvalid={!!formik.errors.description}
           />
           <Form.Control.Feedback type="invalid">
-            {error.name}
+            {formik.errors.name}
           </Form.Control.Feedback>
         </Form.Group>
 
@@ -289,13 +241,13 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
               inputMode="numeric"
               placeholder="메뉴 가격을 입력해주세요"
               name="price"
-              value={inputs.price}
-              onChange={handleChange}
-              isInvalid={!!error.price}
+              value={formik.values.price}
+              onChange={formik.handleChange}
+              isInvalid={!!formik.errors.price}
             />
             <InputGroup.Text>원</InputGroup.Text>
             <Form.Control.Feedback type="invalid">
-              {error.price}
+              {formik.errors.price}
             </Form.Control.Feedback>
           </InputGroup>
         </Form.Group>
@@ -305,6 +257,7 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
             className={styles.submit_button}
             variant="outline-danger"
             onClick={handleCancelClick}
+            type="button"
           >
             취소
           </Button>

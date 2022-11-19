@@ -32,26 +32,37 @@ export default function SignUp() {
   ) => {
     setSubmitting(true);
 
-    console.log('submit!');
     try {
       const response = await client.get(`/signup/check`, {
         data: { email: values.email },
       });
-      console.log(response);
-      const status: number = response.data.status;
-      // email 사용 가능
-      if (status === 1700) {
-        router.push(`/auth/signup/info`, { query: { email: values.email } });
+      console.log(response?.data);
+      const status: number | undefined = response?.data?.status;
+      if (status) {
+        // email 사용 가능
+        switch (status) {
+          case 1700:
+            router.push(`/auth/signup/info`, {
+              query: { email: values.email },
+            });
+            return;
+          // email 중복
+          case 1701:
+            setErrors({ email: '이미 사용중인 이메일입니다' });
+            return;
+          // email 형식에 맞지 않음
+          case 1702:
+            setErrors({ email: '이메일 형식에 맞지 않습니다' });
+            return;
+          default:
+            throw Error('알 수 없는 상태코드');
+        }
+      } else {
+        throw Error('잘못된 응답');
       }
-      // email 중복
-      else if (status === 1701) {
-        setErrors({ email: '이미 사용중인 이메일입니다' });
-      }
-      // email 형식에 맞지 않음
-      else if (status === 1702) {
-        setErrors({ email: '이메일 형식에 맞지 않습니다' });
-      }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
 
     setSubmitting(false);
   };

@@ -9,7 +9,7 @@ import {
   Tabs,
 } from 'react-bootstrap';
 import { IoAdd, IoTrash } from 'react-icons/io5';
-import Header from '../../../src/components/Header';
+import LoginCheck from '../../../src/components/LoginCheck';
 import Seperator from '../../../src/components/Seperator';
 import styles from '../../../styles/ProviderTime.module.scss';
 
@@ -20,8 +20,7 @@ interface Time {
 
 export default function ProviderTime() {
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <div className={styles.container}>
         <div className={styles.title}>매장 운영 시간 설정</div>
         <Tabs defaultActiveKey="time" className={styles.tabs} justify id="tabs">
@@ -39,7 +38,7 @@ export default function ProviderTime() {
           </Tab>
         </Tabs>
       </div>
-    </>
+    </LoginCheck>
   );
 }
 

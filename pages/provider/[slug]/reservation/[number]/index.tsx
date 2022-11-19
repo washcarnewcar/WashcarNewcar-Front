@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Form, ListGroup } from 'react-bootstrap';
 import Header from '../../../../../src/components/Header';
+import LoginCheck from '../../../../../src/components/LoginCheck';
 import styles from '../../../../../styles/ProviderReservation.module.scss';
 
 export default function ProviderReservation() {
@@ -46,8 +47,7 @@ export default function ProviderReservation() {
   }
 
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <div className={styles.container}>
         <div className={styles.info_container}>
           <ListGroup>
@@ -142,6 +142,6 @@ export default function ProviderReservation() {
           </Link>
         </div>
       </div>
-    </>
+    </LoginCheck>
   );
 }

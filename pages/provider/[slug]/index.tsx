@@ -7,7 +7,9 @@ import { Alert, Button, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../../src/components/Header';
 import Loading from '../../../src/components/Loading';
+import LoginCheck from '../../../src/components/LoginCheck';
 import UserContext from '../../../src/context/UserProvider';
+import { RequestDto, ScheduleDto } from '../../../src/dto';
 import { authClient } from '../../../src/function/request';
 import styles from '../../../styles/ProviderDashboard.module.scss';
 
@@ -16,16 +18,6 @@ interface Ready {
   request: boolean;
   schedule: boolean;
 }
-
-interface Request {
-  reservation_number: number;
-  menu: string;
-  car_number: string;
-  car_model: string;
-  date: Date;
-}
-
-interface Schedule extends Request {}
 
 enum Status {
   Loading,
@@ -40,7 +32,7 @@ export default function ProviderDashboard() {
   const { user, setUser } = useContext(UserContext);
   // 임시로 true
   const [storeStatus, setStoreStatus] = useState<Status>(Status.Loading);
-  const [storeRequests, setStoreRequests] = useState<Request[]>([]);
+  const [storeRequests, setStoreRequests] = useState<RequestDto[]>([]);
   const [ready, setReady] = useState<Ready>({
     status: false,
     request: false,
@@ -86,7 +78,6 @@ export default function ProviderDashboard() {
         }
       } catch (error) {
         console.error(error);
-        router.back();
       }
     };
 
@@ -94,12 +85,11 @@ export default function ProviderDashboard() {
       try {
         const response = await authClient.get(`/provider/${slug}/request`);
 
-        const list: Request[] = response.data.list;
+        const list: RequestDto[] = response.data.list;
         console.log('getRequestList');
         console.log(list);
       } catch (error) {
         console.error(error);
-        router.back();
       }
     };
 
@@ -107,12 +97,11 @@ export default function ProviderDashboard() {
       try {
         const response = await authClient.get(`/provider/${slug}/schedule`);
 
-        const list: Schedule[] = response.data.list;
+        const list: ScheduleDto[] = response.data.list;
         console.log('getScheduleList');
         console.log(list);
       } catch (error) {
         console.error(error);
-        router.back();
       }
     };
 
@@ -157,8 +146,7 @@ export default function ProviderDashboard() {
   };
 
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <div className={styles.container}>
         <div className={styles.status_container}>{renderStatus()}</div>
 
@@ -193,7 +181,7 @@ export default function ProviderDashboard() {
           </div>
         </div>
       </div>
-    </>
+    </LoginCheck>
   );
 }
 

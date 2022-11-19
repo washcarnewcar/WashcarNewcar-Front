@@ -1,52 +1,63 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { IoAdd } from 'react-icons/io5';
 import Header from '../../../../src/components/Header';
+import LoginCheck from '../../../../src/components/LoginCheck';
+import { MenuDto } from '../../../../src/dto';
+import { authClient } from '../../../../src/function/request';
 import styles from '../../../../styles/MenuList.module.scss';
 
-const tempData = {
-  menu: [
-    {
-      number: 1,
-      image: 'S3 URL',
-      name: '외부 세차',
-      detail:
-        '세차에 대한 설명dfasffsdfsdfdsfs\n두줄 정도 표시할까 ㅇ라넝라너dfsafdsds',
-      price: 80000,
-    },
-    {
-      number: 2,
-      image: 'S3 URL',
-      name: '내부 세차',
-      detail: '세차에 대한 설명\n두줄 정도 표시할까 생각중',
-      price: 70000,
-    },
-    {
-      number: 3,
-      image: 'S3 URL',
-      name: '내부 세차',
-      detail: '한줄은 어때요?',
-      price: 70000,
-    },
-  ],
-};
+const mockData = [
+  {
+    number: 1,
+    image: 'S3 URL',
+    name: '외부 세차',
+    description:
+      '세차에 대한 설명dfasffsdfsdfdsfs\n두줄 정도 표시할까 ㅇ라넝라너dfsafdsds',
+    price: 80000,
+  },
+  {
+    number: 2,
+    image: 'S3 URL',
+    name: '내부 세차',
+    description: '세차에 대한 설명\n두줄 정도 표시할까 생각중',
+    price: 70000,
+  },
+  {
+    number: 3,
+    image: 'S3 URL',
+    name: '내부 세차',
+    description: '한줄은 어때요?',
+    price: 70000,
+  },
+];
 
 export default function MenuList() {
   const router = useRouter();
   const { slug } = router.query;
-
-  const getMenuList = () => {};
+  const [menus, setMenus] = useState<MenuDto[]>([]);
 
   useEffect(() => {
-    getMenuList();
-  }, []);
+    const getMenuList = async () => {
+      const request = await authClient.get(`/provider/${slug}/menu`);
+      console.log(request?.data);
+      // const menus: MenuDto[] | undefined = request?.data?.menu;
+      const menus: MenuDto[] | undefined = mockData;
+      if (menus) {
+        setMenus(menus);
+      }
+    };
+
+    if (slug) {
+      getMenuList();
+    }
+  }, [slug]);
 
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <div className={styles.container}>
         <div className={styles.title}>메뉴 관리</div>
         <div className={styles.plus_button_wrapper}>
@@ -58,27 +69,19 @@ export default function MenuList() {
           </Link>
         </div>
         <ListGroup>
-          {tempData.menu.map((menuItem, index) => (
+          {menus.map((menu, index) => (
             <ListGroupItem key={index}>
-              <MenuItem slug={slug as string} data={menuItem} />
+              <MenuItem slug={slug as string} data={menu} />
             </ListGroupItem>
           ))}
         </ListGroup>
       </div>
-    </>
+    </LoginCheck>
   );
 }
 
-interface IData {
-  image: string;
-  name: string;
-  detail: string;
-  price: number;
-  number: number;
-}
-
 interface MenuItemProps {
-  data: IData;
+  data: MenuDto;
   slug: string;
 }
 
@@ -98,7 +101,7 @@ function MenuItem({ data, slug }: MenuItemProps) {
           </div>
           <div className={styles.content}>
             <div className={styles.menu_title}>{data.name}</div>
-            <div className={styles.menu_detail}>{data.detail}</div>
+            <div className={styles.menu_description}>{data.description}</div>
             <div className={styles.menu_price}>
               {data.price.toLocaleString()}원
             </div>

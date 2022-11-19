@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Header from '../../../src/components/Header';
-import StoreForm, { Data } from '../../../src/components/StoreForm';
+import LoginCheck from '../../../src/components/LoginCheck';
+import StoreForm from '../../../src/components/StoreForm';
 import { StoreDto } from '../../../src/dto';
 import { authClient, client } from '../../../src/function/request';
 
@@ -29,7 +30,7 @@ const mockData: StoreDto = {
 export default function EditStore() {
   const router = useRouter();
   const { slug } = router.query;
-  const [data, setData] = useState<Data>();
+  const [data, setData] = useState<StoreDto>();
 
   useEffect(() => {
     const getData = async () => {
@@ -40,19 +41,7 @@ export default function EditStore() {
         // TODO:
         console.log(data);
         if (data) {
-          setData({
-            name: data.name,
-            previewImage: data.preview_image,
-            storeImage: data.store_image,
-            tel: data.tel,
-            address: data.address,
-            addressDetail: data.address_detail,
-            description: data.description,
-            wayto: data.wayto,
-            slug: slug as string,
-            latitude: data.coordinate.latitude,
-            longitude: data.coordinate.longitude,
-          });
+          setData(data);
         } else {
           throw Error('data 전송되지 않음');
         }
@@ -67,9 +56,8 @@ export default function EditStore() {
   }, [slug]);
 
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <StoreForm data={data} />
-    </>
+    </LoginCheck>
   );
 }

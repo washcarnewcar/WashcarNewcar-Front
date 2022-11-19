@@ -3,8 +3,6 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { AxiosResponse } from 'axios';
-import Compressor from 'compressorjs';
 import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -16,6 +14,7 @@ import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { BeatLoader } from 'react-spinners';
 import styles from '../../styles/StoreForm.module.scss';
 import { StoreDto } from '../dto';
+import { compressImage } from '../function/processingImage';
 import { authClient, client } from '../function/request';
 import Loading from './Loading';
 
@@ -34,20 +33,6 @@ const s3Client = new S3Client({
 });
 
 const bucket = process.env.NEXT_PUBLIC_BUCKET_NAME;
-
-export interface Data {
-  name: string;
-  previewImage: string;
-  storeImage: string[];
-  tel: string;
-  address: string;
-  addressDetail: string;
-  wayto: string;
-  description: string;
-  slug: string;
-  longitude: number;
-  latitude: number;
-}
 
 interface Values {
   name: string;
@@ -74,6 +59,7 @@ interface Errors {
 
 interface Images {
   file: File | null;
+  uploaded: boolean;
   previewUrl: string;
 }
 
@@ -92,7 +78,7 @@ const initialValues: Values = {
 };
 
 interface StoreFormProps {
-  data: Data | null | undefined;
+  data: StoreDto | null | undefined;
 }
 
 export default function StoreForm({ data }: StoreFormProps) {
@@ -108,6 +94,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   // 이미지
   const [previewImage, setPreviewImage] = useState<Images>({
     file: null,
+    uploaded: false,
     previewUrl: '',
   });
   const [storeImages, setStoreImages] = useState<Images[]>([]);
@@ -217,25 +204,6 @@ export default function StoreForm({ data }: StoreFormProps) {
   };
 
   /**
-   * 이미지를 5MB 이하의 크기로 압축하는 함수
-   */
-  const compressImage = (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      if (!file) reject('파일이 없음');
-
-      new Compressor(file, {
-        convertSize: 5000000,
-        success(file: File) {
-          resolve(file);
-        },
-        error(error) {
-          reject('압축 도중 오류 발생');
-        },
-      });
-    });
-  };
-
-  /**
    * 프로필 사진이 삽입되었을 때
    */
   const handlePreviewImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -279,7 +247,7 @@ export default function StoreForm({ data }: StoreFormProps) {
    * 프로필 사진의 x버튼을 눌렀을 때
    */
   const handlePreviewImageCloseClick = () => {
-    setPreviewImage({ file: null, previewUrl: '' });
+    setPreviewImage({ file: null, uploaded: false, previewUrl: '' });
     if (previewImageInput.current) {
       previewImageInput.current.value = '';
     }
@@ -328,6 +296,7 @@ export default function StoreForm({ data }: StoreFormProps) {
 
       newStoreImages.push({
         file: file,
+        uploaded: false,
         previewUrl: URL.createObjectURL(file),
       });
       setStoreImages(newStoreImages);
@@ -433,31 +402,58 @@ export default function StoreForm({ data }: StoreFormProps) {
     console.log('sending data:');
     console.log(storeDto);
 
-    let response: AxiosResponse;
+    // provider/:slug 일때
     if (data) {
-      response = await authClient.post(`/provider/${data.slug}/store`);
-    } else {
-      response = await authClient.post(`/provider/new`, storeDto);
+      const response = await authClient.post(
+        `/provider/${data.slug}/store`,
+        storeDto
+      );
+      console.log(response.data);
+
+      if (response) {
+        switch (response.data.status) {
+          case 2500:
+            alert('성공적으로 요청되었습니다.');
+            router.replace(`/provider/${formik.values.slug}`);
+            return;
+          case 2501:
+            alert('필수 정보가 입력되지 않았습니다.');
+            formik.setSubmitting(false);
+            return;
+          case 2502:
+            alert('홈페이지 주소가 중복되었습니다.');
+            formik.setSubmitting(false);
+            return;
+          default:
+            formik.setSubmitting(false);
+            throw Error('알 수 없는 상태코드 수신');
+        }
+      }
     }
+    // provider/new 일때
+    else {
+      const response = await authClient.post(`/provider/new`, storeDto);
 
-    console.log(response.data);
+      console.log(response.data);
 
-    if (response) {
-      switch (response.data.status) {
-        case 1300:
-          alert('성공적으로 요청되었습니다.');
-          router.replace(`/provider/${formik.values.slug}`);
-          return;
-        case 1301:
-          alert('필수 정보가 입력되지 않았습니다.');
-          formik.setSubmitting(false);
-          return;
-        case 1302:
-          alert('홈페이지 주소가 중복되었습니다.');
-          formik.setSubmitting(false);
-          return;
-        default:
-          throw Error('알 수 없는 상태코드 수신');
+      if (response) {
+        switch (response.data.status) {
+          case 1300:
+            alert('수정되었습니다.');
+            router.replace(`/provider/${formik.values.slug}`);
+            return;
+          case 1301:
+            alert('필수 정보가 입력되지 않았습니다.');
+            formik.setSubmitting(false);
+            return;
+          case 1302:
+            alert('홈페이지 주소가 중복되었습니다.');
+            formik.setSubmitting(false);
+            return;
+          default:
+            formik.setSubmitting(false);
+            throw Error('알 수 없는 상태코드 수신');
+        }
       }
     }
   };
@@ -541,11 +537,11 @@ export default function StoreForm({ data }: StoreFormProps) {
     validate: validate,
   });
 
-  const setData = (data: Data) => {
+  const setData = (data: StoreDto) => {
     const tel = data.tel.split('-');
     formik.setValues({
       address: data.address,
-      addressDetail: data.addressDetail,
+      addressDetail: data.address_detail,
       description: data.description,
       name: data.name,
       slug: data.slug,
@@ -553,18 +549,20 @@ export default function StoreForm({ data }: StoreFormProps) {
       tel2: tel[1],
       tel3: tel[2],
       wayto: data.wayto,
-      latitude: data.latitude,
-      longitude: data.longitude,
+      latitude: data.coordinate.latitude,
+      longitude: data.coordinate.longitude,
     });
     // string => Image
     setPreviewImage({
       file: null,
-      previewUrl: data.previewImage,
+      uploaded: true,
+      previewUrl: data.preview_image,
     });
     // string[] => Image[]
     setStoreImages(
-      data.storeImage.map((storeImage) => ({
+      data.store_image.map((storeImage) => ({
         file: null,
+        uploaded: true,
         previewUrl: storeImage,
       }))
     );
@@ -580,7 +578,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   useEffect(() => {
     if (data === null) {
       setReady(true);
-    } else if (data !== undefined) {
+    } else if (data) {
       setData(data);
       setReady(true);
     }
@@ -778,7 +776,11 @@ export default function StoreForm({ data }: StoreFormProps) {
                 </button>
                 <Image
                   alt="미리보기 이미지"
-                  src={`${process.env.NEXT_PUBLIC_S3_URL}${previewImage.previewUrl}`}
+                  src={
+                    previewImage.uploaded
+                      ? `${process.env.NEXT_PUBLIC_S3_URL}${previewImage.previewUrl}`
+                      : previewImage.previewUrl
+                  }
                   width={100}
                   height={100}
                   className={styles.image}
@@ -811,7 +813,11 @@ export default function StoreForm({ data }: StoreFormProps) {
                   </button>
                   <Image
                     alt="매장 이미지"
-                    src={`${process.env.NEXT_PUBLIC_S3_URL}${storeImage.previewUrl}`}
+                    src={
+                      storeImage.uploaded
+                        ? `${process.env.NEXT_PUBLIC_S3_URL}${storeImage.previewUrl}`
+                        : storeImage.previewUrl
+                    }
                     width={100}
                     height={100}
                     className={styles.image}
@@ -829,6 +835,8 @@ export default function StoreForm({ data }: StoreFormProps) {
         >
           {formik.isSubmitting ? (
             <BeatLoader color="white" size="10px" />
+          ) : data ? (
+            '정보 수정'
           ) : (
             '승인 요청'
           )}

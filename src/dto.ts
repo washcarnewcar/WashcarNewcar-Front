@@ -15,3 +15,21 @@ export interface CoordinateDto {
   longitude: number;
   latitude: number;
 }
+
+export interface RequestDto {
+  reservation_number: number;
+  menu: string;
+  car_number: string;
+  car_model: string;
+  date: Date;
+}
+
+export interface ScheduleDto extends RequestDto {}
+
+export interface MenuDto {
+  number: number;
+  image: string;
+  name: string;
+  description: string;
+  price: number;
+}

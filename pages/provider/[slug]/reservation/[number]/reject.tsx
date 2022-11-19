@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { Button, Form } from 'react-bootstrap';
 import Header from '../../../../../src/components/Header';
+import LoginCheck from '../../../../../src/components/LoginCheck';
 import styles from '../../../../../styles/Reject.module.scss';
 
 export default function Reject() {
@@ -13,8 +14,7 @@ export default function Reject() {
   }
 
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <div className={styles.container}>
         <div className={styles.title}>예약 요청 거부 사유 입력</div>
         <Form.Control
@@ -26,6 +26,6 @@ export default function Reject() {
           요청 거부
         </Button>
       </div>
-    </>
+    </LoginCheck>
   );
 }

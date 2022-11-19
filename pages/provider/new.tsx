@@ -1,25 +1,10 @@
-import { useRouter } from 'next/router';
-import React, { useContext, useEffect } from 'react';
-import Header from '../../src/components/Header';
+import LoginCheck from '../../src/components/LoginCheck';
 import StoreForm from '../../src/components/StoreForm';
-import UserContext from '../../src/context/UserProvider';
 
 export default function NewStore() {
-  const router = useRouter();
-  const { user, setUser } = useContext(UserContext);
-
-  useEffect(() => {
-    if (user) {
-      if (!user.isLogined) {
-        router.replace('/auth/login');
-      }
-    }
-  }, [user]);
-
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <StoreForm data={null} />
-    </>
+    </LoginCheck>
   );
 }
