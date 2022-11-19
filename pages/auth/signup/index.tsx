@@ -6,7 +6,7 @@ import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../../src/components/AuthHeader';
-import { client } from '../../../src/functions/request';
+import { client } from '../../../src/function/request';
 import styles from '../../../styles/Auth.module.scss';
 
 interface Values {
@@ -35,19 +35,19 @@ export default function SignUp() {
     console.log('submit!');
     try {
       const response = await client.get(`/signup/check`, {
-        params: { email: values.email },
+        data: { email: values.email },
       });
       console.log(response);
       const status: number = response.data.status;
-      // id 사용 가능
+      // email 사용 가능
       if (status === 1700) {
         router.push(`/auth/signup/info`, { query: { email: values.email } });
       }
-      // id 중복
+      // email 중복
       else if (status === 1701) {
         setErrors({ email: '이미 사용중인 이메일입니다' });
       }
-      // id 형식에 맞지 않음
+      // email 형식에 맞지 않음
       else if (status === 1702) {
         setErrors({ email: '이메일 형식에 맞지 않습니다' });
       }

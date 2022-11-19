@@ -3,7 +3,7 @@ import { Container, Nav, Navbar, Offcanvas } from 'react-bootstrap';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useContext } from 'react';
-import UserContext from '../contexts/UserProvider';
+import UserContext from '../context/UserProvider';
 import { useRouter } from 'next/router';
 
 interface HeaderProps {

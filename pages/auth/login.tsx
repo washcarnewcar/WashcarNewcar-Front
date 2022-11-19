@@ -8,8 +8,8 @@ import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../src/components/AuthHeader';
-import UserContext from '../../src/contexts/UserProvider';
-import { client } from '../../src/functions/request';
+import UserContext from '../../src/context/UserProvider';
+import { client } from '../../src/function/request';
 import styles from '../../styles/Auth.module.scss';
 
 interface Values {

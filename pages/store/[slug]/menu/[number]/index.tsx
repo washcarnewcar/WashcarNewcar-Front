@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import Header from '../../../../../src/components/Header';
 import Seperator from '../../../../../src/components/Seperator';
-import { client } from '../../../../../src/functions/request';
+import { client } from '../../../../../src/function/request';
 import styles from '../../../../../styles/Menu.module.scss';
 
 const tempData = {
@@ -16,48 +16,6 @@ const tempData = {
   detail: `세차에 대한 설명
 두줄 정도 표시할까 생각중`,
   price: 80000,
-};
-
-const tempBrandData = {
-  brand: [
-    {
-      number: 0,
-      name: '현대',
-    },
-    {
-      number: 1,
-      name: '제네시스',
-    },
-    {
-      number: 2,
-      name: '기아',
-    },
-    {
-      number: 3,
-      name: '쉐보레',
-    },
-  ],
-};
-
-const tempModelData = {
-  model: [
-    {
-      number: 0,
-      name: 'EF쏘나타',
-    },
-    {
-      number: 1,
-      name: 'i30',
-    },
-    {
-      number: 2,
-      name: 'i40',
-    },
-    {
-      number: 3,
-      name: 'LF쏘나타',
-    },
-  ],
 };
 
 interface Values {
@@ -123,7 +81,6 @@ export default function Menu() {
     console.log('getBrand()');
     try {
       const response = await client.get(`/car/brand`);
-      console.log(response);
       setBrands(response.data.brand);
     } catch (error) {
       console.error(error);
@@ -136,8 +93,7 @@ export default function Menu() {
   const getModel = async (brandNumber: string) => {
     console.log(`getModel(${brandNumber})`);
     try {
-      const response = await client.get(`/car/brand${brandNumber}`);
-      console.log(response);
+      const response = await client.get(`/car/brand/${brandNumber}`);
       setModels(response.data.model);
     } catch (error) {
       console.error(error);

@@ -3,6 +3,7 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { AxiosResponse } from 'axios';
 import Compressor from 'compressorjs';
 import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
@@ -14,7 +15,8 @@ import { IoClose } from 'react-icons/io5';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { BeatLoader } from 'react-spinners';
 import styles from '../../styles/StoreForm.module.scss';
-import { authClient, client } from '../functions/request';
+import { StoreDto } from '../dto';
+import { authClient, client } from '../function/request';
 import Loading from './Loading';
 
 const credentials = {
@@ -33,13 +35,27 @@ const s3Client = new S3Client({
 
 const bucket = process.env.NEXT_PUBLIC_BUCKET_NAME;
 
+export interface Data {
+  name: string;
+  previewImage: string;
+  storeImage: string[];
+  tel: string;
+  address: string;
+  addressDetail: string;
+  wayto: string;
+  description: string;
+  slug: string;
+  longitude: number;
+  latitude: number;
+}
+
 interface Values {
   name: string;
   tel1: string;
   tel2: string;
   tel3: string;
   address: string;
-  address2: string;
+  addressDetail: string;
   longitude: number;
   latitude: number;
   slug: string;
@@ -67,7 +83,7 @@ const initialValues: Values = {
   tel2: '',
   tel3: '',
   address: '',
-  address2: '',
+  addressDetail: '',
   longitude: 126.7059347817178,
   latitude: 37.4527602629939,
   slug: '',
@@ -76,7 +92,7 @@ const initialValues: Values = {
 };
 
 interface StoreFormProps {
-  data: object | null;
+  data: Data | null | undefined;
 }
 
 export default function StoreForm({ data }: StoreFormProps) {
@@ -131,6 +147,14 @@ export default function StoreForm({ data }: StoreFormProps) {
    * 중복 확인 버튼을 클릭했을 때
    */
   const handleSlugCheck = async () => {
+    formik.setTouched(
+      {
+        ...formik.touched,
+        slug: true,
+      },
+      false
+    );
+
     if (!formik.values.slug) {
       formik.setErrors({
         ...formik.errors,
@@ -155,10 +179,13 @@ export default function StoreForm({ data }: StoreFormProps) {
     }
 
     try {
+      console.log(`GET /provider/check-slug/${formik.values.slug}`);
+
       const response = await client.get(
         `/provider/check-slug/${formik.values.slug}`
       );
 
+      console.log(response.data);
       const status: number = response.data.status;
       switch (status) {
         case 1400:
@@ -321,7 +348,7 @@ export default function StoreForm({ data }: StoreFormProps) {
    */
   const uploadPreviewImage = async (): Promise<string> => {
     // 파일 없으면 전송하지 않음
-    if (!previewImage.file) return '';
+    if (!previewImage.file) return previewImage.previewUrl;
 
     const fileName = `previewImages/${crypto.randomUUID()}${
       previewImage.file.name
@@ -354,7 +381,10 @@ export default function StoreForm({ data }: StoreFormProps) {
 
     for (let i = 0; i < storeImages.length; i++) {
       const file = storeImages[i].file;
-      if (!file) continue;
+      if (!file) {
+        urls.push(storeImages[i].previewUrl);
+        continue;
+      }
 
       const fileName = `storeImages/${crypto.randomUUID()}${file.name}`;
       console.log(fileName);
@@ -385,23 +415,30 @@ export default function StoreForm({ data }: StoreFormProps) {
     previewImageUrl: string,
     storeImageUrls: string[]
   ) => {
-    const data = {
+    const storeDto: StoreDto = {
       name: values.name,
       tel: `${values.tel1}-${values.tel2}-${values.tel3}`,
       coordinate: {
         longitude: values.longitude,
         latitude: values.latitude,
       },
-      address: `${values.address} ${values.address2}`,
+      address: values.address,
+      address_detail: values.addressDetail,
       slug: values.slug,
       wayto: values.wayto,
       description: values.description,
       preview_image: previewImageUrl,
       store_image: storeImageUrls,
     };
-    console.log('sending data:\n' + data);
+    console.log('sending data:');
+    console.log(storeDto);
 
-    const response = await authClient.post(`/provider/new`, data);
+    let response: AxiosResponse;
+    if (data) {
+      response = await authClient.post(`/provider/${data.slug}/store`);
+    } else {
+      response = await authClient.post(`/provider/new`, storeDto);
+    }
 
     console.log(response.data);
 
@@ -468,6 +505,7 @@ export default function StoreForm({ data }: StoreFormProps) {
 
   const validate = (values: Values) => {
     const newErrors: Errors = {};
+    console.log('validate()');
 
     if (!values.name) {
       newErrors.name = '세차장 이름은 필수항목입니다.';
@@ -503,7 +541,35 @@ export default function StoreForm({ data }: StoreFormProps) {
     validate: validate,
   });
 
-  const setData = (data: object) => {};
+  const setData = (data: Data) => {
+    const tel = data.tel.split('-');
+    formik.setValues({
+      address: data.address,
+      addressDetail: data.addressDetail,
+      description: data.description,
+      name: data.name,
+      slug: data.slug,
+      tel1: tel[0],
+      tel2: tel[1],
+      tel3: tel[2],
+      wayto: data.wayto,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    });
+    // string => Image
+    setPreviewImage({
+      file: null,
+      previewUrl: data.previewImage,
+    });
+    // string[] => Image[]
+    setStoreImages(
+      data.storeImage.map((storeImage) => ({
+        file: null,
+        previewUrl: storeImage,
+      }))
+    );
+    setSlugValid('사용 가능한 홈페이지 주소입니다.');
+  };
 
   useEffect(() => {
     kakao.maps.load(() => {
@@ -607,8 +673,8 @@ export default function StoreForm({ data }: StoreFormProps) {
           <Form.Control
             type="text"
             placeholder="상세 주소를 입력해주세요"
-            name="address2"
-            value={formik.values.address2}
+            name="addressDetail"
+            value={formik.values.addressDetail}
             onChange={formik.handleChange}
             disabled={!formik.values.address}
             className={styles.address_detail}
@@ -646,7 +712,9 @@ export default function StoreForm({ data }: StoreFormProps) {
               isValid={!!slugValid}
               isInvalid={!!formik.errors.slug && formik.touched.slug}
             />
-            <Button onClick={handleSlugCheck}>중복 확인</Button>
+            <Button onClick={handleSlugCheck} type="button">
+              중복 확인
+            </Button>
             {formik.errors.slug ? (
               <Form.Control.Feedback type="invalid">
                 {formik.errors.slug}
@@ -710,7 +778,7 @@ export default function StoreForm({ data }: StoreFormProps) {
                 </button>
                 <Image
                   alt="미리보기 이미지"
-                  src={previewImage.previewUrl}
+                  src={`${process.env.NEXT_PUBLIC_S3_URL}${previewImage.previewUrl}`}
                   width={100}
                   height={100}
                   className={styles.image}
@@ -743,7 +811,7 @@ export default function StoreForm({ data }: StoreFormProps) {
                   </button>
                   <Image
                     alt="매장 이미지"
-                    src={storeImage.previewUrl}
+                    src={`${process.env.NEXT_PUBLIC_S3_URL}${storeImage.previewUrl}`}
                     width={100}
                     height={100}
                     className={styles.image}

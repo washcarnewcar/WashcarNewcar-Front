@@ -1,17 +1,16 @@
 import { useRouter } from 'next/router';
-import { useContext, useEffect } from 'react';
-import UserContext from '../../src/contexts/UserProvider';
-import { authClient } from '../../src/functions/request';
+import { useEffect } from 'react';
+import { authClient } from '../../src/function/request';
 
 export default function ProviderCheck() {
   const router = useRouter();
-  const { user, setUser } = useContext(UserContext);
 
   const check = async () => {
     try {
       const response = await authClient.get(`/provider/slug`);
 
       const data = response?.data;
+      console.log(data);
       if (data) {
         const { status, slug } = data;
         // slug 존재

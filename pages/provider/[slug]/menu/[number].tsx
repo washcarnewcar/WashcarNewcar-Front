@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import Header from '../../../../src/components/Header';
 import MenuForm from '../../../../src/components/MenuForm';
-import { client } from '../../../../src/functions/request';
+import { client } from '../../../../src/function/request';
 
 interface Data {
   image: string;

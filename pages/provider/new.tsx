@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import React, { useContext, useEffect } from 'react';
 import Header from '../../src/components/Header';
 import StoreForm from '../../src/components/StoreForm';
-import UserContext from '../../src/contexts/UserProvider';
+import UserContext from '../../src/context/UserProvider';
 
 export default function NewStore() {
   const router = useRouter();

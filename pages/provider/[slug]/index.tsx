@@ -1,15 +1,14 @@
 import classNames from 'classnames';
 import moment from 'moment';
-import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { Alert, Button, ButtonGroup, ListGroup } from 'react-bootstrap';
+import { useContext, useEffect, useState } from 'react';
+import { Alert, Button, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../../src/components/Header';
 import Loading from '../../../src/components/Loading';
-import UserContext from '../../../src/contexts/UserProvider';
-import { authClient } from '../../../src/functions/request';
+import UserContext from '../../../src/context/UserProvider';
+import { authClient } from '../../../src/function/request';
 import styles from '../../../styles/ProviderDashboard.module.scss';
 
 interface Ready {
