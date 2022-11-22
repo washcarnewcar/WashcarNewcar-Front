@@ -1,6 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { authClient } from '../../src/function/request';
+import Header from '../../src/components/Header';
+import Loading from '../../src/components/Loading';
 
 export default function ProviderCheck() {
   const router = useRouter();
@@ -35,4 +37,13 @@ export default function ProviderCheck() {
 
     check();
   }, []);
+
+  return (
+    <>
+      <Header type={1} />
+      <div style={{ width: '100%', height: '100vh' }}>
+        <Loading />
+      </div>
+    </>
+  );
 }

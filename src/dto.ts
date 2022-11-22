@@ -26,10 +26,50 @@ export interface RequestDto {
 
 export interface ScheduleDto extends RequestDto {}
 
-export interface MenuDto {
+export interface MenuListDto {
   number: number;
   image: string;
   name: string;
   description: string;
   price: number;
+}
+
+export interface MenuDto {
+  image: string;
+  name: string;
+  description: string;
+  price: number;
+  expected_hour: number;
+  expected_minute: number;
+}
+
+export interface TimeDto {
+  sunday: {
+    start: string;
+    end: string;
+  } | null;
+  monday: {
+    start: string;
+    end: string;
+  } | null;
+  tuesday: {
+    start: string;
+    end: string;
+  } | null;
+  wednesday: {
+    start: string;
+    end: string;
+  } | null;
+  thursday: {
+    start: string;
+    end: string;
+  } | null;
+  friday: {
+    start: string;
+    end: string;
+  } | null;
+  saturday: {
+    start: string;
+    end: string;
+  } | null;
 }

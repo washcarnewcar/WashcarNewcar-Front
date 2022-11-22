@@ -1,8 +1,3 @@
-import {
-  PutObjectCommand,
-  PutObjectCommandInput,
-  S3Client,
-} from '@aws-sdk/client-s3';
 import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -16,23 +11,8 @@ import styles from '../../styles/StoreForm.module.scss';
 import { StoreDto } from '../dto';
 import { compressImage } from '../function/processingImage';
 import { authClient, client } from '../function/request';
+import { Images, uploadImage, uploadImages } from '../function/S3Utils';
 import Loading from './Loading';
-
-const credentials = {
-  accessKeyId: process.env.NEXT_PUBLIC_ACCESSKEY
-    ? process.env.NEXT_PUBLIC_ACCESSKEY
-    : '',
-  secretAccessKey: process.env.NEXT_PUBLIC_SECRET_ACCESSKEY
-    ? process.env.NEXT_PUBLIC_SECRET_ACCESSKEY
-    : '',
-};
-
-const s3Client = new S3Client({
-  region: process.env.NEXT_PUBLIC_REGION,
-  credentials: credentials,
-});
-
-const bucket = process.env.NEXT_PUBLIC_BUCKET_NAME;
 
 interface Values {
   name: string;
@@ -55,12 +35,6 @@ interface Errors {
   tel3?: string;
   address?: string;
   slug?: string;
-}
-
-interface Images {
-  file: File | null;
-  uploaded: boolean;
-  previewUrl: string;
 }
 
 const initialValues: Values = {
@@ -313,70 +287,6 @@ export default function StoreForm({ data }: StoreFormProps) {
   };
 
   /**
-   * 프로필 이미지 전송
-   */
-  const uploadPreviewImage = async (): Promise<string> => {
-    // 파일 없으면 전송하지 않음
-    if (!previewImage.file) return previewImage.previewUrl;
-
-    const fileName = `previewImages/${crypto.randomUUID()}${
-      previewImage.file.name
-    }`;
-    console.log(fileName);
-
-    const command: PutObjectCommandInput = {
-      Bucket: bucket,
-      Key: fileName,
-      Body: previewImage.file,
-      ContentType: previewImage.file.type,
-      ACL: 'public-read',
-    };
-
-    // 파일 전송 (예외 발생 가능)
-    await s3Client.send(new PutObjectCommand(command));
-
-    // 성공
-    return fileName;
-  };
-
-  /**
-   * 세차장 이미지 전송 후 url 배열 반환
-   */
-  const uploadStoreImage = async (): Promise<string[]> => {
-    // 파일 없으면 전송하지 않음
-    if (storeImages.length === 0) return [];
-
-    const urls = [];
-
-    for (let i = 0; i < storeImages.length; i++) {
-      const file = storeImages[i].file;
-      if (!file) {
-        urls.push(storeImages[i].previewUrl);
-        continue;
-      }
-
-      const fileName = `storeImages/${crypto.randomUUID()}${file.name}`;
-      console.log(fileName);
-
-      const command: PutObjectCommandInput = {
-        Bucket: bucket,
-        Key: fileName,
-        Body: file,
-        ContentType: file.type,
-        ACL: 'public-read',
-      };
-
-      // 파일 전송 (예외 발생 가능)
-      await s3Client.send(new PutObjectCommand(command));
-
-      // 성공
-      urls.push(fileName);
-    }
-
-    return urls;
-  };
-
-  /**
    * 백엔드에 정보 전송
    */
   const postToApi = async (
@@ -480,8 +390,8 @@ export default function StoreForm({ data }: StoreFormProps) {
     // aws 이미지 업로드
     let previewImageUrl, storeImageUrls;
     try {
-      previewImageUrl = await uploadPreviewImage();
-      storeImageUrls = await uploadStoreImage();
+      previewImageUrl = await uploadImage(previewImage, 'previewImages');
+      storeImageUrls = await uploadImages(storeImages, 'storeImages');
     } catch (error) {
       alert('이미지 업로드에 오류가 발생했습니다.\n다시 시도해주세요.');
       setSubmitting(false);

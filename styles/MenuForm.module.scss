@@ -75,14 +75,22 @@
 
   .form_group {
     margin: 20px 0px;
+
+    .time {
+      display: flex;
+      gap: 10px;
+    }
   }
 
-  .button_wrapper {
+  .button_group {
+    width: 100%;
     display: flex;
+    justify-content: space-between;
     gap: 10px;
 
-    .submit_button {
+    .button {
       width: 100%;
     }
   }
+
 }

@@ -1,0 +1,119 @@
+.button_container {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  .button {
+    width: 120px;
+  }
+}
+
+.item_container {
+  margin: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .day_of_week {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    width: 40px;
+    font-weight: bold;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .day_of_week_activate {
+    border-style: none;
+    border-color: var(--main-color);
+    background-color: var(--main-color);
+    color: white;
+  }
+
+  .day_of_week_deactivate {
+    background-color: white;
+    border-color: var(--main-color);
+    border-style: solid;
+    border-width: 1px;
+    color: var(--main-color);
+  }
+
+  .select_group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .select {
+      font-size: small;
+      height: 40px;
+      width: 120px;
+    }
+  }
+
+  .error_message {
+    color: #dc3545;
+  }
+}
+
+.except_wrapper {
+  margin: 20px 20px;
+
+  .except_plus_button {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .except_plus_icon {
+      margin-right: 5px;
+    }
+  }
+
+  .except_item_container {
+
+    .allday_form_wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .allday_trash_wrapper {
+      display: flex;
+      align-items: center;
+
+      .allday_trash {
+        padding: 0;
+        border: none;
+        background-color: #ffffff00;
+      }
+    }
+
+    .partday_form_container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 10px;
+
+      .partday_form_wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .partday_trash_wrapper {
+        display: flex;
+        align-items: center;
+
+        .partday_trash {
+          padding: 0;
+          border: none;
+          background-color: #ffffff00;
+        }
+      }
+    }
+
+  }
+}

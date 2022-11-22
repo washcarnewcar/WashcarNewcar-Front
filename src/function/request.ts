@@ -29,10 +29,10 @@ authClient.interceptors.response.use(
     // 권한 없음
     if (error.response.status === 403) {
       console.error('권한 없음');
-      location.href = '/';
+      location.replace('/');
     } else if (error.response.status === 401) {
       console.error('로그인 되지 않음');
-      location.href = '/auth/login';
+      location.replace('/auth/login');
     }
   }
 );

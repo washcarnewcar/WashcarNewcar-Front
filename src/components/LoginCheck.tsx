@@ -5,7 +5,7 @@ import Header from './Header';
 import Loading from './Loading';
 
 interface LoginCheckProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function LoginCheck({ children }: LoginCheckProps) {

@@ -6,7 +6,7 @@ import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { IoAdd } from 'react-icons/io5';
 import Header from '../../../../src/components/Header';
 import LoginCheck from '../../../../src/components/LoginCheck';
-import { MenuDto } from '../../../../src/dto';
+import { MenuListDto } from '../../../../src/dto';
 import { authClient } from '../../../../src/function/request';
 import styles from '../../../../styles/MenuList.module.scss';
 
@@ -38,14 +38,14 @@ const mockData = [
 export default function MenuList() {
   const router = useRouter();
   const { slug } = router.query;
-  const [menus, setMenus] = useState<MenuDto[]>([]);
+  const [menus, setMenus] = useState<MenuListDto[]>([]);
 
   useEffect(() => {
     const getMenuList = async () => {
       const request = await authClient.get(`/provider/${slug}/menu`);
       console.log(request?.data);
       // const menus: MenuDto[] | undefined = request?.data?.menu;
-      const menus: MenuDto[] | undefined = mockData;
+      const menus: MenuListDto[] | undefined = mockData;
       if (menus) {
         setMenus(menus);
       }
@@ -81,7 +81,7 @@ export default function MenuList() {
 }
 
 interface MenuItemProps {
-  data: MenuDto;
+  data: MenuListDto;
   slug: string;
 }
 

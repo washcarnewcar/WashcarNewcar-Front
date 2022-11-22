@@ -7,46 +7,6 @@
     font-weight: bold;
   }
 
-  .item_container {
-    margin: 10px 20px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 10px;
-
-    .day_of_week {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 40px;
-      width: 40px;
-      font-weight: bold;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    .day_of_week_activate {
-      border-style: none;
-      border-color: var(--main-color);
-      background-color: var(--main-color);
-      color: white;
-    }
-
-    .day_of_week_deactivate {
-      background-color: white;
-      border-color: var(--main-color);
-      border-style: solid;
-      border-width: 1px;
-      color: var(--main-color);
-    }
-
-    .select {
-      font-size: small;
-      height: 40px;
-      width: 90px;
-    }
-  }
-
   .except_wrapper {
     margin: 20px 20px;
 
