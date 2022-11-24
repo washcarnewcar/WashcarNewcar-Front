@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import LoginCheck from '../../../../src/components/LoginCheck';
 import MenuForm from '../../../../src/components/MenuForm';
 import { MenuDto } from '../../../../src/dto';
-import { client } from '../../../../src/function/request';
+import { authClient, client } from '../../../../src/function/request';
 
 const mockData = {
   image: 'storeImages/00664fef-064a-4170-aae6-12607e7e84a63D_map4.png',
@@ -19,21 +19,20 @@ export default function MenuEdit() {
   const { slug, number } = router.query;
   const [menu, setMenu] = useState<MenuDto | undefined>();
 
-  const getData = useCallback(async () => {
-    if (slug && number) {
-      const response = await client.get(`/store/${slug}/menu/${number}`);
-      console.log(response.data);
-      // const menu: MenuDto | undefined = response?.data;
-      const menu: MenuDto | undefined = mockData;
-      if (menu) {
-        setMenu(menu);
-      }
-    }
-  }, [number, slug]);
-
   useEffect(() => {
+    const getData = async () => {
+      if (slug && number) {
+        const response = await authClient.get(`/provider/menu/${number}`);
+        console.log(response?.data);
+        const menu: MenuDto | undefined = response?.data;
+        // const menu: MenuDto | undefined = mockData;
+        if (menu) {
+          setMenu(menu);
+        }
+      }
+    };
     getData();
-  }, [getData]);
+  }, [slug, number]);
 
   return (
     <LoginCheck>

@@ -6,21 +6,17 @@ export const authClient = axios.create({
   baseURL: API_SERVER,
 });
 
+// request 정의
 authClient.interceptors.request.use((config) => {
+  if (!config.headers) return config;
   const token = localStorage.getItem('token');
-  if (config.headers) {
-    if (!token) {
-      config.headers['Authorization'] = null;
-      return config;
-    } else {
-      config.headers['Authorization'] = 'Bearer ' + token;
-      return config;
-    }
-  } else {
-    return config;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  return config;
 });
 
+// response 정의
 authClient.interceptors.response.use(
   (response) => {
     return response;

@@ -32,14 +32,23 @@
       display: flex;
 
       .image_wrapper {
-        flex: 0 0 90px;
+        width: 90px;
+        height: 90px;
         display: flex;
+        justify-content: center;
         align-items: center;
+        border-radius: 10px;
 
         .image {
-          background-color: gray;
-          object-fit: cover;
-          border-radius: 10px;
+          object-fit: contain;
+        }
+      }
+
+      .image_wrapper_alt {
+        background-color: rgb(230, 230, 230);
+
+        .image_alt {
+          opacity: 50%;
         }
       }
 

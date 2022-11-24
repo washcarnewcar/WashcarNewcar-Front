@@ -1,10 +1,10 @@
+import classNames from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { IoAdd } from 'react-icons/io5';
-import Header from '../../../../src/components/Header';
 import LoginCheck from '../../../../src/components/LoginCheck';
 import { MenuListDto } from '../../../../src/dto';
 import { authClient } from '../../../../src/function/request';
@@ -44,8 +44,8 @@ export default function MenuList() {
     const getMenuList = async () => {
       const request = await authClient.get(`/provider/${slug}/menu`);
       console.log(request?.data);
-      // const menus: MenuDto[] | undefined = request?.data?.menu;
-      const menus: MenuListDto[] | undefined = mockData;
+      const menus: MenuListDto[] | undefined = request?.data?.menu;
+      // const menus: MenuListDto[] | undefined = mockData;
       if (menus) {
         setMenus(menus);
       }
@@ -90,15 +90,32 @@ function MenuItem({ data, slug }: MenuItemProps) {
     <Link href={`/provider/${slug}/menu/${data.number}`}>
       <a className={styles.link}>
         <div className={styles.link_container}>
-          <div className={styles.image_wrapper}>
-            <Image
-              width={90}
-              height={90}
-              className={styles.image}
-              src="/style_carcare.jpg"
-              alt="menu_image"
-            />
-          </div>
+          {data.image ? (
+            <div className={styles.image_wrapper}>
+              <Image
+                width={90}
+                height={90}
+                className={styles.image}
+                src={process.env.NEXT_PUBLIC_S3_URL + data.image}
+                alt="menu"
+              />
+            </div>
+          ) : (
+            <div
+              className={classNames(
+                styles.image_wrapper,
+                styles.image_wrapper_alt
+              )}
+            >
+              <Image
+                width={50}
+                height={50}
+                className={classNames(styles.image, styles.image_alt)}
+                src="/main_logo.png"
+                alt="menu"
+              />
+            </div>
+          )}
           <div className={styles.content}>
             <div className={styles.menu_title}>{data.name}</div>
             <div className={styles.menu_description}>{data.description}</div>

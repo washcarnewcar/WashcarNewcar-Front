@@ -115,7 +115,7 @@ export default function Except({ slug }: ExceptProps) {
   useEffect(() => {
     const getData = async () => {
       const response = await authClient.get(`/provider/${slug}/except`);
-      const data = response.data;
+      const data = response?.data;
       console.log(data);
     };
     getData();

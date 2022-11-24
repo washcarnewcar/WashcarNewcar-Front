@@ -142,7 +142,7 @@ export default function StoreForm({ data }: StoreFormProps) {
     try {
       console.log(`GET /provider/check-slug/${formik.values.slug}`);
 
-      const response = await client.get(
+      const response = await authClient.get(
         `/provider/check-slug/${formik.values.slug}`
       );
 
@@ -323,7 +323,7 @@ export default function StoreForm({ data }: StoreFormProps) {
       if (response) {
         switch (response.data.status) {
           case 2500:
-            alert('성공적으로 요청되었습니다.');
+            alert('수정되었습니다.');
             router.replace(`/provider/${formik.values.slug}`);
             return;
           case 2501:
@@ -341,7 +341,7 @@ export default function StoreForm({ data }: StoreFormProps) {
       }
     }
     // provider/new 일때
-    else {
+    else if (data === null) {
       const response = await authClient.post(`/provider/new`, storeDto);
 
       console.log(response.data);
@@ -349,7 +349,7 @@ export default function StoreForm({ data }: StoreFormProps) {
       if (response) {
         switch (response.data.status) {
           case 1300:
-            alert('수정되었습니다.');
+            alert('성공적으로 요청되었습니다.');
             router.replace(`/provider/${formik.values.slug}`);
             return;
           case 1301:

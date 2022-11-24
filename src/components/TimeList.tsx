@@ -5,7 +5,6 @@ import { BeatLoader } from 'react-spinners';
 import styles from '../../styles/TimeList.module.scss';
 import { TimeDto } from '../dto';
 import { authClient } from '../function/request';
-import Loading from './Loading';
 import Seperator from './Seperator';
 
 interface Time {
@@ -118,9 +117,9 @@ export default function TimeList({ slug }: TimeListProps) {
           `/provider/${slug}/time`,
           timeDto
         );
-        console.log(response.data);
         const data = response?.data;
-        switch (data.status) {
+        console.log(data);
+        switch (data?.status) {
           case 2000:
             alert('적용되었습니다.');
             return;

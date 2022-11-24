@@ -8,6 +8,7 @@ import styles from '../../styles/MenuForm.module.scss';
 import { MenuDto } from '../dto';
 import { compressImage } from '../function/processingImage';
 import { authClient } from '../function/request';
+import { uploadImage } from '../function/S3Utils';
 import Loading from './Loading';
 
 interface MenuFormProps {
@@ -62,8 +63,18 @@ export default function MenuForm({ slug, number, data }: MenuFormProps) {
   ) => {
     setSubmitting(true);
 
+    // aws 이미지 업로드
+    let imageUrl;
+    try {
+      imageUrl = await uploadImage(image, 'menuImages');
+    } catch (error) {
+      alert('이미지 업로드에 오류가 발생했습니다.\n다시 시도해주세요.');
+      setSubmitting(false);
+      return;
+    }
+
     const menuDto: MenuDto = {
-      image: image.previewUrl,
+      image: imageUrl,
       name: values.name,
       description: values.description,
       price: values.price,
@@ -75,7 +86,7 @@ export default function MenuForm({ slug, number, data }: MenuFormProps) {
       // 수정 요청일 때
       if (data) {
         const response = await authClient.put(
-          `/provider/${slug}/menu/${number}`,
+          `/provider/menu/${number}`,
           menuDto
         );
         const data = response?.data;
@@ -95,7 +106,7 @@ export default function MenuForm({ slug, number, data }: MenuFormProps) {
       }
 
       // 생성 요청일 때
-      else {
+      else if (data === null) {
         const response = await authClient.post(
           `provider/${slug}/menu`,
           menuDto
@@ -153,9 +164,9 @@ export default function MenuForm({ slug, number, data }: MenuFormProps) {
 
   const handleDeleteClick = async () => {
     try {
-      const response = await authClient(`/provider/${slug}/menu/${number}`);
+      const response = await authClient.delete(`/provider/menu/${number}`);
       const data = response?.data;
-      switch (data.status) {
+      switch (data?.status) {
         case 2300:
           alert('삭제되었습니다.');
           router.replace(`/provider/${slug}/menu`);
@@ -309,6 +320,7 @@ export default function MenuForm({ slug, number, data }: MenuFormProps) {
               type="file"
               id="file"
               style={{ display: 'none' }}
+              accept="image/png, image/jpeg"
               onChange={handleImageChange}
               ref={inputFile}
             />
