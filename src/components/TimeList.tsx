@@ -1,10 +1,11 @@
 import classNames from 'classnames';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import styles from '../../styles/TimeList.module.scss';
 import { TimeDto } from '../dto';
 import { authClient } from '../function/request';
+import Loading from './Loading';
 import Seperator from './Seperator';
 
 interface Time {
@@ -21,34 +22,37 @@ interface TimeListItemProps {
   dayOfWeek: number;
 }
 
+const initialTimeList: (Time | null)[] = [
+  null,
+  {
+    start: '10:00',
+    end: '19:00',
+  },
+  {
+    start: '10:00',
+    end: '19:00',
+  },
+  {
+    start: '10:00',
+    end: '19:00',
+  },
+  {
+    start: '10:00',
+    end: '19:00',
+  },
+  {
+    start: '10:00',
+    end: '19:00',
+  },
+  null,
+];
+
 export default function TimeList({ slug }: TimeListProps) {
   // 0번부터 일요일 ~ 6번까지 토요일
-  const [timeList, setTimeList] = useState<(Time | null)[]>([
-    null,
-    {
-      start: '10:00',
-      end: '19:00',
-    },
-    {
-      start: '10:00',
-      end: '19:00',
-    },
-    {
-      start: '10:00',
-      end: '19:00',
-    },
-    {
-      start: '10:00',
-      end: '19:00',
-    },
-    {
-      start: '10:00',
-      end: '19:00',
-    },
-    null,
-  ]);
+  const [timeList, setTimeList] = useState<(Time | null)[]>(initialTimeList);
   const [error, setError] = useState<string[]>(['', '', '', '', '', '', '']);
   const [isSubmiting, setSubmitting] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const setDayOfWeek = (
     dayOfWeek: number,
@@ -135,6 +139,32 @@ export default function TimeList({ slug }: TimeListProps) {
     }
     setSubmitting(false);
   };
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await authClient.get(`/provider/${slug}/time`);
+      const data: TimeDto = response?.data;
+      console.log(`GET /provider/${slug}/time`);
+      console.log(data);
+
+      if (data) {
+        const arr: (Time | null)[] = [null, null, null, null, null, null, null];
+        arr[0] = data.sunday;
+        arr[1] = data.monday;
+        arr[2] = data.tuesday;
+        arr[3] = data.wednesday;
+        arr[4] = data.thursday;
+        arr[5] = data.friday;
+        arr[6] = data.saturday;
+        setTimeList(arr);
+        setReady(true);
+      } else {
+        setReady(true);
+      }
+    };
+
+    getData();
+  }, []);
 
   function TimeListItem({ time, dayOfWeek }: TimeListItemProps) {
     const displayDayOfWeek = () => {
@@ -234,6 +264,14 @@ export default function TimeList({ slug }: TimeListProps) {
         <Form.Text className={styles.error_message}>
           {error[dayOfWeek]}
         </Form.Text>
+      </div>
+    );
+  }
+
+  if (!ready) {
+    return (
+      <div style={{ width: '100%', height: '20vh' }}>
+        <Loading />
       </div>
     );
   }

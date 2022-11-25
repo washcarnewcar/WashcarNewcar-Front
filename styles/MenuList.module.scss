@@ -30,8 +30,10 @@
     .link_container {
       width: 100%;
       display: flex;
+      align-items: center;
 
       .image_wrapper {
+        flex: 0 0 90px;
         width: 90px;
         height: 90px;
         display: flex;
