@@ -10,7 +10,7 @@ import { BeatLoader } from 'react-spinners';
 import styles from '../../styles/StoreForm.module.scss';
 import { StoreDto } from '../dto';
 import { compressImage } from '../function/processingImage';
-import { authClient, client } from '../function/request';
+import { authClient } from '../function/request';
 import { Images, uploadImage, uploadImages } from '../function/S3Utils';
 import Loading from './Loading';
 

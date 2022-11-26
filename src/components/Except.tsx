@@ -11,6 +11,7 @@ import { IoAdd, IoTrash } from 'react-icons/io5';
 import { BeatLoader } from 'react-spinners';
 import styles from '../../styles/Except.module.scss';
 import { authClient } from '../function/request';
+import Loading from './Loading';
 
 interface ExceptData {
   allDay: boolean;
@@ -29,6 +30,7 @@ interface ExceptProps {
 export default function Except({ slug }: ExceptProps) {
   const [exceptList, setExceptList] = useState<ExceptData[]>([]);
   const [isSubmitting, setSubmitting] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const handleAddClick = () => {
     const newList = [...exceptList];
@@ -115,11 +117,25 @@ export default function Except({ slug }: ExceptProps) {
   useEffect(() => {
     const getData = async () => {
       const response = await authClient.get(`/provider/${slug}/except`);
-      const data = response?.data;
+      const data: ExceptData[] = response?.data?.except;
       console.log(data);
+      if (data) {
+        setExceptList(data);
+        setReady(true);
+      } else {
+        setReady(true);
+      }
     };
     getData();
   }, []);
+
+  if (!ready) {
+    return (
+      <div style={{ width: '100%', height: '20vh' }}>
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.except_wrapper}>

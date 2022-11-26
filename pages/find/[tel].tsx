@@ -6,7 +6,7 @@ import Header from '../../src/components/Header';
 import Seperator from '../../src/components/Seperator';
 import styles from '../../styles/FindList.module.scss';
 
-const tempData = [
+const mockData = [
   {
     status: 'request', // 예약 요청 대기중인 상태
     reservation_number: 1, // 예약 번호
@@ -68,7 +68,7 @@ const tempData = [
 
 export default function FindList() {
   const router = useRouter();
-  const { phone } = router.query;
+  const { tel } = router.query;
 
   return (
     <>
@@ -77,11 +77,11 @@ export default function FindList() {
         <div className={styles.title}>예약한 세차</div>
         <div className={styles.blank} />
 
-        <FindListItem data={tempData} />
+        <FindListItem data={mockData} />
         <Seperator />
-        <FindListItem data={tempData} />
+        <FindListItem data={mockData} />
         <Seperator />
-        <FindListItem data={tempData} />
+        <FindListItem data={mockData} />
         <Seperator />
       </div>
     </>

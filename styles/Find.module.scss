@@ -14,8 +14,18 @@
       word-break: keep-all;
     }
 
-    .phone {
-      margin-bottom: 10px;
+    .form_group {
+      margin: 20px 0px;
+
+      .tel_wrapper {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        .tel {
+          margin-bottom: 10px;
+        }
+      }
     }
 
     .submit {
