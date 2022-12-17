@@ -78,9 +78,9 @@ export default function Menu() {
    * 차 브랜드를 받아오는 함수
    */
   const getBrand = async () => {
-    console.log('getBrand()');
     try {
       const response = await client.get(`/car/brand`);
+      console.debug(`GET /car/brand`);
       setBrands(response.data.brand);
     } catch (error) {
       console.error(error);
@@ -91,9 +91,9 @@ export default function Menu() {
    * 차 모델을 받아오는 함수
    */
   const getModel = async (brandNumber: string) => {
-    console.log(`getModel(${brandNumber})`);
     try {
       const response = await client.get(`/car/brand/${brandNumber}`);
+      console.debug(`GET /car/brand/${brandNumber}`);
       setModels(response.data.model);
     } catch (error) {
       console.error(error);

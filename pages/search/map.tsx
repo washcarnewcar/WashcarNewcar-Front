@@ -61,9 +61,9 @@ function SelectMap() {
    */
   const positionErrorCallback = (error: GeolocationPositionError) => {
     if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
-      console.log('권한 없음');
+      console.debug('권한 없음');
     } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
-      console.log('위치를 사용할 수 없음');
+      console.debug('위치를 사용할 수 없음');
     }
   };
 
@@ -161,7 +161,7 @@ function SelectMap() {
 
   useEffect(() => {
     kakao.maps.load(() => {
-      console.log('map is ready!');
+      console.debug('카카오맵 준비됨');
       setMapReady(true);
     });
   }, []);

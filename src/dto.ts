@@ -73,3 +73,10 @@ export interface TimeDto {
     end: string;
   } | null;
 }
+
+export interface ExceptDto {
+  allday: boolean;
+  start: string;
+  end: string;
+  error: string;
+}

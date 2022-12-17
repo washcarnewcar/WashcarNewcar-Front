@@ -36,7 +36,8 @@ export default function SignUp() {
       const response = await client.get(`/signup/check`, {
         data: { email: values.email },
       });
-      console.log(response?.data);
+      console.debug(`GET signup/check`);
+      console.debug(response?.data);
       const status: number | undefined = response?.data?.status;
       if (status) {
         // email 사용 가능

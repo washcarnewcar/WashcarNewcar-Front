@@ -36,10 +36,11 @@ export default function EditStore() {
     const getData = async () => {
       try {
         const response = await authClient.get(`/provider/${slug}/store`);
+        console.debug(`GET /provider/${slug}/store`);
         const data: StoreDto | undefined = response?.data;
         // const data: StoreDto | undefined = mockData;
         // TODO:
-        console.log(data);
+        console.debug(data);
         if (data) {
           setData(data);
         } else {

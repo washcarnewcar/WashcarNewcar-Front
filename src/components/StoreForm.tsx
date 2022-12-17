@@ -140,13 +140,12 @@ export default function StoreForm({ data }: StoreFormProps) {
     }
 
     try {
-      console.log(`GET /provider/check-slug/${formik.values.slug}`);
-
       const response = await authClient.get(
         `/provider/check-slug/${formik.values.slug}`
       );
+      console.debug(`GET /provider/check-slug/${formik.values.slug}`);
 
-      console.log(response.data);
+      console.debug(response?.data);
       const status: number = response.data.status;
       switch (status) {
         case 1400:
@@ -309,8 +308,6 @@ export default function StoreForm({ data }: StoreFormProps) {
       preview_image: previewImageUrl,
       store_image: storeImageUrls,
     };
-    console.log('sending data:');
-    console.log(storeDto);
 
     // provider/:slug 일때
     if (data) {
@@ -318,7 +315,8 @@ export default function StoreForm({ data }: StoreFormProps) {
         `/provider/${data.slug}/store`,
         storeDto
       );
-      console.log(response.data);
+      console.debug(`POST /provider/${data.slug}/store`, storeDto);
+      console.debug(response.data);
 
       if (response) {
         switch (response.data.status) {
@@ -343,8 +341,8 @@ export default function StoreForm({ data }: StoreFormProps) {
     // provider/new 일때
     else if (data === null) {
       const response = await authClient.post(`/provider/new`, storeDto);
-
-      console.log(response.data);
+      console.debug(`POST /provider/new`, storeDto);
+      console.debug(response.data);
 
       if (response) {
         switch (response.data.status) {

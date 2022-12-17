@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
@@ -11,10 +12,6 @@ import Seperator from './Seperator';
 interface Time {
   start: string;
   end: string;
-}
-
-interface TimeListProps {
-  slug: string;
 }
 
 interface TimeListItemProps {
@@ -47,12 +44,14 @@ const initialTimeList: (Time | null)[] = [
   null,
 ];
 
-export default function TimeList({ slug }: TimeListProps) {
+export default function TimeList() {
   // 0번부터 일요일 ~ 6번까지 토요일
   const [timeList, setTimeList] = useState<(Time | null)[]>(initialTimeList);
   const [error, setError] = useState<string[]>(['', '', '', '', '', '', '']);
   const [isSubmiting, setSubmitting] = useState(false);
   const [ready, setReady] = useState(false);
+  const router = useRouter();
+  const { slug } = router.query;
 
   const setDayOfWeek = (
     dayOfWeek: number,
@@ -113,16 +112,14 @@ export default function TimeList({ slug }: TimeListProps) {
         saturday: timeList[6],
       };
 
-      console.log(`timeDto`);
-      console.log(timeDto);
-
       try {
         const response = await authClient.post(
           `/provider/${slug}/time`,
           timeDto
         );
+        console.debug(`POST /provider/${slug}/time`, timeDto);
         const data = response?.data;
-        console.log(data);
+        console.debug('time response data', data);
         switch (data?.status) {
           case 2000:
             alert('적용되었습니다.');
@@ -143,10 +140,9 @@ export default function TimeList({ slug }: TimeListProps) {
   useEffect(() => {
     const getData = async () => {
       const response = await authClient.get(`/provider/${slug}/time`);
+      console.debug(`GET /provider/${slug}/time`);
       const data: TimeDto = response?.data;
-      console.log(`GET /provider/${slug}/time`);
-      console.log(data);
-
+      console.debug('time data', data);
       if (data) {
         const arr: (Time | null)[] = [null, null, null, null, null, null, null];
         arr[0] = data.sunday;
@@ -163,8 +159,10 @@ export default function TimeList({ slug }: TimeListProps) {
       }
     };
 
-    getData();
-  }, []);
+    if (slug) {
+      getData();
+    }
+  }, [slug]);
 
   function TimeListItem({ time, dayOfWeek }: TimeListItemProps) {
     const displayDayOfWeek = () => {

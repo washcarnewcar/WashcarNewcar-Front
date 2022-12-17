@@ -89,8 +89,9 @@ export default function MenuForm({ slug, number, data }: MenuFormProps) {
           `/provider/menu/${number}`,
           menuDto
         );
+        console.debug(`PUT /provider/menu/${number}`, menuDto);
         const data = response?.data;
-        console.log(data);
+        console.debug(data);
         switch (data?.status) {
           case 2400:
             alert('수정되었습니다.');
@@ -111,8 +112,9 @@ export default function MenuForm({ slug, number, data }: MenuFormProps) {
           `provider/${slug}/menu`,
           menuDto
         );
+        console.debug(`POST provider/${slug}/menu`, menuDto);
         const data = response?.data;
-        console.log(data);
+        console.debug(data);
         switch (data?.status) {
           case 2200:
             alert('추가되었습니다.');
@@ -303,7 +305,7 @@ export default function MenuForm({ slug, number, data }: MenuFormProps) {
                       ? process.env.NEXT_PUBLIC_S3_URL + image.previewUrl
                       : image.previewUrl
                   }
-                  alt="menu_image"
+                  alt=""
                   width={200}
                   height={200}
                   className={styles.image}

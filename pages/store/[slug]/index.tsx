@@ -74,7 +74,7 @@ export default function Store() {
         const response = await client.get(`/store/${slug}/info`);
 
         const data: StoreDto = response?.data;
-        // setStoreData(data);
+        setStoreData(data);
       } catch (error) {
         if (error instanceof AxiosError && error.response?.status === 404) {
           alert('해당 주소의 세차장이 없습니다.');

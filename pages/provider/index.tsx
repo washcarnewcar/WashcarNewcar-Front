@@ -11,9 +11,10 @@ export default function ProviderCheck() {
     const check = async () => {
       try {
         const response = await authClient.get(`/provider/slug`);
+        console.debug(`GET /provider/slug`);
 
         const data = response?.data;
-        console.log(data);
+        console.debug(data);
         if (data) {
           const { status, slug } = data;
           // slug 존재

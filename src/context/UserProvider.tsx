@@ -22,7 +22,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const getUser = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.log('token not exist');
+      console.debug('token not exist');
       setUser({ isLogined: false });
       return;
     }
@@ -34,13 +34,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         },
       });
       if (response.status === 200) {
-        console.log('logined');
+        console.debug('logined');
         setUser({ isLogined: true });
       }
     } catch (error) {
       // 로그인 되지 않거나, 토큰 만료됨
       if (error instanceof AxiosError && error.response?.status === 401) {
-        console.log('token expired');
+        console.debug('token expired');
         setUser({ isLogined: false });
         return;
       } else {

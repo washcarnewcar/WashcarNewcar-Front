@@ -23,7 +23,8 @@ export default function MenuEdit() {
     const getData = async () => {
       if (slug && number) {
         const response = await authClient.get(`/provider/menu/${number}`);
-        console.log(response?.data);
+        console.debug(`GET /provider/menu/${number}`);
+        console.debug(response?.data);
         const menu: MenuDto | undefined = response?.data;
         // const menu: MenuDto | undefined = mockData;
         if (menu) {

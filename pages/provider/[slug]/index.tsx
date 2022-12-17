@@ -43,10 +43,10 @@ export default function ProviderDashboard() {
     const getStoreState = async () => {
       try {
         const response = await authClient.get(`/provider/${slug}/approve`);
+        console.debug(`GET /provider/${slug}/approve`);
 
         const data = response?.data;
-        console.log('getStoreState');
-        console.log(data);
+        console.debug(data);
         switch (data.status) {
           // 세차장 승인, 페이지 운영중
           case 1500:
@@ -84,10 +84,10 @@ export default function ProviderDashboard() {
     const getRequestList = async () => {
       try {
         const response = await authClient.get(`/provider/${slug}/request`);
+        console.debug(`GET /provider/${slug}/request`);
 
         const list: RequestDto[] = response.data.list;
-        console.log('getRequestList');
-        console.log(list);
+        console.debug(list);
       } catch (error) {
         console.error(error);
       }
@@ -96,10 +96,10 @@ export default function ProviderDashboard() {
     const getScheduleList = async () => {
       try {
         const response = await authClient.get(`/provider/${slug}/schedule`);
+        console.debug(`GET /provider/${slug}/schedule`);
 
         const list: ScheduleDto[] = response.data.list;
-        console.log('getScheduleList');
-        console.log(list);
+        console.debug(list);
       } catch (error) {
         console.error(error);
       }

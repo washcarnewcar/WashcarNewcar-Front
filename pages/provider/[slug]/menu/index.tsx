@@ -42,10 +42,10 @@ export default function MenuList() {
 
   useEffect(() => {
     const getMenuList = async () => {
-      const request = await authClient.get(`/provider/${slug}/menu`);
-      console.log(request?.data);
-      const menus: MenuListDto[] | undefined = request?.data?.menu;
-      // const menus: MenuListDto[] | undefined = mockData;
+      const response = await authClient.get(`/provider/${slug}/menu`);
+      console.debug(`GET /provider/${slug}/menu`);
+      console.debug(response?.data);
+      const menus: MenuListDto[] | undefined = response?.data?.menu;
       if (menus) {
         setMenus(menus);
       }
@@ -97,7 +97,7 @@ function MenuItem({ data, slug }: MenuItemProps) {
                 height={90}
                 className={styles.image}
                 src={process.env.NEXT_PUBLIC_S3_URL + data.image}
-                alt="menu"
+                alt=""
               />
             </div>
           ) : (

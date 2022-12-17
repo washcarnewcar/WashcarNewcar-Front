@@ -37,7 +37,7 @@ export const uploadImage = async (
   if (!image.file) return image.previewUrl;
 
   const fileName = `${directory}/${crypto.randomUUID()}${image.file.name}`;
-  console.log(fileName);
+  console.debug(fileName);
 
   const command: PutObjectCommandInput = {
     Bucket: bucket,
