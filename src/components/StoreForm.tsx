@@ -411,7 +411,6 @@ export default function StoreForm({ data }: StoreFormProps) {
 
   const validate = (values: Values) => {
     const newErrors: Errors = {};
-    console.log('validate()');
 
     if (!values.name) {
       newErrors.name = '세차장 이름은 필수항목입니다.';

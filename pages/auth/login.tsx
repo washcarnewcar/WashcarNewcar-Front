@@ -63,7 +63,7 @@ function Login() {
       if (error instanceof AxiosError && error.response?.status === 401) {
         setErrors({
           email: ' ',
-          password: '아이디 또는 비밀번호가 틀렸습니다.',
+          password: '이메일 또는 비밀번호가 틀렸습니다.',
         });
       } else {
         alert('알 수 없는 오류가 발생했습니다.');

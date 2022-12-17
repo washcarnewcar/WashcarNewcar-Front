@@ -121,7 +121,7 @@ export default function Search() {
         </Link>
         <div className={styles.blank}></div>
 
-        <Item slug="test" />
+        <Item slug="stylecarcare" />
         <Seperator />
         <Item slug="test" />
         <Seperator />

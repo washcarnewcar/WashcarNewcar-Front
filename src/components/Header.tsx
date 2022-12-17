@@ -15,10 +15,12 @@ export default function Header({ type }: HeaderProps) {
   const { user, setUser } = useContext(UserContext);
 
   const handleLogoutClick = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refresh_token');
-    setUser(null);
-    router.replace('/');
+    if (confirm('로그아웃 하시겠습니까?')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token');
+      setUser(null);
+      router.replace('/');
+    }
   };
 
   return (

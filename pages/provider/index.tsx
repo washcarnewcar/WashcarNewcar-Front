@@ -27,8 +27,6 @@ export default function ProviderCheck() {
             default:
               throw new Error('알 수 없는 상태코드');
           }
-        } else {
-          throw new Error('잘못된 응답');
         }
       } catch (error) {
         console.error(error);

@@ -1,6 +1,8 @@
+import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../src/components/Header';
 import Seperator from '../../src/components/Seperator';
@@ -69,6 +71,12 @@ const mockData = [
 export default function FindList() {
   const router = useRouter();
   const { tel } = router.query;
+
+  useEffect(() => {
+    const telData = { tel: tel };
+
+    axios.get('/find', telData);
+  }, []);
 
   return (
     <>

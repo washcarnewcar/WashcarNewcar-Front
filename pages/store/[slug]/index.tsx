@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Carousel, Tab, Tabs } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Carousel, Placeholder, Tab, Tabs } from 'react-bootstrap';
 import Header from '../../../src/components/Header';
 import Seperator from '../../../src/components/Seperator';
 import styles from '../../../styles/Store.module.scss';
@@ -12,6 +12,10 @@ import {
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Image from 'next/image';
+import axios, { AxiosError } from 'axios';
+import { StoreDto } from '../../../src/dto';
+import { client } from '../../../src/function/request';
+import Loading from '../../../src/components/Loading';
 
 const tempData = {
   call: '010-2474-6837',
@@ -62,50 +66,63 @@ const menuTempData = {
 export default function Store() {
   const router = useRouter();
   const { slug } = router.query;
+  const [storeData, setStoreData] = useState<StoreDto>();
+
+  useEffect(() => {
+    const getStoreInfo = async () => {
+      try {
+        const response = await client.get(`/store/${slug}/info`);
+
+        const data: StoreDto = response?.data;
+        // setStoreData(data);
+      } catch (error) {
+        if (error instanceof AxiosError && error.response?.status === 404) {
+          alert('해당 주소의 세차장이 없습니다.');
+          router.replace('/');
+        } else {
+          console.error(error);
+        }
+      }
+    };
+
+    if (slug) {
+      getStoreInfo();
+    }
+  }, [slug]);
 
   return (
     <>
       <Header type={1} />
       <Carousel>
-        <Carousel.Item className={styles.carousel_item}>
-          <Image
-            width={350}
-            height={200}
-            className={styles.image}
-            src="/sample_store_image.png"
-            alt="sample"
-          />
-        </Carousel.Item>
-        <Carousel.Item className={styles.carousel_item}>
-          <Image
-            width={350}
-            height={200}
-            className={styles.image}
-            src="/sample_store_image.png"
-            alt="sample"
-          />
-        </Carousel.Item>
-        <Carousel.Item className={styles.carousel_item}>
-          <Image
-            width={350}
-            height={200}
-            className={styles.image}
-            src="/sample_store_image.png"
-            alt="sample"
-          />
-        </Carousel.Item>
+        {storeData?.store_image.map((storeImage, index) => (
+          <Carousel.Item className={styles.carousel_item} key={index}>
+            <Image
+              width={350}
+              height={200}
+              className={styles.image}
+              src={process.env.NEXT_PUBLIC_S3_URL + storeImage}
+              alt="매장사진"
+            />
+          </Carousel.Item>
+        ))}
       </Carousel>
 
       <div className={styles.store_info}>
-        <Image
-          className={styles.preview_image}
-          width={60}
-          height={60}
-          src="/style_carcare.jpg"
-          alt="테스트"
-        />
+        {storeData ? (
+          <Image
+            className={styles.preview_image}
+            width={60}
+            height={60}
+            src={process.env.NEXT_PUBLIC_S3_URL + storeData.preview_image}
+            alt="테스트"
+          />
+        ) : (
+          <Placeholder></Placeholder>
+        )}
         <div className={styles.content}>
-          <div className={styles.store_name}>스타일카케어</div>
+          <div className={styles.store_name}>
+            {storeData ? storeData.name : <Placeholder xs={6} />}
+          </div>
         </div>
       </div>
 
