@@ -86,9 +86,28 @@ export default function Except() {
 
     setSubmitting(true);
 
+    const newExceptList: ExceptDto[] = [...exceptList];
+
+    newExceptList.map((except) => {
+      // 하루종일인 경우 2022-11-11 => 2122-11-11 00:00
+      if (except.allday) {
+        const newExcept: ExceptDto = {
+          start: moment(except.start).format('YYYY-MM-DD HH:mm'),
+          end: moment(except.end).format('YYYY-MM-DD HH:mm'),
+          allday: except.allday,
+          error: except.error,
+        };
+        return newExcept;
+      }
+    });
+    console.log('test except list', exceptList);
+
     try {
-      const response = await authClient.post(`/provider/${slug}/except`);
-      console.debug(`POST /provider/${slug}/except`);
+      const response = await authClient.post(
+        `/provider/${slug}/except`,
+        newExceptList
+      );
+      console.debug(`POST /provider/${slug}/except`, newExceptList);
       const data = response?.data;
       console.debug(data);
       switch (data?.status) {
@@ -103,9 +122,9 @@ export default function Except() {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
   };
 
   useEffect(() => {
@@ -113,10 +132,8 @@ export default function Except() {
       const response = await authClient.get(`/provider/${slug}/except`);
       console.debug(`GET /provider/${slug}/except`);
       const data: ExceptDto[] = response?.data?.except;
-      console.debug('except data', data);
-
       if (data) {
-        const newExceptList: ExceptDto[] = data.map((except) => {
+        data.map((except) => {
           // 하루종일인 경우 2022-11-11 00:00 => 2122-11-11
           if (except.allday) {
             except.start = moment(except.start).format('YYYY-MM-DD');
@@ -124,8 +141,8 @@ export default function Except() {
           }
           return except;
         });
-        console.debug('newExceptList', newExceptList);
-        setExceptList(newExceptList);
+        console.debug('mapped data', data);
+        setExceptList(data);
         setReady(true);
       } else {
         setReady(true);
