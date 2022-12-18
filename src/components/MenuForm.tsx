@@ -12,9 +12,7 @@ import { uploadImage } from '../function/S3Utils';
 import Loading from './Loading';
 
 interface MenuFormProps {
-  slug: string;
   data: MenuDto | null | undefined;
-  number?: string;
 }
 
 interface Values {
@@ -47,8 +45,9 @@ const initialValues: Values = {
   minute: 0,
 };
 
-export default function MenuForm({ slug, number, data }: MenuFormProps) {
+export default function MenuForm({ data }: MenuFormProps) {
   const router = useRouter();
+  const { slug, number } = router.query;
   const inputFile = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<Images>({
     file: null,

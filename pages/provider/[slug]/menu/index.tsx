@@ -10,31 +10,6 @@ import { MenuListDto } from '../../../../src/dto';
 import { authClient } from '../../../../src/function/request';
 import styles from '../../../../styles/MenuList.module.scss';
 
-const mockData = [
-  {
-    number: 1,
-    image: 'S3 URL',
-    name: '외부 세차',
-    description:
-      '세차에 대한 설명dfasffsdfsdfdsfs\n두줄 정도 표시할까 ㅇ라넝라너dfsafdsds',
-    price: 80000,
-  },
-  {
-    number: 2,
-    image: 'S3 URL',
-    name: '내부 세차',
-    description: '세차에 대한 설명\n두줄 정도 표시할까 생각중',
-    price: 70000,
-  },
-  {
-    number: 3,
-    image: 'S3 URL',
-    name: '내부 세차',
-    description: '한줄은 어때요?',
-    price: 70000,
-  },
-];
-
 export default function MenuList() {
   const router = useRouter();
   const { slug } = router.query;
@@ -71,7 +46,7 @@ export default function MenuList() {
         <ListGroup>
           {menus.map((menu, index) => (
             <ListGroupItem key={index}>
-              <MenuItem slug={slug as string} data={menu} />
+              <MenuItem data={menu} />
             </ListGroupItem>
           ))}
         </ListGroup>
@@ -82,10 +57,12 @@ export default function MenuList() {
 
 interface MenuItemProps {
   data: MenuListDto;
-  slug: string;
 }
 
-function MenuItem({ data, slug }: MenuItemProps) {
+function MenuItem({ data }: MenuItemProps) {
+  const router = useRouter();
+  const { slug } = router.query;
+
   return (
     <Link href={`/provider/${slug}/menu/${data.number}`}>
       <a className={styles.link}>

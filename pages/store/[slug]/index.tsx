@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Image from 'next/image';
 import axios, { AxiosError } from 'axios';
-import { StoreDto } from '../../../src/dto';
+import { MenuListDto, StoreDto } from '../../../src/dto';
 import { client } from '../../../src/function/request';
 import Loading from '../../../src/components/Loading';
 
@@ -66,27 +66,49 @@ const menuTempData = {
 export default function Store() {
   const router = useRouter();
   const { slug } = router.query;
-  const [storeData, setStoreData] = useState<StoreDto>();
+  const [storeInfo, setStoreInfo] = useState<StoreDto>();
+  const [menuList, setMenuList] = useState<MenuListDto[] | null[]>([
+    null,
+    null,
+    null,
+  ]);
 
   useEffect(() => {
     const getStoreInfo = async () => {
       try {
         const response = await client.get(`/store/${slug}/info`);
-
         const data: StoreDto = response?.data;
-        setStoreData(data);
+        console.debug(`GET /store/${slug}/info`, data);
+        setStoreInfo(data);
       } catch (error) {
         if (error instanceof AxiosError && error.response?.status === 404) {
           alert('해당 주소의 세차장이 없습니다.');
           router.replace('/');
         } else {
-          console.error(error);
+          throw error;
+        }
+      }
+    };
+
+    const getMenuList = async () => {
+      try {
+        const response = await client.get(`/store/${slug}/menu`);
+        const data: MenuListDto[] = response?.data?.menu;
+        console.debug(`GET /store/${slug}/menu`, data);
+        setMenuList(data);
+      } catch (error) {
+        if (error instanceof AxiosError && error.response?.status === 404) {
+          alert('해당 주소의 세차장이 없습니다.');
+          router.replace('/');
+        } else {
+          throw error;
         }
       }
     };
 
     if (slug) {
       getStoreInfo();
+      getMenuList();
     }
   }, [slug]);
 
@@ -94,7 +116,7 @@ export default function Store() {
     <>
       <Header type={1} />
       <Carousel>
-        {storeData?.store_image.map((storeImage, index) => (
+        {storeInfo?.store_image.map((storeImage, index) => (
           <Carousel.Item className={styles.carousel_item} key={index}>
             <Image
               width={350}
@@ -107,30 +129,36 @@ export default function Store() {
         ))}
       </Carousel>
 
-      <div className={styles.store_info}>
-        {storeData ? (
+      {storeInfo ? (
+        <div className={styles.store_info}>
           <Image
             className={styles.preview_image}
             width={60}
             height={60}
-            src={process.env.NEXT_PUBLIC_S3_URL + storeData.preview_image}
-            alt="테스트"
+            src={process.env.NEXT_PUBLIC_S3_URL + storeInfo.preview_image}
+            alt=""
           />
-        ) : (
-          <Placeholder></Placeholder>
-        )}
-        <div className={styles.content}>
-          <div className={styles.store_name}>
-            {storeData ? storeData.name : <Placeholder xs={6} />}
+          <div className={styles.content}>
+            <div className={styles.store_name}>{storeInfo.name}</div>
           </div>
         </div>
-      </div>
+      ) : (
+        <Placeholder className={styles.store_info} animation="glow">
+          <Placeholder className={styles.preview_image} />
+          <div className={styles.content}>
+            <Placeholder
+              style={{ width: '100px' }}
+              className={styles.store_name}
+            />
+          </div>
+        </Placeholder>
+      )}
 
       <Tabs defaultActiveKey="wash" className={styles.tabs} justify id="tabs">
         <Tab eventKey="wash" title="세차" tabClassName={styles.tab}>
-          {menuTempData.menu.map((menuItem, index) => (
+          {menuList.map((menuItem, index) => (
             <div key={index}>
-              <MenuItem slug={slug as string} data={menuItem} />
+              <MenuItem data={menuItem} />
               <Seperator />
             </div>
           ))}
@@ -203,36 +231,61 @@ function InfoItem({ type, data }: InfoItemProps) {
   }
 }
 
-interface IData {
-  image: string;
-  name: string;
-  detail: string;
-  price: number;
-  number: number;
-}
-
 interface MenuItemProps {
-  data: IData;
-  slug: string;
+  data: MenuListDto | null;
 }
 
-function MenuItem({ slug, data }: MenuItemProps) {
+function MenuItem({ data }: MenuItemProps) {
+  const router = useRouter();
+  const { slug } = router.query;
+
+  // Placeholder
+  if (!data) {
+    return (
+      <Placeholder className={styles.link} animation="glow">
+        <div className={styles.container}>
+          <div className={styles.image_wrapper}>
+            <Placeholder
+              style={{ width: 90, height: 90 }}
+              className={styles.image}
+            />
+          </div>
+          <div className={styles.content}>
+            <div className={styles.menu_title_description}>
+              <Placeholder
+                style={{ width: 90 }}
+                className={styles.menu_title}
+              />
+              <Placeholder
+                style={{ width: 90 }}
+                className={styles.menu_description}
+              />
+            </div>
+            <Placeholder style={{ width: 90 }} className={styles.menu_price} />
+          </div>
+        </div>
+      </Placeholder>
+    );
+  }
+
   return (
     <Link href={`/store/${slug}/menu/${data.number}`}>
       <a className={styles.link}>
         <div className={styles.container}>
           <div className={styles.image_wrapper}>
             <Image
-              width={90}
-              height={90}
+              width={100}
+              height={100}
               className={styles.image}
               src="/style_carcare.jpg"
               alt="menu_image"
             />
           </div>
           <div className={styles.content}>
-            <div className={styles.menu_title}>{data.name}</div>
-            <div className={styles.menu_detail}>{data.detail}</div>
+            <div className={styles.menu_title_description}>
+              <div className={styles.menu_title}>{data.name}</div>
+              <div className={styles.menu_description}>{data.description}</div>
+            </div>
             <div className={styles.menu_price}>
               {data.price.toLocaleString()}원
             </div>

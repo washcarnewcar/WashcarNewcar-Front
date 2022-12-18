@@ -97,6 +97,7 @@ function Login() {
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 isInvalid={!!formik.errors.email && formik.touched.email}
+                autoComplete="on"
               />
               <Form.Control.Feedback type="invalid">
                 {formik.errors.email}
@@ -111,6 +112,7 @@ function Login() {
                 value={formik.values.password}
                 onChange={formik.handleChange}
                 isInvalid={!!formik.errors.password && formik.touched.password}
+                autoComplete="on"
               />
               <Form.Control.Feedback type="invalid">
                 {formik.errors.password}

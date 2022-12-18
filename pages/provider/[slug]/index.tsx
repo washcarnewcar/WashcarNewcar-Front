@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { Alert, Button, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../../src/components/Header';
 import Loading from '../../../src/components/Loading';
 import LoginCheck from '../../../src/components/LoginCheck';
 import UserContext from '../../../src/context/UserProvider';

@@ -1,12 +1,12 @@
-import styles from '../../styles/Search.module.scss';
-import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../src/components/Header';
-import { useCallback, useEffect, useState } from 'react';
-import { BeatLoader } from 'react-spinners';
-import Seperator from '../../src/components/Seperator';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { IoIosArrowForward } from 'react-icons/io';
+import { BeatLoader } from 'react-spinners';
+import Header from '../../src/components/Header';
+import Seperator from '../../src/components/Seperator';
+import styles from '../../styles/Search.module.scss';
 
 export default function Search() {
   const router = useRouter();

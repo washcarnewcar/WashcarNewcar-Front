@@ -3,34 +3,29 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+}
 
-  .form {
-    width: 300px;
+.form {
+  width: 300px;
+}
 
-    .title {
-      font-size: x-large;
-      font-weight: bolder;
-      margin-bottom: 10px;
-      word-break: keep-all;
-    }
+.title {
+  font-size: x-large;
+  font-weight: bolder;
+  margin-bottom: 10px;
+  word-break: keep-all;
+}
 
-    .form_group {
-      margin: 20px 0px;
+.form_group {
+  margin: 20px 0px;
+}
 
-      .tel_wrapper {
-        display: flex;
-        align-items: center;
-        gap: 5px;
+.tel_wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 
-        .tel {
-          margin-bottom: 10px;
-        }
-      }
-    }
-
-    .submit {
-      width: 100%;
-    }
-  }
-
+.submit {
+  width: 100%;
 }

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Form, ListGroup } from 'react-bootstrap';
-import Header from '../../../../../src/components/Header';
 import LoginCheck from '../../../../../src/components/LoginCheck';
 import styles from '../../../../../styles/ProviderReservation.module.scss';
 

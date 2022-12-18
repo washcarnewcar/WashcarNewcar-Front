@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import { Button, Form } from 'react-bootstrap';
-import Header from '../../../../../src/components/Header';
 import LoginCheck from '../../../../../src/components/LoginCheck';
 import styles from '../../../../../styles/Reject.module.scss';
 
