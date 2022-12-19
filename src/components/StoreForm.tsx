@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -309,14 +310,14 @@ export default function StoreForm({ data }: StoreFormProps) {
       store_image: storeImageUrls,
     };
 
-    // provider/:slug 일때
+    // provider/:slug/store 일때
     if (data) {
       const response = await authClient.post(
         `/provider/${data.slug}/store`,
         storeDto
       );
       console.debug(`POST /provider/${data.slug}/store`, storeDto);
-      console.debug(response.data);
+      console.debug(response?.data);
 
       if (response) {
         switch (response.data.status) {
@@ -400,10 +401,15 @@ export default function StoreForm({ data }: StoreFormProps) {
     try {
       await postToApi(values, previewImageUrl, storeImageUrls);
     } catch (error) {
-      console.error(error);
-      alert('서버에 전송하는 도중 오류가 발생했습니다.\n다시 시도해주세요.');
-      setSubmitting(false);
-      return;
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 500) {
+          alert(
+            '서버에 전송하는 도중 오류가 발생했습니다.\n다시 시도해주세요.'
+          );
+          setSubmitting(false);
+          return;
+        }
+      }
     }
   };
 

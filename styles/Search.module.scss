@@ -16,8 +16,6 @@
   font-weight: bolder;
 }
 
-.car {}
-
 .select_car_body {
   display: flex;
 }
@@ -34,11 +32,6 @@
   text-decoration: none;
   color: black;
   line-height: 21.6px;
-}
-
-.title {
-  font-size: large;
-  font-weight: bolder;
 }
 
 .right {
@@ -72,7 +65,7 @@
   margin-bottom: 5px;
 }
 
-.title {
+.item_info {
   padding-right: var(--margin-right);
   padding-left: var(--margin-left);
   padding-top: 10px;

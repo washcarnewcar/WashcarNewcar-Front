@@ -1,67 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import { AxiosError } from 'axios';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { Carousel, Placeholder, Tab, Tabs } from 'react-bootstrap';
-import Header from '../../../src/components/Header';
-import Seperator from '../../../src/components/Seperator';
-import styles from '../../../styles/Store.module.scss';
 import {
   IoCallOutline,
   IoInformationCircleOutline,
   IoLocationOutline,
   IoNavigateOutline,
 } from 'react-icons/io5';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import Image from 'next/image';
-import axios, { AxiosError } from 'axios';
+import Header from '../../../src/components/Header';
+import Seperator from '../../../src/components/Seperator';
 import { MenuListDto, StoreDto } from '../../../src/dto';
 import { client } from '../../../src/function/request';
-import Loading from '../../../src/components/Loading';
-
-const tempData = {
-  call: '010-2474-6837',
-  location: '서울 서초구 반포대로 24길 20 1층',
-  wayto: `서초역 1번 출구(교대역 방면)에서 바로 우회전 후
-현대 자동차 정비소 끼고 좌회전 하시면
-바로 있습니다.`,
-  information: `안녕하세요.
-스타일카케어 서초직영점입니다
-
-스타일카케어는 강남논현본점을 시작으로 강남역삼점 강 남대치점 서울신윌점 그리고 이번 강남 서초직영점까지 5개의 매장이 함께하고 있는 중견업체입니다.
-또한 2021 대한민국 인기브랜드 대상을 수상하며 고객 뿐 아니라 업계에서도 인정받는다는 것을 증명하였습니다.
-
-저희 스타일카케어는 디테일링, 손세차, 유리막코팅, PPF, 사고수리, 썬팅, 카오 디오, 방음 등 차량 관리 토탈 케어샵으로 확실한 시공과 사후 처리까지 완벽하게 진행해드리고 있으며,
-전 직원들의 철저한 교육을 통해 꼼꼼하고 확실한 작업을 도와드리고 있습니다.
-
-차량에 관련한 모든 부분 저희 스타일카케어를 통해 진행하신다면 후회 없으실거라 자신합니다.
-자세한 문의사항은 010.4465.6111 으로 문의주시면 친절히 답변해드리겠습니다.`,
-};
-
-const menuTempData = {
-  menu: [
-    {
-      number: 1,
-      image: 'S3 URL',
-      name: '외부 세차',
-      detail:
-        '세차에 대한 설명dfasffsdfsdfdsfs\n두줄 정도 표시할까 ㅇ라넝라너dfsafdsds',
-      price: 80000,
-    },
-    {
-      number: 2,
-      image: 'S3 URL',
-      name: '내부 세차',
-      detail: '세차에 대한 설명\n두줄 정도 표시할까 생각중',
-      price: 70000,
-    },
-    {
-      number: 3,
-      image: 'S3 URL',
-      name: '내부 세차',
-      detail: '한줄은 어때요?',
-      price: 70000,
-    },
-  ],
-};
+import styles from '../../../styles/Store.module.scss';
 
 export default function Store() {
   const router = useRouter();
@@ -116,39 +69,40 @@ export default function Store() {
     <>
       <Header type={1} />
       <Carousel>
-        {storeInfo?.store_image.map((storeImage, index) => (
-          <Carousel.Item className={styles.carousel_item} key={index}>
-            <Image
-              width={350}
-              height={200}
-              className={styles.image}
-              src={process.env.NEXT_PUBLIC_S3_URL + storeImage}
-              alt="매장사진"
-            />
-          </Carousel.Item>
-        ))}
+        {storeInfo?.store_image
+          ? storeInfo?.store_image.map((storeImage, index) => (
+              <Carousel.Item className={styles.carousel_item} key={index}>
+                <Image
+                  className={styles.carousel_image}
+                  src={process.env.NEXT_PUBLIC_S3_URL + storeImage}
+                  alt="매장사진"
+                  layout="fill"
+                />
+              </Carousel.Item>
+            ))
+          : null}
       </Carousel>
 
       {storeInfo ? (
-        <div className={styles.store_info}>
+        <div className={styles.title}>
           <Image
-            className={styles.preview_image}
+            className={styles.title_image}
             width={60}
             height={60}
             src={process.env.NEXT_PUBLIC_S3_URL + storeInfo.preview_image}
             alt=""
           />
-          <div className={styles.content}>
-            <div className={styles.store_name}>{storeInfo.name}</div>
+          <div className={styles.title_content}>
+            <div className={styles.title_name}>{storeInfo.name}</div>
           </div>
         </div>
       ) : (
-        <Placeholder className={styles.store_info} animation="glow">
-          <Placeholder className={styles.preview_image} />
-          <div className={styles.content}>
+        <Placeholder className={styles.title} animation="glow">
+          <Placeholder className={styles.title_image} />
+          <div className={styles.title_content}>
             <Placeholder
               style={{ width: '100px' }}
-              className={styles.store_name}
+              className={styles.title_name}
             />
           </div>
         </Placeholder>
@@ -156,7 +110,7 @@ export default function Store() {
 
       <Tabs defaultActiveKey="wash" className={styles.tabs} justify id="tabs">
         <Tab eventKey="wash" title="세차" tabClassName={styles.tab}>
-          {menuList.map((menuItem, index) => (
+          {menuList?.map((menuItem, index) => (
             <div key={index}>
               <MenuItem data={menuItem} />
               <Seperator />
@@ -165,13 +119,17 @@ export default function Store() {
         </Tab>
 
         <Tab eventKey="info" title="정보" tabClassName={styles.tab}>
-          <InfoItem type="call" data={tempData.call} />
-          <Seperator />
-          <InfoItem type="location" data={tempData.location} />
-          <Seperator />
-          <InfoItem type="wayto" data={tempData.wayto} />
-          <Seperator />
-          <InfoItem type="information" data={tempData.information} />
+          <InfoItem type="tel" data={storeInfo?.tel} />
+          <InfoItem
+            type="address"
+            data={
+              storeInfo?.address || storeInfo?.address_detail
+                ? `${storeInfo?.address} ${storeInfo?.address_detail}`
+                : undefined
+            }
+          />
+          <InfoItem type="wayto" data={storeInfo?.wayto} />
+          <InfoItem type="information" data={storeInfo?.description} />
         </Tab>
       </Tabs>
     </>
@@ -180,54 +138,82 @@ export default function Store() {
 
 interface InfoItemProps {
   type: string;
-  data: string;
+  data: string | undefined;
 }
 
 function InfoItem({ type, data }: InfoItemProps) {
+  // placeholder
+  if (data === undefined) {
+    return (
+      <>
+        <Placeholder className={styles.info_flex} animation="glow">
+          <div className={styles.icon}>
+            <Placeholder
+              style={{ width: '20px', height: '20px', borderRadius: '4px' }}
+            />
+          </div>
+          <div className={styles.info_content}>
+            <Placeholder style={{ width: '150px' }} />
+          </div>
+        </Placeholder>
+        <Seperator />
+      </>
+    );
+  }
+
+  // 데이터가 없으면 표시하지 않음
+  if (data === '' || data === null) {
+    return null;
+  }
+
+  // 유형에 따라 정보 표시
   switch (type) {
-    case 'call':
+    case 'tel':
       return (
-        <div className={styles.info_flex}>
-          <div className={styles.icon}>
+        <>
+          <div className={styles.info_flex}>
             <IoCallOutline className={styles.icon} size={20} color="gray" />
+            <div className={styles.info_content}>{data}</div>
           </div>
-          <div className={styles.info_content}>{data}</div>
-        </div>
+          <Seperator />
+        </>
       );
-    case 'location':
+    case 'address':
       return (
-        <div className={styles.info_flex}>
-          <div className={styles.icon}>
+        <>
+          <div className={styles.info_flex}>
             <IoLocationOutline className={styles.icon} size={20} color="gray" />
+            <div className={styles.info_content}>{data}</div>
           </div>
-          <div className={styles.info_content}>{data}</div>
-        </div>
+          <Seperator />
+        </>
       );
     case 'wayto':
       return (
-        <div className={styles.info_flex}>
-          <div className={styles.icon}>
-            <IoNavigateOutline size={20} color="gray" />
+        <>
+          <div className={styles.info_flex}>
+            <IoNavigateOutline className={styles.icon} size={20} color="gray" />
+            <div className={styles.info_content}>{data}</div>
           </div>
-          <div className={styles.info_content}>{data}</div>
-        </div>
+          <Seperator />
+        </>
       );
     case 'information':
       return (
-        <div className={styles.info_flex}>
-          <div className={styles.icon}>
-            <IoInformationCircleOutline size={20} color="gray" />
-          </div>
-          <div className={styles.info_content}>{data}</div>
-        </div>
-      );
-    default:
-      return (
         <>
-          {type}
-          {data}
+          <div className={styles.info_flex}>
+            <IoInformationCircleOutline
+              className={styles.icon}
+              size={20}
+              color="gray"
+            />
+            <div className={styles.info_content}>{data}</div>
+          </div>
+          <Seperator />
         </>
       );
+    default:
+      throw new Error('잘못된 info 타입');
   }
 }
 
@@ -246,7 +232,7 @@ function MenuItem({ data }: MenuItemProps) {
         <div className={styles.container}>
           <div className={styles.image_wrapper}>
             <Placeholder
-              style={{ width: 90, height: 90 }}
+              style={{ width: 100, height: 100 }}
               className={styles.image}
             />
           </div>
@@ -257,7 +243,7 @@ function MenuItem({ data }: MenuItemProps) {
                 className={styles.menu_title}
               />
               <Placeholder
-                style={{ width: 90 }}
+                style={{ width: 90, marginTop: 10 }}
                 className={styles.menu_description}
               />
             </div>

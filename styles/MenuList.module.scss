@@ -35,9 +35,8 @@
 }
 
 .image_wrapper {
-  flex: 0 0 90px;
-  width: 90px;
-  height: 90px;
+  flex: 0 0 100px;
+  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -59,7 +58,13 @@
 
 .content {
   margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100px;
 }
+
+.menu_title_description {}
 
 .menu_title {
   font-size: 20px;

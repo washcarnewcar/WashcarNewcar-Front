@@ -1,12 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'wcnc.s3.ap-northeast-2.amazonaws.com',
-      },
-    ],
+    domains: ['wcnc.s3.ap-northeast-2.amazonaws.com'],
   },
   reactStrictMode: true,
   swcMinify: true,

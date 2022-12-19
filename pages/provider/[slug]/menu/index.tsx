@@ -70,8 +70,8 @@ function MenuItem({ data }: MenuItemProps) {
           {data.image ? (
             <div className={styles.image_wrapper}>
               <Image
-                width={90}
-                height={90}
+                width={100}
+                height={100}
                 className={styles.image}
                 src={process.env.NEXT_PUBLIC_S3_URL + data.image}
                 alt=""
@@ -94,8 +94,10 @@ function MenuItem({ data }: MenuItemProps) {
             </div>
           )}
           <div className={styles.content}>
-            <div className={styles.menu_title}>{data.name}</div>
-            <div className={styles.menu_description}>{data.description}</div>
+            <div className={styles.menu_title_description}>
+              <div className={styles.menu_title}>{data.name}</div>
+              <div className={styles.menu_description}>{data.description}</div>
+            </div>
             <div className={styles.menu_price}>
               {data.price.toLocaleString()}원
             </div>
