@@ -40,9 +40,7 @@ export default function ProviderCheck() {
   return (
     <>
       <Header type={1} />
-      <div style={{ width: '100%', height: '100vh' }}>
-        <Loading />
-      </div>
+      <Loading fullscreen />
     </>
   );
 }

@@ -277,9 +277,7 @@ export default function MenuForm({ data }: MenuFormProps) {
   }, [data]);
 
   if (!ready) {
-    <div style={{ width: '100%', height: '100vh' }}>
-      <Loading />
-    </div>;
+    <Loading fullscreen />;
   }
 
   return (

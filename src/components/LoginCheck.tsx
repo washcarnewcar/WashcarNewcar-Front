@@ -26,13 +26,7 @@ export default function LoginCheck({ children }: LoginCheckProps) {
   return (
     <>
       <Header type={1} />
-      {ready ? (
-        children
-      ) : (
-        <div style={{ width: '100%', height: '100vh' }}>
-          <Loading />
-        </div>
-      )}
+      {ready ? children : <Loading fullscreen />}
     </>
   );
 }

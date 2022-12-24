@@ -267,11 +267,7 @@ export default function TimeList() {
   }
 
   if (!ready) {
-    return (
-      <div style={{ width: '100%', height: '20vh' }}>
-        <Loading />
-      </div>
-    );
+    return <Loading fullscreen />;
   }
 
   return (
