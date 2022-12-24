@@ -13,7 +13,7 @@ interface Values {
   email: string;
 }
 
-const initialValues = {
+const initialValues: Values = {
   email: '',
 };
 
@@ -32,36 +32,32 @@ export default function SignUp() {
   ) => {
     setSubmitting(true);
 
-    try {
-      const response = await client.get(`/signup/check`, {
-        data: { email: values.email },
-      });
-      console.debug(`GET signup/check`, response?.data);
-      const status: number | undefined = response?.data?.status;
-      if (status) {
-        switch (status) {
-          // email 전송함
-          case 1700:
-            router.push(`/auth/signup/check`, {
-              query: { email: values.email },
-            });
-            return;
-          // email 중복
-          case 1701:
-            setErrors({ email: '이미 사용중인 이메일입니다' });
-            return;
-          // email 형식에 맞지 않음
-          case 1702:
-            setErrors({ email: '이메일 형식에 맞지 않습니다' });
-            return;
-          default:
-            throw Error('알 수 없는 상태코드');
-        }
-      } else {
-        throw Error('잘못된 응답');
+    const response = await client.post(`/signup/check/email`, {
+      email: values.email,
+    });
+    console.debug(`GET /signup/check/email`, response?.data);
+    const status: number | undefined = response?.data?.status;
+    if (status) {
+      switch (status) {
+        // email 전송함
+        case 1700:
+          router.push(`/auth/signup/check`, {
+            query: { email: values.email },
+          });
+          return;
+        // email 중복
+        case 1701:
+          setErrors({ email: '이미 사용중인 이메일입니다' });
+          break;
+        // email 형식에 맞지 않음
+        case 1702:
+          setErrors({ email: '이메일 형식에 맞지 않습니다' });
+          break;
+        default:
+          console.error('알 수 없는 상태코드');
       }
-    } catch (error) {
-      console.error(error);
+    } else {
+      console.error('잘못된 응답');
     }
 
     setSubmitting(false);
