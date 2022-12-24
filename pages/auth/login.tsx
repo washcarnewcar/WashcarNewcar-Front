@@ -143,14 +143,14 @@ function Login() {
 
             <div className={styles.change}>
               <div>아직 계정이 없으신가요?</div>
-              <Link href="/auth/signup">
-                <a className={styles.change_text}>회원가입</a>
+              <Link className={styles.change_text} href="/auth/signup">
+                회원가입
               </Link>
             </div>
             <div className={styles.change}>
               <div>비밀번호를 잊으셨나요?</div>
-              <Link href="/auth/password">
-                <a className={styles.change_text}>비밀번호 재설정</a>
+              <Link className={styles.change_text} href="/auth/password">
+                비밀번호 재설정
               </Link>
             </div>
           </Form>

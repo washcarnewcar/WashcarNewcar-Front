@@ -26,16 +26,14 @@ export default function Header({ type }: HeaderProps) {
   return (
     <Navbar sticky="top" bg="white" expand={false} className={styles.container}>
       <Container>
-        <Link href="/">
-          <a style={{ display: 'flex' }}>
-            <Image
-              className={styles.main_logo}
-              src="/row_logo.png"
-              alt="세차새차"
-              width={146}
-              height={40}
-            />
-          </a>
+        <Link href="/" style={{ display: 'flex' }}>
+          <Image
+            className={styles.main_logo}
+            src="/row_logo.png"
+            alt="세차새차"
+            width={146}
+            height={40}
+          />
         </Link>
         <Navbar.Toggle />
         <Navbar.Offcanvas placement="end" style={{ width: '300px' }}>
@@ -50,10 +48,10 @@ export default function Header({ type }: HeaderProps) {
                 </>
               ) : (
                 <>
-                  <Link href="/auth/login" passHref>
+                  <Link href="/auth/login" legacyBehavior passHref>
                     <Nav.Link>로그인</Nav.Link>
                   </Link>
-                  <Link href="/auth/signup" passHref>
+                  <Link href="/auth/signup" legacyBehavior passHref>
                     <Nav.Link>회원가입</Nav.Link>
                   </Link>
                 </>

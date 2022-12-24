@@ -255,29 +255,27 @@ function MenuItem({ data }: MenuItemProps) {
   }
 
   return (
-    <Link href={`/store/${slug}/menu/${data.number}`}>
-      <a className={styles.link}>
-        <div className={styles.container}>
-          <div className={styles.image_wrapper}>
-            <Image
-              width={100}
-              height={100}
-              className={styles.image}
-              src="/style_carcare.jpg"
-              alt="menu_image"
-            />
+    <Link href={`/store/${slug}/menu/${data.number}`} className={styles.link}>
+      <div className={styles.container}>
+        <div className={styles.image_wrapper}>
+          <Image
+            width={100}
+            height={100}
+            className={styles.image}
+            src="/style_carcare.jpg"
+            alt="menu_image"
+          />
+        </div>
+        <div className={styles.content}>
+          <div className={styles.menu_title_description}>
+            <div className={styles.menu_title}>{data.name}</div>
+            <div className={styles.menu_description}>{data.description}</div>
           </div>
-          <div className={styles.content}>
-            <div className={styles.menu_title_description}>
-              <div className={styles.menu_title}>{data.name}</div>
-              <div className={styles.menu_description}>{data.description}</div>
-            </div>
-            <div className={styles.menu_price}>
-              {data.price.toLocaleString()}원
-            </div>
+          <div className={styles.menu_price}>
+            {data.price.toLocaleString()}원
           </div>
         </div>
-      </a>
+      </div>
     </Link>
   );
 }

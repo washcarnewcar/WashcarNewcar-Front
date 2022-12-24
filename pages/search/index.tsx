@@ -108,16 +108,15 @@ export default function Search() {
               foundLocation: foundLocation,
             },
           }}
+          className={styles.search_location}
         >
-          <a className={styles.search_location}>
-            <div className={styles.title}>검색 위치</div>
-            <div className={styles.right}>
-              <div className={styles.current_location}>
-                {foundLocation ? textLocation : <BeatLoader size={10} />}
-              </div>
-              <IoIosArrowForward size={20} />
+          <div className={styles.title}>검색 위치</div>
+          <div className={styles.right}>
+            <div className={styles.current_location}>
+              {foundLocation ? textLocation : <BeatLoader size={10} />}
             </div>
-          </a>
+            <IoIosArrowForward size={20} />
+          </div>
         </Link>
         <div className={styles.blank}></div>
 
@@ -141,43 +140,41 @@ interface ItemProps {
 
 function Item({ slug }: ItemProps) {
   return (
-    <Link href={`/store/${slug}`}>
-      <a className={styles.link}>
-        <div className={styles.container}>
-          <div className={styles.item_info}>
-            <Image
-              src="/style_carcare.jpg"
-              alt="스타일카케어"
-              width={60}
-              height={60}
-              className={styles.image}
-            />
-            <div className={styles.text}>
-              <div className={styles.name}>스타일카케어</div>
-              <div className={styles.subtext}>
-                <div className={styles.distance}>0.3km</div>
-                <div className={styles.ratings}>
-                  ⭐️<span className={styles.number}>4.7</span>(200+)
-                </div>
+    <Link href={`/store/${slug}`} className={styles.link}>
+      <div className={styles.container}>
+        <div className={styles.item_info}>
+          <Image
+            src="/style_carcare.jpg"
+            alt="스타일카케어"
+            width={60}
+            height={60}
+            className={styles.image}
+          />
+          <div className={styles.text}>
+            <div className={styles.name}>스타일카케어</div>
+            <div className={styles.subtext}>
+              <div className={styles.distance}>0.3km</div>
+              <div className={styles.ratings}>
+                ⭐️<span className={styles.number}>4.7</span>(200+)
               </div>
             </div>
           </div>
-          <div className={styles.content}>
-            <div className={styles.inner1}>
-              <Tag text="기본세차 38,500원" />
-              <Tag text="스페셜세차 66,000원" />
-              <Tag text="프리미엄세차 126,000원" />
-            </div>
-            {/* <div className={styles.inner2}>
+        </div>
+        <div className={styles.content}>
+          <div className={styles.inner1}>
+            <Tag text="기본세차 38,500원" />
+            <Tag text="스페셜세차 66,000원" />
+            <Tag text="프리미엄세차 126,000원" />
+          </div>
+          {/* <div className={styles.inner2}>
             <Tag text="10:00" />
             <Tag text="10:30" />
             <Tag text="11:00" />
             <Tag text="12:00" />
             <Tag text="12:30" />
           </div> */}
-          </div>
         </div>
-      </a>
+      </div>
     </Link>
   );
 }

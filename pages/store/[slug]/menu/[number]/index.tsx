@@ -192,17 +192,16 @@ export default function Menu() {
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className={styles.form_group}>
           <Form.Label className={styles.form_label}>예약날짜 선택</Form.Label>
-          <Link href={`/store/${slug}/menu/${number}/time`}>
-            <a
-              className={classNames(styles.date_input, {
-                [styles.date_input_selected]: formik.values.date,
-                [styles.date_input_unselected]: !formik.values.date,
-              })}
-            >
-              {formik.values.date
-                ? moment(formik.values.date).format('MM월 D일 a h시 mm분')
-                : '예약 날짜를 선택해주세요'}
-            </a>
+          <Link
+            href={`/store/${slug}/menu/${number}/time`}
+            className={classNames(styles.date_input, {
+              [styles.date_input_selected]: formik.values.date,
+              [styles.date_input_unselected]: !formik.values.date,
+            })}
+          >
+            {formik.values.date
+              ? moment(formik.values.date).format('MM월 D일 a h시 mm분')
+              : '예약 날짜를 선택해주세요'}
           </Link>
         </Form.Group>
 

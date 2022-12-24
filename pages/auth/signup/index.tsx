@@ -122,8 +122,8 @@ export default function SignUp() {
 
             <div className={styles.change}>
               <div>이미 계정이 있으신가요?</div>
-              <Link href="/auth/login">
-                <a className={styles.change_text}>로그인</a>
+              <Link href="/auth/login" className={styles.change_text}>
+                로그인
               </Link>
             </div>
           </Form>

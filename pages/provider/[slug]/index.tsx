@@ -188,57 +188,51 @@ function List() {
   return (
     <ListGroup className={classNames(styles.list, styles.reqest)}>
       <ListGroup.Item>
-        <Link href="/provider/hello/reservation/1">
-          <a className={styles.link}>
-            <div className={styles.content_container}>
-              <div>
-                <div className={styles.menu}>외부 세차</div>
-                <div className={styles.car}>기아 EV6 / 31하 1450</div>
-                <div className={styles.date}>
-                  {moment().format('YYYY.MM.DD(dd) HH:mm')}
-                </div>
-              </div>
-              <div className={styles.arrow}>
-                <IoIosArrowForward size={25} />
+        <Link href="/provider/hello/reservation/1" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
               </div>
             </div>
-          </a>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
         </Link>
       </ListGroup.Item>
       <ListGroup.Item>
-        <Link href="/">
-          <a className={styles.link}>
-            <div className={styles.content_container}>
-              <div>
-                <div className={styles.menu}>외부 세차</div>
-                <div className={styles.car}>기아 EV6 / 31하 1450</div>
-                <div className={styles.date}>
-                  {moment().format('YYYY.MM.DD(dd) HH:mm')}
-                </div>
-              </div>
-              <div className={styles.arrow}>
-                <IoIosArrowForward size={25} />
+        <Link href="/" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
               </div>
             </div>
-          </a>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
         </Link>
       </ListGroup.Item>
       <ListGroup.Item>
-        <Link href="/">
-          <a className={styles.link}>
-            <div className={styles.content_container}>
-              <div>
-                <div className={styles.menu}>외부 세차</div>
-                <div className={styles.car}>기아 EV6 / 31하 1450</div>
-                <div className={styles.date}>
-                  {moment().format('YYYY.MM.DD(dd) HH:mm')}
-                </div>
-              </div>
-              <div className={styles.arrow}>
-                <IoIosArrowForward size={25} />
+        <Link href="/" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
               </div>
             </div>
-          </a>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
         </Link>
       </ListGroup.Item>
     </ListGroup>

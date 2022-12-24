@@ -64,46 +64,47 @@ function MenuItem({ data }: MenuItemProps) {
   const { slug } = router.query;
 
   return (
-    <Link href={`/provider/${slug}/menu/${data.number}`}>
-      <a className={styles.link}>
-        <div className={styles.link_container}>
-          {data.image ? (
-            <div className={styles.image_wrapper}>
-              <Image
-                width={100}
-                height={100}
-                className={styles.image}
-                src={process.env.NEXT_PUBLIC_S3_URL + data.image}
-                alt=""
-              />
-            </div>
-          ) : (
-            <div
-              className={classNames(
-                styles.image_wrapper,
-                styles.image_wrapper_alt
-              )}
-            >
-              <Image
-                width={50}
-                height={50}
-                className={classNames(styles.image, styles.image_alt)}
-                src="/main_logo.png"
-                alt="menu"
-              />
-            </div>
-          )}
-          <div className={styles.content}>
-            <div className={styles.menu_title_description}>
-              <div className={styles.menu_title}>{data.name}</div>
-              <div className={styles.menu_description}>{data.description}</div>
-            </div>
-            <div className={styles.menu_price}>
-              {data.price.toLocaleString()}원
-            </div>
+    <Link
+      href={`/provider/${slug}/menu/${data.number}`}
+      className={styles.link}
+    >
+      <div className={styles.link_container}>
+        {data.image ? (
+          <div className={styles.image_wrapper}>
+            <Image
+              width={100}
+              height={100}
+              className={styles.image}
+              src={process.env.NEXT_PUBLIC_S3_URL + data.image}
+              alt=""
+            />
+          </div>
+        ) : (
+          <div
+            className={classNames(
+              styles.image_wrapper,
+              styles.image_wrapper_alt
+            )}
+          >
+            <Image
+              width={50}
+              height={50}
+              className={classNames(styles.image, styles.image_alt)}
+              src="/main_logo.png"
+              alt="menu"
+            />
+          </div>
+        )}
+        <div className={styles.content}>
+          <div className={styles.menu_title_description}>
+            <div className={styles.menu_title}>{data.name}</div>
+            <div className={styles.menu_description}>{data.description}</div>
+          </div>
+          <div className={styles.menu_price}>
+            {data.price.toLocaleString()}원
           </div>
         </div>
-      </a>
+      </div>
     </Link>
   );
 }
