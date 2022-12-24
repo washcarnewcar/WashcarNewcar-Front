@@ -33,6 +33,7 @@ export default function Header({ type }: HeaderProps) {
             alt="세차새차"
             width={146}
             height={40}
+            priority
           />
         </Link>
         <Navbar.Toggle />

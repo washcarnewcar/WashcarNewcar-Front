@@ -76,7 +76,7 @@ export default function Store() {
                   className={styles.carousel_image}
                   src={process.env.NEXT_PUBLIC_S3_URL + storeImage}
                   alt="매장사진"
-                  layout="fill"
+                  fill
                 />
               </Carousel.Item>
             ))

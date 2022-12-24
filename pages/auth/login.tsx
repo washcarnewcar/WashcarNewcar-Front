@@ -138,6 +138,7 @@ function Login() {
                 alt="카카오 로그인"
                 height={45}
                 width={300}
+                priority
               />
             </a>
 

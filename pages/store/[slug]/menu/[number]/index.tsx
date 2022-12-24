@@ -91,13 +91,9 @@ export default function Menu() {
    * 차 모델을 받아오는 함수
    */
   const getModel = async (brandNumber: string) => {
-    try {
-      const response = await client.get(`/car/brand/${brandNumber}`);
-      console.debug(`GET /car/brand/${brandNumber}`);
-      setModels(response.data.model);
-    } catch (error) {
-      console.error(error);
-    }
+    const response = await client.get(`/car/brand/${brandNumber}`);
+    console.debug(`GET /car/brand/${brandNumber}`);
+    setModels(response.data.model);
   };
 
   /**

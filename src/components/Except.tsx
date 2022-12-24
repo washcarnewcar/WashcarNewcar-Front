@@ -100,14 +100,14 @@ export default function Except() {
         return newExcept;
       }
     });
-    console.log('test except list', exceptList);
 
     try {
-      const response = await authClient.post(
-        `/provider/${slug}/except`,
-        newExceptList
-      );
-      console.debug(`POST /provider/${slug}/except`, newExceptList);
+      console.debug(`POST /provider/${slug}/except`, {
+        except: newExceptList,
+      });
+      const response = await authClient.post(`/provider/${slug}/except`, {
+        except: newExceptList,
+      });
       const data = response?.data;
       console.debug(data);
       switch (data?.status) {

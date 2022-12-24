@@ -36,14 +36,13 @@ export default function SignUp() {
       const response = await client.get(`/signup/check`, {
         data: { email: values.email },
       });
-      console.debug(`GET signup/check`);
-      console.debug(response?.data);
+      console.debug(`GET signup/check`, response?.data);
       const status: number | undefined = response?.data?.status;
       if (status) {
-        // email 사용 가능
         switch (status) {
+          // email 전송함
           case 1700:
-            router.push(`/auth/signup/info`, {
+            router.push(`/auth/signup/check`, {
               query: { email: values.email },
             });
             return;
@@ -117,6 +116,7 @@ export default function SignUp() {
                 alt="카카오 로그인"
                 height={45}
                 width={300}
+                priority
               />
             </a>
 

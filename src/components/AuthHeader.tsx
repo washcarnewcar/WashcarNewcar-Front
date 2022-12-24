@@ -11,6 +11,7 @@ export default function AuthHeader() {
         height={54}
         width={200}
         className={styles.img_logo}
+        priority
       />
     </Link>
   );
