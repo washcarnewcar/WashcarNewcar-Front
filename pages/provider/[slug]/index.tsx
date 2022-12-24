@@ -162,21 +162,33 @@ export default function ProviderDashboard() {
         <div className={styles.menus_container}>
           <div className={styles.title}>매장 관리</div>
           <div className={styles.buttongroup}>
-            <Link href={`/provider/${slug}/store`}>
-              <Button className={styles.button} variant="outline-primary">
-                매장 정보 설정
-              </Button>
-            </Link>
-            <Link href={`/provider/${slug}/menu`}>
-              <Button className={styles.button} variant="outline-primary">
-                메뉴 관리
-              </Button>
-            </Link>
-            <Link href={`/provider/${slug}/time`}>
-              <Button className={styles.button} variant="outline-primary">
-                매장 운영 시간 설정
-              </Button>
-            </Link>
+            <Button
+              className={styles.button}
+              variant="outline-primary"
+              onClick={() => {
+                router.push(`/provider/${slug}/store`);
+              }}
+            >
+              매장 정보 설정
+            </Button>
+            <Button
+              className={styles.button}
+              variant="outline-primary"
+              onClick={() => {
+                router.push(`/provider/${slug}/menu`);
+              }}
+            >
+              메뉴 관리
+            </Button>
+            <Button
+              className={styles.button}
+              variant="outline-primary"
+              onClick={() => {
+                router.push(`/provider/${slug}/time`);
+              }}
+            >
+              매장 운영 시간 설정
+            </Button>
           </div>
         </div>
       </div>

@@ -131,14 +131,23 @@ export default function ProviderReservation() {
         </div>
 
         <div className={styles.button_container}>
-          <Link href={`/provider/${slug}/reservation/${number}/reject`}>
-            <Button variant="danger" className={styles.button}>
-              요청 거부
-            </Button>
-          </Link>
-          <Link href={`/reservation/1`}>
-            <Button className={styles.button}>요청 확인</Button>
-          </Link>
+          <Button
+            variant="danger"
+            className={styles.button}
+            onClick={() => {
+              router.push(`/provider/${slug}/reservation/${number}/reject`);
+            }}
+          >
+            요청 거부
+          </Button>
+          <Button
+            className={styles.button}
+            onClick={() => {
+              router.push(`/reservation/1`);
+            }}
+          >
+            요청 확인
+          </Button>
         </div>
       </div>
     </LoginCheck>

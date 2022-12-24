@@ -36,12 +36,15 @@ export default function MenuList() {
       <div className={styles.container}>
         <div className={styles.title}>메뉴 관리</div>
         <div className={styles.plus_button_wrapper}>
-          <Link href={`/provider/${slug}/menu/new`}>
-            <Button className={styles.plus_button}>
-              <IoAdd size={20} className={styles.plus_icon} />
-              메뉴 추가
-            </Button>
-          </Link>
+          <Button
+            className={styles.plus_button}
+            onClick={() => {
+              router.push(`/provider/${slug}/menu/new`);
+            }}
+          >
+            <IoAdd size={20} className={styles.plus_icon} />
+            메뉴 추가
+          </Button>
         </div>
         <ListGroup>
           {menus.map((menu, index) => (
