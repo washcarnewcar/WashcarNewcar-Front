@@ -1,12 +1,12 @@
-import styles from '../../styles/Search.module.scss';
-import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../src/components/Header';
-import { useCallback, useEffect, useState } from 'react';
-import { BeatLoader } from 'react-spinners';
-import Seperator from '../../src/components/Seperator';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { IoIosArrowForward } from 'react-icons/io';
+import { BeatLoader } from 'react-spinners';
+import Header from '../../src/components/Header';
+import Seperator from '../../src/components/Seperator';
+import styles from '../../styles/Search.module.scss';
 
 export default function Search() {
   const router = useRouter();
@@ -51,7 +51,7 @@ export default function Search() {
   /**
    * geolocation을 사용해 위치를 받아오는데 성공하면 호출되는 함수
    */
-  const positionCallback = useCallback((position: GeolocationPosition) => {
+  const positionCallback = (position: GeolocationPosition) => {
     const longitude = position.coords.longitude;
     const latitude = position.coords.latitude;
     setCoordinate({ longitude: longitude, latitude: latitude });
@@ -59,20 +59,22 @@ export default function Search() {
       const geocoder = new kakao.maps.services.Geocoder();
       displayLocation(geocoder, longitude, latitude);
     });
-  }, []);
+  };
 
   /**
    * geolocation을 사용해 위치를 받아오는데 실패하면 호출되는 함수
    */
   const positionErrorCallback = (error: GeolocationPositionError) => {
     if (error.code === GeolocationPositionError.PERMISSION_DENIED) {
-      console.log('권한 없음');
+      console.debug('권한 없음');
     } else if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
-      console.log('위치를 사용할 수 없음');
+      console.debug('위치를 사용할 수 없음');
     }
   };
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     /**
      * url에 longitude와 latitude가 없을 시 gps를 통해 위치를 가져온다.
      */
@@ -82,7 +84,7 @@ export default function Search() {
         positionErrorCallback
       );
     } else {
-      console.log('found location!');
+      console.debug('위치 찾음');
 
       const parsedLongitude = parseFloat(longitude as string);
       const parsedLatitude = parseFloat(latitude as string);
@@ -93,7 +95,7 @@ export default function Search() {
         displayLocation(geocoder, parsedLongitude, parsedLatitude);
       });
     }
-  }, [longitude, latitude, positionCallback]);
+  }, [router.isReady]);
 
   return (
     <>
@@ -108,20 +110,19 @@ export default function Search() {
               foundLocation: foundLocation,
             },
           }}
+          className={styles.search_location}
         >
-          <a className={styles.search_location}>
-            <div className={styles.title}>검색 위치</div>
-            <div className={styles.right}>
-              <div className={styles.current_location}>
-                {foundLocation ? textLocation : <BeatLoader size={10} />}
-              </div>
-              <IoIosArrowForward size={20} />
+          <div className={styles.title}>검색 위치</div>
+          <div className={styles.right}>
+            <div className={styles.current_location}>
+              {foundLocation ? textLocation : <BeatLoader size={10} />}
             </div>
-          </a>
+            <IoIosArrowForward size={20} />
+          </div>
         </Link>
         <div className={styles.blank}></div>
 
-        <Item slug="test" />
+        <Item slug="stylecarcare" />
         <Seperator />
         <Item slug="test" />
         <Seperator />
@@ -141,43 +142,41 @@ interface ItemProps {
 
 function Item({ slug }: ItemProps) {
   return (
-    <Link href={`/store/${slug}`}>
-      <a className={styles.link}>
-        <div className={styles.container}>
-          <div className={styles.title}>
-            <Image
-              src="/style_carcare.jpg"
-              alt="스타일카케어"
-              width={60}
-              height={60}
-              className={styles.image}
-            />
-            <div className={styles.text}>
-              <div className={styles.name}>스타일카케어</div>
-              <div className={styles.subtext}>
-                <div className={styles.distance}>0.3km</div>
-                <div className={styles.ratings}>
-                  ⭐️<span className={styles.number}>4.7</span>(200+)
-                </div>
+    <Link href={`/store/${slug}`} className={styles.link}>
+      <div className={styles.container}>
+        <div className={styles.item_info}>
+          <Image
+            src="/style_carcare.jpg"
+            alt="스타일카케어"
+            width={60}
+            height={60}
+            className={styles.image}
+          />
+          <div className={styles.text}>
+            <div className={styles.name}>스타일카케어</div>
+            <div className={styles.subtext}>
+              <div className={styles.distance}>0.3km</div>
+              <div className={styles.ratings}>
+                ⭐️<span className={styles.number}>4.7</span>(200+)
               </div>
             </div>
           </div>
-          <div className={styles.content}>
-            <div className={styles.inner1}>
-              <Tag text="기본세차 38,500원" />
-              <Tag text="스페셜세차 66,000원" />
-              <Tag text="프리미엄세차 126,000원" />
-            </div>
-            {/* <div className={styles.inner2}>
+        </div>
+        <div className={styles.content}>
+          <div className={styles.inner1}>
+            <Tag text="기본세차 38,500원" />
+            <Tag text="스페셜세차 66,000원" />
+            <Tag text="프리미엄세차 126,000원" />
+          </div>
+          {/* <div className={styles.inner2}>
             <Tag text="10:00" />
             <Tag text="10:30" />
             <Tag text="11:00" />
             <Tag text="12:00" />
             <Tag text="12:30" />
           </div> */}
-          </div>
         </div>
-      </a>
+      </div>
     </Link>
   );
 }

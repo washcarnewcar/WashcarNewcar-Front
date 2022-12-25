@@ -1,80 +1,79 @@
-.container {
+.container {}
 
-  .info_container {
-    padding: 20px;
+.info_container {
+  padding: 20px;
+}
 
-    .title {
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 15px 15px 0px 0px;
-    }
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 15px 15px 0px 0px;
+}
 
-    .detail {
-      border-radius: 0px 0px 15px 15px;
-    }
+.detail {
+  border-radius: 0px 0px 15px 15px;
+}
 
-    .list {
-      border-color: lightgray;
+.list {
+  border-color: lightgray;
+}
 
-      .head {
-        font-size: 14px;
-        width: 75px;
-      }
+.head {
+  font-size: 14px;
+  width: 75px;
+}
 
-      .content {
-        font-size: 14px;
-        font-weight: bold;
-        padding: 5px 0px;
-        word-break: keep-all;
-      }
-    }
-  }
+.content {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px 0px;
+  word-break: keep-all;
+}
 
-  .predict_container {
-    .predict_title {
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-size: 18px;
-      font-weight: bold;
-    }
+.predict_container {}
 
-    .predict {
-      background-color: white;
-      display: flex;
-      justify-content: space-around;
-      border-color: lightgray;
-      border-radius: 10px;
-      border-style: solid;
-      border-width: 1px;
-      padding: 10px;
+.predict_title {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
 
-      .hour {
-        display: flex;
-        align-items: center;
-      }
+.predict {
+  background-color: white;
+  display: flex;
+  justify-content: space-around;
+  border-color: lightgray;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  padding: 10px;
+}
 
-      .minute {
-        display: flex;
-        align-items: center;
-      }
+.hour {
+  display: flex;
+  align-items: center;
+}
 
-      .select {
-        width: 100px;
-      }
+.minute {
+  display: flex;
+  align-items: center;
+}
 
-      .text {
-        margin-left: 10px;
-      }
-    }
-  }
+.select {
+  width: 100px;
+}
 
-  .button_container {
-    margin-top: 20px;
-    text-align: center;
+.text {
+  margin-left: 10px;
+}
 
-    .button {
-      padding: 8px 30px;
-      margin: 0px 5px;
-    }
-  }
+.button_container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.button {
+  padding: 8px 30px;
+  margin: 0px 5px;
 }

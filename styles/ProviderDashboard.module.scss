@@ -1,0 +1,58 @@
+.container {
+  padding: 20px;
+}
+
+.status_container {
+  display: flex;
+  justify-content: center;
+}
+
+.status {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 0px;
+}
+
+.menus_container {}
+
+.title {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.buttongroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.button {
+  height: 60px
+}
+
+.link {
+  text-decoration: none;
+  color: black;
+}
+
+.content_container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.menu {
+  font-size: 16px;
+}
+
+.car {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.arrow {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

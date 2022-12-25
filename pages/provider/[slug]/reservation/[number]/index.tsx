@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Form, ListGroup } from 'react-bootstrap';
-import Header from '../../../../../src/components/Header';
+import LoginCheck from '../../../../../src/components/LoginCheck';
 import styles from '../../../../../styles/ProviderReservation.module.scss';
 
 export default function ProviderReservation() {
@@ -46,8 +46,7 @@ export default function ProviderReservation() {
   }
 
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <div className={styles.container}>
         <div className={styles.info_container}>
           <ListGroup>
@@ -132,16 +131,25 @@ export default function ProviderReservation() {
         </div>
 
         <div className={styles.button_container}>
-          <Link href={`/provider/${slug}/reservation/${number}/reject`}>
-            <Button variant="danger" className={styles.button}>
-              요청 거부
-            </Button>
-          </Link>
-          <Link href={`/reservation/1`}>
-            <Button className={styles.button}>요청 확인</Button>
-          </Link>
+          <Button
+            variant="danger"
+            className={styles.button}
+            onClick={() => {
+              router.push(`/provider/${slug}/reservation/${number}/reject`);
+            }}
+          >
+            요청 거부
+          </Button>
+          <Button
+            className={styles.button}
+            onClick={() => {
+              router.push(`/reservation/1`);
+            }}
+          >
+            요청 확인
+          </Button>
         </div>
       </div>
-    </>
+    </LoginCheck>
   );
 }

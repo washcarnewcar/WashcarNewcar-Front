@@ -3,24 +3,29 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+}
 
-  .form {
-    width: 300px;
+.form {
+  width: 300px;
+}
 
-    .title {
-      font-size: x-large;
-      font-weight: bolder;
-      margin-bottom: 10px;
-      word-break: keep-all;
-    }
+.title {
+  font-size: x-large;
+  font-weight: bolder;
+  margin-bottom: 10px;
+  word-break: keep-all;
+}
 
-    .phone {
-      margin-bottom: 10px;
-    }
+.form_group {
+  margin: 20px 0px;
+}
 
-    .submit {
-      width: 100%;
-    }
-  }
+.tel_wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 
+.submit {
+  width: 100%;
 }

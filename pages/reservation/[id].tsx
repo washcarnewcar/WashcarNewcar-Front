@@ -114,9 +114,14 @@ export default function Reservation() {
           <Button variant="outline-danger" className={styles.button}>
             예약취소
           </Button>
-          <Link href={`/`}>
-            <Button className={styles.button}>홈으로 돌아가기</Button>
-          </Link>
+          <Button
+            className={styles.button}
+            onClick={() => {
+              router.push(`/`);
+            }}
+          >
+            홈으로 돌아가기
+          </Button>
         </div>
       </div>
     </>

@@ -1,12 +1,14 @@
+import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../src/components/Header';
 import Seperator from '../../src/components/Seperator';
 import styles from '../../styles/FindList.module.scss';
 
-const tempData = [
+const mockData = [
   {
     status: 'request', // 예약 요청 대기중인 상태
     reservation_number: 1, // 예약 번호
@@ -68,7 +70,11 @@ const tempData = [
 
 export default function FindList() {
   const router = useRouter();
-  const { phone } = router.query;
+  const { tel } = router.query;
+
+  useEffect(() => {
+    axios.get('/find', { params: { tel: tel } });
+  }, []);
 
   return (
     <>
@@ -77,11 +83,11 @@ export default function FindList() {
         <div className={styles.title}>예약한 세차</div>
         <div className={styles.blank} />
 
-        <FindListItem data={tempData} />
+        <FindListItem data={mockData} />
         <Seperator />
-        <FindListItem data={tempData} />
+        <FindListItem data={mockData} />
         <Seperator />
-        <FindListItem data={tempData} />
+        <FindListItem data={mockData} />
         <Seperator />
       </div>
     </>
@@ -94,30 +100,28 @@ interface FindListItemProps {
 
 function FindListItem({ data }: FindListItemProps) {
   return (
-    <Link href={`/reservation/1`}>
-      <a className={styles.item_container}>
-        <div className={styles.left}>
-          <div className={styles.date}>2022.9.6(화) 16:00</div>
-          <div className={styles.info}>
-            <Image
-              src="/style_carcare.jpg"
-              alt="스타일 카케어"
-              width={65}
-              height={65}
-              className={styles.image}
-            />
-            <div className={styles.info_text}>
-              <div className={styles.menu}>외부세차</div>
-              <div className={styles.store}>스타일 카케어</div>
-              <div className={styles.car}>기아 EV6 / 31하 1450</div>
-            </div>
+    <Link href={`/reservation/1`} className={styles.item_container}>
+      <div className={styles.item_left}>
+        <div className={styles.item_date}>2022.9.6(화) 16:00</div>
+        <div className={styles.item_info}>
+          <Image
+            src="/style_carcare.jpg"
+            alt="스타일 카케어"
+            width={65}
+            height={65}
+            className={styles.item_image}
+          />
+          <div className={styles.item_info_text}>
+            <div className={styles.item_menu}>외부세차</div>
+            <div className={styles.item_store}>스타일 카케어</div>
+            <div className={styles.item_car}>기아 EV6 / 31하 1450</div>
           </div>
         </div>
-        <div className={styles.right}>
-          <div className={styles.state}>확인중</div>
-          <IoIosArrowForward size={30} />
-        </div>
-      </a>
+      </div>
+      <div className={styles.item_right}>
+        <div className={styles.item_state}>확인중</div>
+        <IoIosArrowForward size={30} />
+      </div>
     </Link>
   );
 }

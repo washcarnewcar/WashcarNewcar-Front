@@ -1,41 +1,35 @@
-import axios from 'axios';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
-import Header from '../../../../src/components/Header';
+import { useEffect, useState } from 'react';
+import LoginCheck from '../../../../src/components/LoginCheck';
 import MenuForm from '../../../../src/components/MenuForm';
-import styles from '../../../../styles/MenuEdit.module.scss';
-
-interface Data {
-  image: string;
-  name: string;
-  detail: string;
-  price: number;
-}
+import { MenuDto } from '../../../../src/dto';
+import { authClient } from '../../../../src/function/request';
 
 export default function MenuEdit() {
   const router = useRouter();
   const { slug, number } = router.query;
-  const [data, setData] = useState<Data | undefined>();
-
-  const getData = useCallback(async () => {
-    if (slug && number) {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/store/${slug}/menu/${number}`
-      );
-      const responseData: Data = response.data;
-      console.log(response.data);
-      setData(responseData);
-    }
-  }, [number, slug]);
+  const [menu, setMenu] = useState<MenuDto | undefined>();
 
   useEffect(() => {
-    getData();
-  }, [getData]);
+    if (!router.isReady) return;
+
+    const getData = async () => {
+      const response = await authClient.get(`/provider/menu/${number}`);
+      console.debug(`GET /provider/menu/${number}`, response?.data);
+      const menu: MenuDto | undefined = response?.data;
+      if (menu) {
+        setMenu(menu);
+      }
+    };
+
+    if (slug && number) {
+      getData();
+    }
+  }, [router.isReady]);
 
   return (
-    <>
-      <Header type={1} />
-      <MenuForm slug={slug as string} data={data} />
-    </>
+    <LoginCheck>
+      <MenuForm data={menu} />
+    </LoginCheck>
   );
 }

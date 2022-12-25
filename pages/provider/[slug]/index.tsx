@@ -1,66 +1,139 @@
 import classNames from 'classnames';
 import moment from 'moment';
-import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { Alert, Button, ButtonGroup, ListGroup } from 'react-bootstrap';
+import { useContext, useEffect, useState } from 'react';
+import { Alert, Button, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
-import Header from '../../../src/components/Header';
 import Loading from '../../../src/components/Loading';
-import UserContext from '../../../src/contexts/UserProvider';
-import { requestWithToken } from '../../../src/functions/request';
-import styles from '../../../styles/Provider.module.scss';
+import LoginCheck from '../../../src/components/LoginCheck';
+import UserContext from '../../../src/context/UserProvider';
+import { RequestDto, ScheduleDto } from '../../../src/dto';
+import { authClient } from '../../../src/function/request';
+import styles from '../../../styles/ProviderDashboard.module.scss';
 
-interface ResponseJson {
-  first: boolean;
-  menus: Array<Menu>;
+interface Ready {
+  status: boolean;
+  request: boolean;
+  schedule: boolean;
 }
 
-interface Menu {
-  name: string;
-  code: string;
+enum Status {
+  Loading,
+  Operation,
+  Waiting,
+  Abort,
 }
 
-export default function Provider() {
-  // 임시로 true
+export default function ProviderDashboard() {
   const router = useRouter();
-  const { user, setUser } = useContext(UserContext);
   const { slug } = router.query;
-  const [ready, setReady] = useState(true);
-  const [menuList, setMenuList] = useState(new Array<Menu>());
-
-  const getCalendarList = useCallback(async () => {
-    if (router && slug) {
-      const response = await requestWithToken(
-        router,
-        setUser,
-        `/provider/${slug}/schedule`,
-        { method: 'GET' }
-      );
-      console.log(response);
-    }
-  }, [router, slug, setUser]);
+  const { user, setUser } = useContext(UserContext);
+  // 임시로 true
+  const [storeStatus, setStoreStatus] = useState<Status>(Status.Loading);
+  const [storeRequests, setStoreRequests] = useState<RequestDto[]>([]);
+  const [ready, setReady] = useState<Ready>({
+    status: false,
+    request: false,
+    schedule: false,
+  });
 
   useEffect(() => {
-    getCalendarList();
-  }, [getCalendarList]);
+    if (!router.isReady) return;
 
-  if (!ready) {
-    return (
-      <div style={{ width: '100%', height: '100vh' }}>
-        <Loading />
-      </div>
-    );
-  }
+    const getStoreState = async () => {
+      const response = await authClient.get(`/provider/${slug}/approve`);
+      const data = response?.data;
+      console.debug(`GET /provider/${slug}/approve`, data);
+      switch (data.status) {
+        // 세차장 승인, 페이지 운영중
+        case 1500:
+          setStoreStatus(Status.Operation);
+          setReady((ready) => ({
+            ...ready,
+            status: true,
+          }));
+          return;
+        // 세차장 승인 대기중
+        case 1501:
+          setStoreStatus(Status.Waiting);
+          setReady((ready) => ({
+            ...ready,
+            status: true,
+          }));
+          return;
+        // 세차장 승인 거부
+        case 1502:
+          setStoreStatus(Status.Abort);
+          setReady((ready) => ({
+            ...ready,
+            status: true,
+          }));
+          return;
+        // 정상적인 접근 아님
+        default:
+          throw Error('잘못된 응답');
+      }
+    };
+
+    const getRequestList = async () => {
+      const response = await authClient.get(`/provider/${slug}/request`);
+      const list: RequestDto[] = response.data.list;
+      console.debug(`GET /provider/${slug}/request`, list);
+    };
+
+    const getScheduleList = async () => {
+      const response = await authClient.get(`/provider/${slug}/schedule`);
+      const list: ScheduleDto[] = response.data.list;
+      console.debug(`GET /provider/${slug}/schedule`, list);
+    };
+
+    if (slug) {
+      getStoreState();
+      getRequestList();
+      getScheduleList();
+    } else {
+      router.replace('/');
+    }
+  }, [router.isReady]);
+
+  const renderStatus = () => {
+    if (!ready.status) {
+      return (
+        <Alert className={styles.status}>
+          <Loading />
+        </Alert>
+      );
+    }
+
+    switch (storeStatus) {
+      case Status.Loading:
+        return null;
+      case Status.Operation:
+        return (
+          <Alert variant="success" className={styles.status}>
+            세차장이 승인되었으며, 운영중입니다.
+          </Alert>
+        );
+      case Status.Waiting:
+        return (
+          <Alert variant="primary" className={styles.status}>
+            세차장 승인 대기중입니다.
+          </Alert>
+        );
+      case Status.Abort:
+        return (
+          <Alert variant="danger" className={styles.status}>
+            세차장 승인 대기중입니다.
+          </Alert>
+        );
+    }
+  };
 
   return (
-    <>
-      <Header type={1} />
+    <LoginCheck>
       <div className={styles.container}>
-        <div className={styles.status_container}>
-          <Alert className={styles.status}>매장 승인 대기중입니다.</Alert>
-        </div>
+        <div className={styles.status_container}>{renderStatus()}</div>
 
         <div className={styles.menus_container}>
           <div className={styles.title}>세차 예약 요청</div>
@@ -75,25 +148,37 @@ export default function Provider() {
         <div className={styles.menus_container}>
           <div className={styles.title}>매장 관리</div>
           <div className={styles.buttongroup}>
-            <Link href={`/provider/${slug}/store`}>
-              <Button className={styles.button} variant="outline-primary">
-                매장 정보 설정
-              </Button>
-            </Link>
-            <Link href={`/provider/${slug}/menu`}>
-              <Button className={styles.button} variant="outline-primary">
-                메뉴 관리
-              </Button>
-            </Link>
-            <Link href={`/provider/${slug}/time`}>
-              <Button className={styles.button} variant="outline-primary">
-                매장 운영 시간 설정
-              </Button>
-            </Link>
+            <Button
+              className={styles.button}
+              variant="outline-primary"
+              onClick={() => {
+                router.push(`/provider/${slug}/store`);
+              }}
+            >
+              매장 정보 설정
+            </Button>
+            <Button
+              className={styles.button}
+              variant="outline-primary"
+              onClick={() => {
+                router.push(`/provider/${slug}/menu`);
+              }}
+            >
+              메뉴 관리
+            </Button>
+            <Button
+              className={styles.button}
+              variant="outline-primary"
+              onClick={() => {
+                router.push(`/provider/${slug}/time`);
+              }}
+            >
+              매장 운영 시간 설정
+            </Button>
           </div>
         </div>
       </div>
-    </>
+    </LoginCheck>
   );
 }
 
@@ -101,77 +186,53 @@ function List() {
   return (
     <ListGroup className={classNames(styles.list, styles.reqest)}>
       <ListGroup.Item>
-        <Link href="/provider/hello/reservation/1">
-          <a className={styles.link}>
-            <div className={styles.content_container}>
-              <div>
-                <div className={styles.menu}>외부 세차</div>
-                <div className={styles.car}>기아 EV6 / 31하 1450</div>
-                <div className={styles.date}>
-                  {moment().format('YYYY.MM.DD(dd) HH:mm')}
-                </div>
-              </div>
-              <div className={styles.arrow}>
-                <IoIosArrowForward size={25} />
+        <Link href="/provider/hello/reservation/1" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
               </div>
             </div>
-          </a>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
         </Link>
       </ListGroup.Item>
       <ListGroup.Item>
-        <Link href="/">
-          <a className={styles.link}>
-            <div className={styles.content_container}>
-              <div>
-                <div className={styles.menu}>외부 세차</div>
-                <div className={styles.car}>기아 EV6 / 31하 1450</div>
-                <div className={styles.date}>
-                  {moment().format('YYYY.MM.DD(dd) HH:mm')}
-                </div>
-              </div>
-              <div className={styles.arrow}>
-                <IoIosArrowForward size={25} />
+        <Link href="/" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
               </div>
             </div>
-          </a>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
         </Link>
       </ListGroup.Item>
       <ListGroup.Item>
-        <Link href="/">
-          <a className={styles.link}>
-            <div className={styles.content_container}>
-              <div>
-                <div className={styles.menu}>외부 세차</div>
-                <div className={styles.car}>기아 EV6 / 31하 1450</div>
-                <div className={styles.date}>
-                  {moment().format('YYYY.MM.DD(dd) HH:mm')}
-                </div>
-              </div>
-              <div className={styles.arrow}>
-                <IoIosArrowForward size={25} />
+        <Link href="/" className={styles.link}>
+          <div className={styles.content_container}>
+            <div>
+              <div className={styles.menu}>외부 세차</div>
+              <div className={styles.car}>기아 EV6 / 31하 1450</div>
+              <div className={styles.date}>
+                {moment().format('YYYY.MM.DD(dd) HH:mm')}
               </div>
             </div>
-          </a>
+            <div className={styles.arrow}>
+              <IoIosArrowForward size={25} />
+            </div>
+          </div>
         </Link>
       </ListGroup.Item>
     </ListGroup>
   );
 }
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  console.log('hello');
-
-  return {
-    paths: [{ params: { slug: 'hello' } }],
-    fallback: false,
-  };
-};
-
-export const getStaticProps: GetStaticProps = async () => {
-  console.log('hello');
-  return {
-    props: {
-      posts: 'hello',
-    },
-  };
-};

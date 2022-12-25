@@ -1,128 +1,194 @@
-import Compressor from 'compressorjs';
+import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { IoClose, IoImage } from 'react-icons/io5';
 import styles from '../../styles/MenuForm.module.scss';
+import { MenuDto } from '../dto';
+import { compressImage } from '../function/processingImage';
+import { authClient } from '../function/request';
+import { uploadImage } from '../function/S3Utils';
 import Loading from './Loading';
 
-interface Data {
-  image: string;
-  name: string;
-  detail: string;
-  price: number;
-}
-
 interface MenuFormProps {
-  slug: string;
-  data?: Data | null;
+  data: MenuDto | null | undefined;
 }
 
-interface Inputs {
-  image: File | null;
-  imageUrl: string;
+interface Values {
   name: string;
-  detail: string;
+  description: string;
   price: number;
+  hour: number;
+  minute: number;
 }
 
 interface Errors {
-  image: string;
-  name: string;
-  detail: string;
-  price: string;
+  name?: string;
+  description?: string;
+  price?: string;
+  hour?: string;
+  minute?: string;
 }
 
-export default function MenuForm({ slug, data }: MenuFormProps) {
+interface Images {
+  file: File | null;
+  uploaded: boolean;
+  previewUrl: string;
+}
+
+const initialValues: Values = {
+  name: '',
+  description: '',
+  price: 0,
+  hour: 0,
+  minute: 0,
+};
+
+export default function MenuForm({ data }: MenuFormProps) {
   const router = useRouter();
+  const { slug, number } = router.query;
   const inputFile = useRef<HTMLInputElement>(null);
-
-  const [inputs, setInputs] = useState<Inputs>({
-    image: null,
-    imageUrl: '',
-    name: '',
-    detail: '',
-    price: 0,
+  const [image, setImage] = useState<Images>({
+    file: null,
+    uploaded: false,
+    previewUrl: '',
   });
-
-  const [error, setError] = useState<Errors>({
-    image: '',
-    name: '',
-    detail: '',
-    price: '',
-  });
-
   const [ready, setReady] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newInputs = {
-      ...inputs,
-      [e.target.name]: e.target.value,
+  const handleSubmit = async (
+    values: Values,
+    { setErrors, setSubmitting }: FormikHelpers<Values>
+  ) => {
+    setSubmitting(true);
+
+    // aws 이미지 업로드
+    let imageUrl;
+    try {
+      imageUrl = await uploadImage(image, 'menuImages');
+    } catch (error) {
+      alert('이미지 업로드에 오류가 발생했습니다.\n다시 시도해주세요.');
+      setSubmitting(false);
+      return;
+    }
+
+    const menuDto: MenuDto = {
+      image: imageUrl,
+      name: values.name,
+      description: values.description,
+      price: values.price,
+      expected_hour: values.hour,
+      expected_minute: values.minute,
     };
-    setInputs(newInputs);
+
+    try {
+      // 수정 요청일 때
+      if (data) {
+        const response = await authClient.put(
+          `/provider/menu/${number}`,
+          menuDto
+        );
+        console.debug(`PUT /provider/menu/${number}`, menuDto);
+        const data = response?.data;
+        console.debug(data);
+        switch (data?.status) {
+          case 2400:
+            alert('수정되었습니다.');
+            router.push(`/provider/${slug}/menu`);
+            return;
+          case 2401:
+            alert('필수 정보가 입력되지 않았습니다.');
+            return;
+          default:
+            alert('오류가 발생했습니다. 다시 시도해주세요.');
+            return;
+        }
+      }
+
+      // 생성 요청일 때
+      else if (data === null) {
+        const response = await authClient.post(
+          `provider/${slug}/menu`,
+          menuDto
+        );
+        console.debug(`POST provider/${slug}/menu`, menuDto);
+        const data = response?.data;
+        console.debug(data);
+        switch (data?.status) {
+          case 2200:
+            alert('추가되었습니다.');
+            router.push(`/provider/${slug}/menu`);
+            return;
+          case 2201:
+            alert('필수 정보가 입력되지 않았습니다.');
+            return;
+          default:
+            alert('오류가 발생했습니다. 다시 시도해주세요.');
+            return;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    setSubmitting(false);
   };
 
-  /**
-   * 이미지를 5MB 이하의 크기로 압축하는 함수
-   */
-  const compressImage = (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      if (!file) reject('파일이 없음');
+  const validate = (values: Values) => {
+    const newErrors: Errors = {};
 
-      new Compressor(file, {
-        convertSize: 5000000,
-        success(file: File) {
-          resolve(file);
-        },
-        error(error) {
-          reject('압축 도중 오류 발생');
-        },
-      });
-    });
+    if (!values.name) {
+      newErrors.name = '메뉴 이름을 입력해주세요';
+    }
+
+    if (!values.description) {
+      newErrors.description = '메뉴 설명을 입력해주세요';
+    }
+
+    if (values.price === 0 || !values.price) {
+      newErrors.price = '메뉴 가격을 입력해주세요';
+    }
+
+    if (values.hour === 0 && values.minute === 0) {
+      newErrors.hour = ' ';
+      newErrors.minute = ' ';
+    }
+
+    return newErrors;
   };
 
-  const validateForm = () => {
-    let pass = true;
-    const newError = { ...error };
+  const formik = useFormik({
+    initialValues: initialValues,
+    onSubmit: handleSubmit,
+    validate: validate,
+  });
 
-    if (!inputs.name) {
-      newError.name = '메뉴 이름을 입력해주세요';
-      pass = false;
-    } else {
-      newError.name = '';
+  const handleDeleteClick = async () => {
+    try {
+      const response = await authClient.delete(`/provider/menu/${number}`);
+      const data = response?.data;
+      switch (data?.status) {
+        case 2300:
+          alert('삭제되었습니다.');
+          router.replace(`/provider/${slug}/menu`);
+          return;
+        default:
+          alert('오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error(error);
     }
-
-    if (!inputs.detail) {
-      newError.detail = '메뉴 설명을 입력해주세요';
-      pass = false;
-    } else {
-      newError.detail = '';
-    }
-
-    if (!inputs.price) {
-      newError.price = '메뉴 가격을 입력해주세요';
-      pass = false;
-    } else {
-      newError.price = '';
-    }
-    setError(newError);
   };
 
   /**
    * 이미지를 선택했을 때
    */
-  const handleImageInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let file = e.target.files ? e.target.files[0] : null;
 
     // 파일을 넣지 않은 경우
     if (!file) {
-      const newInputs = {
-        ...inputs,
-        image: null,
-        imageUrl: '',
-      };
-      setInputs(newInputs);
+      setImage({ file: null, uploaded: false, previewUrl: '' });
       return;
     }
 
@@ -142,51 +208,57 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
       }
     }
 
-    const newInputs = {
-      ...inputs,
-      image: file,
-      imageUrl: URL.createObjectURL(file),
-    };
-    setInputs(newInputs);
-  };
-
-  /**
-   * 등록하기를 눌렀을 때
-   */
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    validateForm();
-    console.log(inputs);
-  };
-
-  /**
-   * 취소 버튼 눌렀을 때
-   */
-  const handleCancelClick = () => {
-    router.back();
+    setImage({
+      file: file,
+      uploaded: false,
+      previewUrl: URL.createObjectURL(file),
+    });
   };
 
   /**
    * 사진 삭제 버튼을 눌렀을 때
    */
-  const handleDeleteClick = () => {
-    const newInputs = {
-      ...inputs,
-      image: null,
-      imageUrl: '',
-    };
-    setInputs(newInputs);
-    inputFile.current ? (inputFile.current.value = '') : null;
+  const handleImageDeleteClick = () => {
+    setImage({
+      file: null,
+      uploaded: false,
+      previewUrl: '',
+    });
   };
 
-  const setData = (data: Data) => {
-    setInputs({
-      image: null,
-      imageUrl: data.image ? data.image : '',
-      name: data.name ? data.name : '',
-      detail: data.detail ? data.detail : '',
+  const generateHour = () => {
+    const arr = [];
+    for (let i = 0; i <= 24; i++) {
+      arr.push(
+        <option key={i} value={i}>
+          {i}
+        </option>
+      );
+    }
+    return arr;
+  };
+
+  const generateMinute = () => {
+    const arr = [];
+    for (let i = 0; i <= 59; i += 5) {
+      arr.push(
+        <option key={i} value={i}>
+          {i}
+        </option>
+      );
+    }
+    return arr;
+  };
+
+  const setData = (data: MenuDto) => {
+    formik.setValues({
+      name: data.name,
+      description: data.description,
       price: data.price,
+      hour: data.expected_hour,
+      minute: data.expected_minute,
     });
+    setImage({ file: null, uploaded: true, previewUrl: data.image });
   };
 
   /**
@@ -205,30 +277,32 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
   }, [data]);
 
   if (!ready) {
-    <div style={{ width: '100%', height: '100vh' }}>
-      <Loading />
-    </div>;
+    <Loading fullscreen />;
   }
 
   return (
     <div className={styles.container}>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={formik.handleSubmit}>
         <div className={styles.image_container}>
           <div className={styles.image_wrapper}>
-            {inputs.imageUrl ? (
+            {image.previewUrl ? (
               <>
                 <label htmlFor="file" className={styles.change_wrapper}>
                   <IoImage size="100%" />
                 </label>
                 <button
                   className={styles.delete_button}
-                  onClick={handleDeleteClick}
+                  onClick={handleImageDeleteClick}
                 >
                   <IoClose />
                 </button>
                 <Image
-                  src={inputs.imageUrl}
-                  alt="menu_image"
+                  src={
+                    image.uploaded
+                      ? process.env.NEXT_PUBLIC_S3_URL + image.previewUrl
+                      : image.previewUrl
+                  }
+                  alt=""
                   width={200}
                   height={200}
                   className={styles.image}
@@ -245,7 +319,8 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
               type="file"
               id="file"
               style={{ display: 'none' }}
-              onChange={handleImageInput}
+              accept="image/png, image/jpeg"
+              onChange={handleImageChange}
               ref={inputFile}
             />
           </div>
@@ -258,12 +333,12 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
             type="text"
             placeholder="메뉴 이름을 입력해주세요"
             name="name"
-            value={inputs.name}
-            onChange={handleChange}
-            isInvalid={!!error.name}
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            isInvalid={!!formik.errors.name && formik.touched.name}
           />
           <Form.Control.Feedback type="invalid">
-            {error.name}
+            {formik.errors.name}
           </Form.Control.Feedback>
         </Form.Group>
 
@@ -274,13 +349,15 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
             as="textarea"
             rows={5}
             placeholder="메뉴의 설명을 입력해주세요"
-            name="detail"
-            value={inputs.detail}
-            onChange={handleChange}
-            isInvalid={!!error.detail}
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            isInvalid={
+              !!formik.errors.description && formik.touched.description
+            }
           />
           <Form.Control.Feedback type="invalid">
-            {error.name}
+            {formik.errors.name}
           </Form.Control.Feedback>
         </Form.Group>
 
@@ -291,30 +368,69 @@ export default function MenuForm({ slug, data }: MenuFormProps) {
             <Form.Control
               type="number"
               inputMode="numeric"
-              placeholder="메뉴 가격을 입력해주세요"
               name="price"
-              value={inputs.price}
-              onChange={handleChange}
-              isInvalid={!!error.price}
+              value={formik.values.price}
+              onChange={formik.handleChange}
+              isInvalid={!!formik.errors.price && formik.touched.price}
             />
             <InputGroup.Text>원</InputGroup.Text>
             <Form.Control.Feedback type="invalid">
-              {error.price}
+              {formik.errors.price}
             </Form.Control.Feedback>
           </InputGroup>
         </Form.Group>
 
-        <div className={styles.button_wrapper}>
-          <Button
-            className={styles.submit_button}
-            variant="outline-danger"
-            onClick={handleCancelClick}
-          >
-            취소
-          </Button>
-          <Button type="submit" className={styles.submit_button}>
-            등록하기
-          </Button>
+        {/* 예상 시간 */}
+        <Form.Group className={styles.form_group}>
+          <Form.Label>예상 시간</Form.Label>
+          <div className={styles.time}>
+            <InputGroup>
+              <Form.Select
+                name="hour"
+                value={formik.values.hour}
+                onChange={formik.handleChange}
+                isInvalid={!!formik.errors.hour && formik.touched.hour}
+              >
+                {generateHour()}
+              </Form.Select>
+              <InputGroup.Text>시간</InputGroup.Text>
+            </InputGroup>
+            <InputGroup>
+              <Form.Select
+                name="minute"
+                value={formik.values.minute}
+                onChange={formik.handleChange}
+                isInvalid={!!formik.errors.minute && formik.touched.minute}
+              >
+                {generateMinute()}
+              </Form.Select>
+              <InputGroup.Text>분</InputGroup.Text>
+            </InputGroup>
+          </div>
+        </Form.Group>
+
+        <div className={styles.button_group}>
+          {ready ? (
+            data ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline-danger"
+                  className={styles.button}
+                  onClick={handleDeleteClick}
+                >
+                  삭제
+                </Button>
+                <Button type="submit" className={styles.button}>
+                  수정
+                </Button>
+              </>
+            ) : (
+              <Button type="submit" className={styles.button}>
+                등록
+              </Button>
+            )
+          ) : null}
         </div>
       </Form>
     </div>

@@ -2,7 +2,6 @@ import axios, { AxiosError } from 'axios';
 import React, { createContext, useEffect, useState } from 'react';
 
 export interface User {
-  nickname: string;
   isLogined: boolean;
 }
 
@@ -23,8 +22,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const getUser = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.log('token not exist');
-      setUser({ nickname: '', isLogined: false });
+      console.debug('token not exist');
+      setUser({ isLogined: false });
       return;
     }
 
@@ -35,18 +34,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         },
       });
       if (response.status === 200) {
-        console.log('logined');
-        setUser({ nickname: '', isLogined: true });
+        console.debug('logined');
+        setUser({ isLogined: true });
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          // TODO: 토큰 만료 로직 삽입
-          setUser({ nickname: '', isLogined: false });
-          return;
-        }
+      // 로그인 되지 않거나, 토큰 만료됨
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        console.debug('token expired');
+        setUser({ isLogined: false });
+        return;
+      } else {
+        console.error(error);
       }
-      console.error(error);
     }
   };
 

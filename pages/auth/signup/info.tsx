@@ -1,87 +1,134 @@
-import Image from 'next/image';
+import { FormikHelpers, useFormik } from 'formik';
 import Link from 'next/link';
-import React, { useState } from 'react';
-import { Button, Form, InputGroup } from 'react-bootstrap';
-import styles from '../../../styles/SignUpInfo.module.scss';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { Button, Form } from 'react-bootstrap';
+import { BeatLoader } from 'react-spinners';
+import { object, ref, string } from 'yup';
+import AuthHeader from '../../../src/components/AuthHeader';
+import styles from '../../../styles/Auth.module.scss';
+
+interface Values {
+  email: string;
+  password: string;
+  passwordConfirm: string;
+}
+
+const initialValues: Values = {
+  email: '',
+  password: '',
+  passwordConfirm: '',
+};
+
+const schema = object().shape({
+  email: string()
+    .required('이메일을 입력해주세요')
+    .email('이메일 형식이 아닙니다'),
+  password: string().required('비밀번호를 입력해주세요'),
+  passwordConfirm: string()
+    .required('비밀번호 확인을 입력해주세요')
+    .oneOf([ref('password')], '비밀번호가 다릅니다'),
+});
 
 function SignUpInfo() {
-  const [carrier, setCarrier] = useState('SKT');
-  const [mobile, setMobile] = useState('010');
+  const router = useRouter();
+  const { email } = router.query;
 
-  function onCarrierSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    console.log(e.target.value);
-    setCarrier(e.target.value);
-  }
+  const handleSubmit = async (
+    values: Values,
+    { setSubmitting, setErrors }: FormikHelpers<Values>
+  ) => {
+    setSubmitting(true);
 
-  function onMobileSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    console.log(e.target.value);
-    setMobile(e.target.value);
-  }
+    // logic
+
+    setSubmitting(false);
+  };
+
+  const formik = useFormik({
+    initialValues: initialValues,
+    onSubmit: handleSubmit,
+    validationSchema: schema,
+  });
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (email) {
+      formik.setValues((values) => ({ ...values, email: email as string }));
+    }
+  }, [router.isReady]);
 
   return (
     <>
       <div className={styles.container}>
-        <Link href="/">
-          <a className={styles.logo_container}>
-            <Image
-              src="/row_logo.png"
-              alt="세차새차"
-              height={54}
-              width={200}
-              className={styles.img_logo}
-            />
-          </a>
-        </Link>
+        <AuthHeader />
 
         <div className={styles.form_container}>
           <div className={styles.title}>회원가입</div>
-          <Form className={styles.form}>
-            <Form.Group className={styles.pw_group}>
+
+          <Form className={styles.form} onSubmit={formik.handleSubmit}>
+            <Form.Group>
+              <Form.Control
+                placeholder="이메일"
+                type="email"
+                name="email"
+                className={styles.inputs}
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                isInvalid={!!formik.errors.email && formik.touched.email}
+              />
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.email}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group>
               <Form.Control
                 type="password"
-                className={styles.pw}
+                name="password"
+                className={styles.inputs}
                 placeholder="비밀번호"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                isInvalid={!!formik.errors.password && formik.touched.password}
               />
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.password}
+              </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className={styles.pwcheck_group}>
+            <Form.Group>
               <Form.Control
                 type="password"
-                className={styles.pwcheck}
+                name="passwordConfirm"
+                className={styles.inputs}
                 placeholder="비밀번호 확인"
+                value={formik.values.passwordConfirm}
+                onChange={formik.handleChange}
+                isInvalid={
+                  !!formik.errors.passwordConfirm &&
+                  formik.touched.passwordConfirm
+                }
               />
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.passwordConfirm}
+              </Form.Control.Feedback>
             </Form.Group>
-            <InputGroup className={styles.phone_group}>
-              <Form.Select onChange={onCarrierSelect} className={styles.select}>
-                <option value="SKT">SKT</option>
-                <option value="KT">KT</option>
-                <option value="LGU+">LGU+</option>
-              </Form.Select>
-              <Form.Select onChange={onMobileSelect} className={styles.select}>
-                <option value="010">010</option>
-                <option value="011">011</option>
-                <option value="016">016</option>
-                <option value="017">017</option>
-                <option value="018">018</option>
-                <option value="019">019</option>
-              </Form.Select>
-              <Form.Control
-                type="number"
-                className={styles.phone}
-                placeholder="핸드폰 번호"
-              />
-            </InputGroup>
             <Button
               variant="primary"
               type="submit"
-              className={styles.login_button}
+              className={styles.submit_button}
+              disabled={formik.isSubmitting}
             >
-              회원가입
+              {formik.isSubmitting ? (
+                <BeatLoader color="white" size={10} />
+              ) : (
+                '회원가입'
+              )}
             </Button>
 
-            <div className={styles.signup}>
+            <div className={styles.change}>
               <div>이미 계정이 있으신가요?</div>
-              <Link href="/auth/login">
-                <a className={styles.signup_button}>로그인</a>
+              <Link href="/auth/login" className={styles.change_text}>
+                로그인
               </Link>
             </div>
           </Form>

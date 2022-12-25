@@ -1,0 +1,47 @@
+.container {
+  padding-top: 50px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.form_container {
+  margin-top: 100px;
+  width: 300px;
+
+}
+
+.title {
+  font-size: xx-large;
+  font-weight: bolder;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 12px;
+
+}
+
+.inputs {
+  height: 45px;
+  width: 300px;
+}
+
+.submit_button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 45px;
+}
+
+.change {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.change_text {
+  text-decoration: none;
+}
