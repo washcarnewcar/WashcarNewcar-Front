@@ -131,6 +131,8 @@ function SelectMap() {
   };
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     if (!longitude || !latitude || !foundLocation) {
       router.push('/');
     }
@@ -157,7 +159,7 @@ function SelectMap() {
 
     setScreenSize();
     window.addEventListener('resize', () => setScreenSize());
-  }, [longitude, latitude, foundLocation, router]);
+  }, [router.isReady]);
 
   useEffect(() => {
     kakao.maps.load(() => {

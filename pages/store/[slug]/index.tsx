@@ -27,6 +27,8 @@ export default function Store() {
   ]);
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     const getStoreInfo = async () => {
       try {
         const response = await client.get(`/store/${slug}/info`);
@@ -63,7 +65,7 @@ export default function Store() {
       getStoreInfo();
       getMenuList();
     }
-  }, [slug]);
+  }, [router.isReady]);
 
   return (
     <>

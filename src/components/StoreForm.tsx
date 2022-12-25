@@ -178,7 +178,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   };
 
   /**
-   * 프로필 사진이 삽입되었을 때
+   * 미리보기 사진이 삽입되었을 때
    */
   const handlePreviewImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const inputFile = e.target;
@@ -218,7 +218,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   };
 
   /**
-   * 프로필 사진의 x버튼을 눌렀을 때
+   * 미리보기 사진의 x버튼을 눌렀을 때
    */
   const handlePreviewImageCloseClick = () => {
     setPreviewImage({ file: null, uploaded: false, previewUrl: '' });
@@ -665,7 +665,7 @@ export default function StoreForm({ data }: StoreFormProps) {
 
         {/* 미리보기 사진 */}
         <Form.Group className={styles.form_group}>
-          <Form.Label>프로필 사진</Form.Label>
+          <Form.Label>미리보기 사진</Form.Label>
           <Form.Control
             type="file"
             onChange={handlePreviewImageChange}
@@ -684,7 +684,7 @@ export default function StoreForm({ data }: StoreFormProps) {
                   <IoClose />
                 </button>
                 <Image
-                  alt="미리보기 이미지"
+                  alt=""
                   src={
                     previewImage.uploaded
                       ? `${process.env.NEXT_PUBLIC_S3_URL}${previewImage.previewUrl}`
@@ -721,7 +721,7 @@ export default function StoreForm({ data }: StoreFormProps) {
                     <IoClose />
                   </button>
                   <Image
-                    alt="매장 이미지"
+                    alt=""
                     src={
                       storeImage.uploaded
                         ? `${process.env.NEXT_PUBLIC_S3_URL}${storeImage.previewUrl}`

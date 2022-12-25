@@ -16,10 +16,11 @@ export default function MenuList() {
   const [menus, setMenus] = useState<MenuListDto[]>([]);
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     const getMenuList = async () => {
       const response = await authClient.get(`/provider/${slug}/menu`);
-      console.debug(`GET /provider/${slug}/menu`);
-      console.debug(response?.data);
+      console.debug(`GET /provider/${slug}/menu`, response?.data);
       const menus: MenuListDto[] | undefined = response?.data?.menu;
       if (menus) {
         setMenus(menus);
@@ -29,7 +30,7 @@ export default function MenuList() {
     if (slug) {
       getMenuList();
     }
-  }, [slug]);
+  }, [router.isReady]);
 
   return (
     <LoginCheck>

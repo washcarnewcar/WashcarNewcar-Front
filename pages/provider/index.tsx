@@ -8,34 +8,31 @@ export default function ProviderCheck() {
   const router = useRouter();
 
   useEffect(() => {
-    const check = async () => {
-      try {
-        const response = await authClient.get(`/provider/slug`);
-        console.debug(`GET /provider/slug`);
+    if (!router.isReady) return;
 
-        const data = response?.data;
-        console.debug(data);
-        if (data) {
-          const { status, slug } = data;
+    const check = async () => {
+      const response = await authClient.get(`/provider/slug`);
+      const data = response?.data;
+      console.debug(`GET /provider/slug`, data);
+      if (data) {
+        const { status, slug } = data;
+        switch (status) {
           // slug 존재
-          switch (status) {
-            case 2600:
-              router.replace(`/provider/${slug}`);
-              return;
-            case 2601:
-              router.replace(`/provider/new`);
-              return;
-            default:
-              throw new Error('알 수 없는 상태코드');
-          }
+          case 2600:
+            router.replace(`/provider/${slug}`);
+            return;
+          // 세차장 만들지 않음
+          case 2601:
+            router.replace(`/provider/new`);
+            return;
+          default:
+            throw new Error('알 수 없는 상태코드');
         }
-      } catch (error) {
-        console.error(error);
       }
     };
 
     check();
-  }, []);
+  }, [router.isReady]);
 
   return (
     <>

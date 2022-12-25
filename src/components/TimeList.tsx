@@ -138,6 +138,8 @@ export default function TimeList() {
   };
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     const getData = async () => {
       const response = await authClient.get(`/provider/${slug}/time`);
       console.debug(`GET /provider/${slug}/time`);
@@ -162,7 +164,7 @@ export default function TimeList() {
     if (slug) {
       getData();
     }
-  }, [slug]);
+  }, [router.isReady]);
 
   function TimeListItem({ time, dayOfWeek }: TimeListItemProps) {
     const displayDayOfWeek = () => {

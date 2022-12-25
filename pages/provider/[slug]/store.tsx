@@ -11,27 +11,25 @@ export default function EditStore() {
   const [data, setData] = useState<StoreDto>();
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     const getData = async () => {
-      try {
-        const response = await authClient.get(`/provider/${slug}/store`);
-        console.debug(`GET /provider/${slug}/store`);
-        const data: StoreDto | undefined = response?.data;
-        // TODO:
-        console.debug(data);
-        if (data) {
-          setData(data);
-        } else {
-          throw Error('data 전송되지 않음');
-        }
-      } catch (error) {
-        console.error(error);
+      const response = await authClient.get(`/provider/${slug}/store`);
+      const data: StoreDto | undefined = response?.data;
+      console.debug(`GET /provider/${slug}/store`, data);
+      if (data) {
+        setData(data);
+      } else {
+        throw Error('data 전송되지 않음');
       }
     };
 
     if (slug) {
       getData();
+    } else {
+      router.replace('/');
     }
-  }, [slug]);
+  }, [router.isReady]);
 
   return (
     <LoginCheck>

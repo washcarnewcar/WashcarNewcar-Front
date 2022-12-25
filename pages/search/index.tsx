@@ -73,6 +73,8 @@ export default function Search() {
   };
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     /**
      * url에 longitude와 latitude가 없을 시 gps를 통해 위치를 가져온다.
      */
@@ -93,7 +95,7 @@ export default function Search() {
         displayLocation(geocoder, parsedLongitude, parsedLatitude);
       });
     }
-  }, [longitude, latitude]);
+  }, [router.isReady]);
 
   return (
     <>

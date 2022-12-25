@@ -39,77 +39,63 @@ export default function ProviderDashboard() {
   });
 
   useEffect(() => {
-    const getStoreState = async () => {
-      try {
-        const response = await authClient.get(`/provider/${slug}/approve`);
-        console.debug(`GET /provider/${slug}/approve`);
+    if (!router.isReady) return;
 
-        const data = response?.data;
-        console.debug(data);
-        switch (data.status) {
-          // 세차장 승인, 페이지 운영중
-          case 1500:
-            setStoreStatus(Status.Operation);
-            setReady((ready) => ({
-              ...ready,
-              status: true,
-            }));
-            return;
-          // 세차장 승인 대기중
-          case 1501:
-            setStoreStatus(Status.Waiting);
-            setReady((ready) => ({
-              ...ready,
-              status: true,
-            }));
-            return;
-          // 세차장 승인 거부
-          case 1502:
-            setStoreStatus(Status.Abort);
-            setReady((ready) => ({
-              ...ready,
-              status: true,
-            }));
-            return;
-          // 정상적인 접근 아님
-          default:
-            throw Error('잘못된 응답');
-        }
-      } catch (error) {
-        console.error(error);
+    const getStoreState = async () => {
+      const response = await authClient.get(`/provider/${slug}/approve`);
+      const data = response?.data;
+      console.debug(`GET /provider/${slug}/approve`, data);
+      switch (data.status) {
+        // 세차장 승인, 페이지 운영중
+        case 1500:
+          setStoreStatus(Status.Operation);
+          setReady((ready) => ({
+            ...ready,
+            status: true,
+          }));
+          return;
+        // 세차장 승인 대기중
+        case 1501:
+          setStoreStatus(Status.Waiting);
+          setReady((ready) => ({
+            ...ready,
+            status: true,
+          }));
+          return;
+        // 세차장 승인 거부
+        case 1502:
+          setStoreStatus(Status.Abort);
+          setReady((ready) => ({
+            ...ready,
+            status: true,
+          }));
+          return;
+        // 정상적인 접근 아님
+        default:
+          throw Error('잘못된 응답');
       }
     };
 
     const getRequestList = async () => {
-      try {
-        const response = await authClient.get(`/provider/${slug}/request`);
-        console.debug(`GET /provider/${slug}/request`);
-
-        const list: RequestDto[] = response.data.list;
-        console.debug(list);
-      } catch (error) {
-        console.error(error);
-      }
+      const response = await authClient.get(`/provider/${slug}/request`);
+      const list: RequestDto[] = response.data.list;
+      console.debug(`GET /provider/${slug}/request`, list);
     };
 
     const getScheduleList = async () => {
-      try {
-        const response = await authClient.get(`/provider/${slug}/schedule`);
-        console.debug(`GET /provider/${slug}/schedule`);
-
-        const list: ScheduleDto[] = response.data.list;
-        console.debug(list);
-      } catch (error) {
-        console.error(error);
-      }
+      const response = await authClient.get(`/provider/${slug}/schedule`);
+      const list: ScheduleDto[] = response.data.list;
+      console.debug(`GET /provider/${slug}/schedule`, list);
     };
 
     if (slug) {
       getStoreState();
       getRequestList();
       getScheduleList();
+    } else {
+      router.replace('/');
     }
-  }, [slug]);
+  }, [router.isReady]);
 
   const renderStatus = () => {
     if (!ready.status) {

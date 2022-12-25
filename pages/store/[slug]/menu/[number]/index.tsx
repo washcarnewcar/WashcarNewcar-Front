@@ -148,13 +148,15 @@ export default function Menu() {
   }, []);
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     if (date && Date.parse(date as string)) {
       formik.setValues((values) => ({
         ...values,
         date: new Date(date as string),
       }));
     }
-  }, [date]);
+  }, [router.isReady]);
 
   return (
     <>

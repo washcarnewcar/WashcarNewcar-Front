@@ -11,19 +11,21 @@ export default function MenuEdit() {
   const [menu, setMenu] = useState<MenuDto | undefined>();
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     const getData = async () => {
-      if (slug && number) {
-        const response = await authClient.get(`/provider/menu/${number}`);
-        console.debug(`GET /provider/menu/${number}`);
-        console.debug(response?.data);
-        const menu: MenuDto | undefined = response?.data;
-        if (menu) {
-          setMenu(menu);
-        }
+      const response = await authClient.get(`/provider/menu/${number}`);
+      console.debug(`GET /provider/menu/${number}`, response?.data);
+      const menu: MenuDto | undefined = response?.data;
+      if (menu) {
+        setMenu(menu);
       }
     };
-    getData();
-  }, [slug, number]);
+
+    if (slug && number) {
+      getData();
+    }
+  }, [router.isReady]);
 
   return (
     <LoginCheck>

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, ListGroup } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { number, object, string } from 'yup';
 import AuthHeader from '../../../src/components/AuthHeader';
@@ -26,6 +26,7 @@ export default function SigninCheck() {
   const router = useRouter();
   const { email } = router.query;
   const [checked, setChecked] = useState(false);
+  const [timer, setTimer] = useState<NodeJS.Timeout>();
 
   const handleSubmit = async (
     values: Values,
@@ -66,6 +67,14 @@ export default function SigninCheck() {
     validationSchema: schema,
   });
 
+  // email이 유효한지 확인
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (!email) {
+      router.replace('/');
+    }
+  }, [router.isReady]);
+
   return (
     <div className={styles.container}>
       <AuthHeader />
@@ -75,7 +84,25 @@ export default function SigninCheck() {
 
         <Form className={styles.form} onSubmit={formik.handleSubmit}>
           <Form.Group>
-            <Form.Control className={styles.inputs} value={email} disabled />
+            <Form.Control
+              className={styles.inputs}
+              value={email || ''}
+              disabled
+              isValid={true}
+            />
+            <Form.Control.Feedback type="valid">
+              이메일로 인증번호를 보냈습니다.
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>인증번호</Form.Label>
+            <Form.Control
+              className={styles.inputs}
+              value={formik.values.number}
+              onChange={formik.handleChange}
+              name="number"
+            />
+            <Form.Text>이메일로 전송된 인증번호를 입력해주세요.</Form.Text>
           </Form.Group>
           <Button
             variant="primary"
@@ -86,25 +113,9 @@ export default function SigninCheck() {
             {formik.isSubmitting ? (
               <BeatLoader color="white" size={10} />
             ) : (
-              '시작하기'
+              '확인'
             )}
           </Button>
-          <a href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}>
-            <Image
-              src="/kakao_login_large_wide.png"
-              alt="카카오 로그인"
-              height={45}
-              width={300}
-              priority
-            />
-          </a>
-
-          <div className={styles.change}>
-            <div>이미 계정이 있으신가요?</div>
-            <Link href="/auth/login" className={styles.change_text}>
-              로그인
-            </Link>
-          </div>
         </Form>
       </div>
     </div>

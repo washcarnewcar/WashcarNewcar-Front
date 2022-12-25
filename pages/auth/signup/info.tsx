@@ -52,10 +52,11 @@ function SignUpInfo() {
   });
 
   useEffect(() => {
+    if (!router.isReady) return;
     if (email) {
       formik.setValues((values) => ({ ...values, email: email as string }));
     }
-  }, [email]);
+  }, [router.isReady]);
 
   return (
     <>

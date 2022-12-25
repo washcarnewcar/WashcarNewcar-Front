@@ -86,30 +86,31 @@ export default function Except() {
 
     setSubmitting(true);
 
-    const newExceptList: ExceptDto[] = [...exceptList];
-
-    newExceptList.map((except) => {
-      // 하루종일인 경우 2022-11-11 => 2122-11-11 00:00
-      if (except.allday) {
-        const newExcept: ExceptDto = {
-          start: moment(except.start).format('YYYY-MM-DD HH:mm'),
-          end: moment(except.end).format('YYYY-MM-DD HH:mm'),
-          allday: except.allday,
-          error: except.error,
-        };
-        return newExcept;
+    const mappedExceptList: (ExceptDto | undefined)[] = exceptList.map(
+      (except) => {
+        // 하루종일인 경우 2022-11-11 => 2122-11-11 00:00
+        if (except.allday) {
+          return {
+            start: moment(except.start).format('YYYY-MM-DD HH:mm'),
+            end: moment(except.end).format('YYYY-MM-DD HH:mm'),
+            allday: except.allday,
+            error: except.error,
+          };
+        } else {
+          return { ...except };
+        }
       }
-    });
+    );
+
+    const sendData = { except: mappedExceptList };
 
     try {
-      console.debug(`POST /provider/${slug}/except`, {
-        except: newExceptList,
-      });
-      const response = await authClient.post(`/provider/${slug}/except`, {
-        except: newExceptList,
-      });
+      console.debug(`POST /provider/${slug}/except`, sendData);
+      const response = await authClient.post(
+        `/provider/${slug}/except`,
+        sendData
+      );
       const data = response?.data;
-      console.debug(data);
       switch (data?.status) {
         case 2100:
           alert('저장되었습니다.');
@@ -120,29 +121,34 @@ export default function Except() {
         default:
           throw new Error('잘못된 응답');
       }
-    } catch (error) {
-      console.error(error);
     } finally {
       setSubmitting(false);
     }
   };
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     const getData = async () => {
       const response = await authClient.get(`/provider/${slug}/except`);
-      console.debug(`GET /provider/${slug}/except`);
       const data: ExceptDto[] = response?.data?.except;
+      console.debug(`GET /provider/${slug}/except`, data);
       if (data) {
-        data.map((except) => {
+        const mappedData = data.map((except) => {
           // 하루종일인 경우 2022-11-11 00:00 => 2122-11-11
           if (except.allday) {
-            except.start = moment(except.start).format('YYYY-MM-DD');
-            except.end = moment(except.end).format('YYYY-MM-DD');
+            return {
+              start: moment(except.start).format('YYYY-MM-DD'),
+              end: moment(except.end).format('YYYY-MM-DD'),
+              allday: except.allday,
+              error: except.error,
+            };
+          } else {
+            return { ...except };
           }
-          return except;
         });
-        console.debug('mapped data', data);
-        setExceptList(data);
+        console.debug('mapped data', mappedData);
+        setExceptList(mappedData);
         setReady(true);
       } else {
         setReady(true);
@@ -152,7 +158,7 @@ export default function Except() {
     if (slug) {
       getData();
     }
-  }, [slug]);
+  }, [router.isReady]);
 
   return (
     <div className={styles.except_wrapper}>
