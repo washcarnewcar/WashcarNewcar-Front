@@ -1,11 +1,9 @@
 import { FormikHelpers, useFormik } from 'formik';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { Button, Form, ListGroup } from 'react-bootstrap';
+import { useEffect } from 'react';
+import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
-import { number, object, string } from 'yup';
+import { number, object } from 'yup';
 import AuthHeader from '../../../src/components/AuthHeader';
 import { client } from '../../../src/function/request';
 import styles from '../../../styles/Auth.module.scss';
@@ -18,15 +16,15 @@ const initialValues: Values = {
   number: '',
 };
 
-const schema = object().shape({
-  number: number().required('이메일로 전송된 숫자를 입력해주세요'),
+const schema = object({
+  number: number()
+    .typeError('숫자만 입력할 수 있습니다.')
+    .required('인증번호를 정확하게 입력해주세요'),
 });
 
 export default function SigninCheck() {
   const router = useRouter();
   const { email } = router.query;
-  const [checked, setChecked] = useState(false);
-  const [timer, setTimer] = useState<NodeJS.Timeout>();
 
   const handleSubmit = async (
     values: Values,
@@ -43,19 +41,21 @@ export default function SigninCheck() {
     const status: number | undefined = response?.data?.status;
     if (status) {
       switch (status) {
-        // email 전송함
+        // 인증번호 유효
         case 2700:
-          setChecked(true);
+          router.push(`/auth/signup/info`, {
+            query: { email: email, number: values.number },
+          });
           return;
-        // email 중복
+        // 유효하지 않은 인증번호
         case 2701:
           setErrors({ number: '유효하지 않은 인증번호입니다.' });
           break;
         default:
-          console.error('알 수 없는 상태코드');
+          throw new Error('알 수 없는 상태코드');
       }
     } else {
-      console.error('잘못된 응답');
+      throw new Error('잘못된 응답');
     }
 
     setSubmitting(false);
@@ -101,7 +101,11 @@ export default function SigninCheck() {
               value={formik.values.number}
               onChange={formik.handleChange}
               name="number"
+              isInvalid={!!formik.errors.number && formik.touched.number}
             />
+            <Form.Control.Feedback type="invalid">
+              {formik.errors.number}
+            </Form.Control.Feedback>
             <Form.Text>이메일로 전송된 인증번호를 입력해주세요.</Form.Text>
           </Form.Group>
           <Button
