@@ -24,7 +24,7 @@ export default function Header({ type }: HeaderProps) {
   };
 
   return (
-    <Navbar sticky="top" bg="white" expand={false} className={styles.container}>
+    <Navbar sticky="top" bg="white" expand="sm" className={styles.container}>
       <Container>
         <Link href="/" style={{ display: 'flex' }}>
           <Image
@@ -39,10 +39,21 @@ export default function Header({ type }: HeaderProps) {
         <Navbar.Toggle />
         <Navbar.Offcanvas placement="end" style={{ width: '300px' }}>
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title>세차새차</Offcanvas.Title>
+            <Offcanvas.Title>
+              <Link href="/">
+                <Image
+                  className={styles.main_logo}
+                  src="/row_logo.png"
+                  alt="세차새차"
+                  width={146}
+                  height={40}
+                  priority
+                />
+              </Link>
+            </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
-            <Nav>
+            <Nav className={styles.nav_item}>
               {user?.isLogined ? (
                 <>
                   <Nav.Link onClick={handleLogoutClick}>로그아웃</Nav.Link>

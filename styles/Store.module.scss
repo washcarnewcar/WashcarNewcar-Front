@@ -13,11 +13,19 @@
   margin: 20px;
 }
 
-.title_image {
+.title_image_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 60px;
   height: 60px;
-  object-fit: cover;
   border-radius: 20px;
+  overflow: hidden;
+  background-color: rgb(230, 230, 230);
+}
+
+.title_image {
+  object-fit: cover;
 }
 
 .title_content {

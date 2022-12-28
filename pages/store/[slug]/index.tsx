@@ -13,6 +13,7 @@ import {
 } from 'react-icons/io5';
 import Header from '../../../src/components/Header';
 import Seperator from '../../../src/components/Seperator';
+import TempImage from '../../../src/components/TempImage';
 import { MenuListDto, StoreDto } from '../../../src/dto';
 import { client } from '../../../src/function/request';
 import styles from '../../../styles/Store.module.scss';
@@ -89,15 +90,23 @@ export default function Store() {
           : null}
       </Carousel>
 
+      {/* storeInfo가 없을 땐 placeholder 표시 */}
       {storeInfo ? (
         <div className={styles.title}>
-          <Image
-            className={styles.title_image}
-            width={60}
-            height={60}
-            src={process.env.NEXT_PUBLIC_S3_URL + storeInfo.preview_image}
-            alt=""
-          />
+          <div className={styles.title_image_container}>
+            {/* preview_image가 없을 땐 임시 이미지 표시 */}
+            {storeInfo.preview_image ? (
+              <Image
+                className={styles.title_image}
+                width={60}
+                height={60}
+                src={process.env.NEXT_PUBLIC_S3_URL + storeInfo.preview_image}
+                alt=""
+              />
+            ) : (
+              <TempImage width={50} height={50} />
+            )}
+          </div>
           <div className={styles.title_content}>
             <div className={styles.title_name}>{storeInfo.name}</div>
           </div>
