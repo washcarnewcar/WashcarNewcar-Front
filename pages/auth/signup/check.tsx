@@ -52,10 +52,10 @@ export default function SigninCheck() {
           setErrors({ number: '유효하지 않은 인증번호입니다.' });
           break;
         default:
-          throw new Error('알 수 없는 상태코드');
+          console.error('알 수 없는 상태코드');
       }
     } else {
-      throw new Error('잘못된 응답');
+      console.error('잘못된 응답');
     }
 
     setSubmitting(false);
@@ -95,13 +95,13 @@ export default function SigninCheck() {
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Group>
-            <Form.Label>인증번호</Form.Label>
             <Form.Control
               className={styles.inputs}
               value={formik.values.number}
               onChange={formik.handleChange}
               name="number"
               isInvalid={!!formik.errors.number && formik.touched.number}
+              placeholder="인증번호"
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.number}

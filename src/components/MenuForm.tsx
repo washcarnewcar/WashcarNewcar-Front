@@ -90,7 +90,6 @@ export default function MenuForm({ data }: MenuFormProps) {
         );
         console.debug(`PUT /provider/menu/${number}`, menuDto);
         const data = response?.data;
-        console.debug(data);
         switch (data?.status) {
           case 2400:
             alert('수정되었습니다.');

@@ -215,7 +215,8 @@ function InfoItem({ type, data }: InfoItemProps) {
         </>
       );
     default:
-      throw new Error('잘못된 info 타입');
+      console.error('잘못된 info 타입');
+      return null;
   }
 }
 

@@ -104,14 +104,14 @@ export default function Except() {
 
     const sendData = { except: mappedExceptList };
 
-    try {
-      console.debug(`POST /provider/${slug}/except`, sendData);
-      const response = await authClient.post(
-        `/provider/${slug}/except`,
-        sendData
-      );
-      const data = response?.data;
-      switch (data?.status) {
+    console.debug(`POST /provider/${slug}/except`, sendData);
+    const response = await authClient.post(
+      `/provider/${slug}/except`,
+      sendData
+    );
+    const data = response?.data;
+    if (data) {
+      switch (data.status) {
         case 2100:
           alert('저장되었습니다.');
           break;
@@ -119,11 +119,12 @@ export default function Except() {
           alert('저장중에 오류가 발생했습니다.');
           break;
         default:
-          throw new Error('잘못된 응답');
+          console.error('알 수 없는 상태코드');
       }
-    } finally {
-      setSubmitting(false);
+    } else {
+      console.error('잘못된 응답');
     }
+    setSubmitting(false);
   };
 
   useEffect(() => {

@@ -70,61 +70,57 @@ export default function SignUp() {
   });
 
   return (
-    <>
-      <div className={styles.container}>
-        <AuthHeader />
+    <div className={styles.container}>
+      <AuthHeader />
 
-        <div className={styles.form_container}>
-          <div className={styles.title}>회원가입</div>
+      <div className={styles.form_container}>
+        <div className={styles.title}>회원가입</div>
 
-          <Form className={styles.form} onSubmit={formik.handleSubmit}>
-            <Form.Group>
-              <Form.Control
-                type="email"
-                className={styles.inputs}
-                placeholder="이메일"
-                name="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                isInvalid={!!formik.errors.email && formik.touched.email}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.email}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              className={styles.submit_button}
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? (
-                <BeatLoader color="white" size={10} />
-              ) : (
-                '시작하기'
-              )}
-            </Button>
-            <a
-              href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}
-            >
-              <Image
-                src="/kakao_login_large_wide.png"
-                alt="카카오 로그인"
-                height={45}
-                width={300}
-                priority
-              />
-            </a>
+        <Form className={styles.form} onSubmit={formik.handleSubmit}>
+          <Form.Group>
+            <Form.Control
+              type="email"
+              className={styles.inputs}
+              placeholder="이메일"
+              name="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              isInvalid={!!formik.errors.email && formik.touched.email}
+            />
+            <Form.Control.Feedback type="invalid">
+              {formik.errors.email}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Button
+            variant="primary"
+            type="submit"
+            className={styles.submit_button}
+            disabled={formik.isSubmitting}
+          >
+            {formik.isSubmitting ? (
+              <BeatLoader color="white" size={10} />
+            ) : (
+              '시작하기'
+            )}
+          </Button>
+          <a href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}>
+            <Image
+              src="/kakao_login_large_wide.png"
+              alt="카카오 로그인"
+              height={45}
+              width={300}
+              priority
+            />
+          </a>
 
-            <div className={styles.change}>
-              <div>이미 계정이 있으신가요?</div>
-              <Link href="/auth/login" className={styles.change_text}>
-                로그인
-              </Link>
-            </div>
-          </Form>
-        </div>
+          <div className={styles.change}>
+            <div>이미 계정이 있으신가요?</div>
+            <Link href="/auth/login" className={styles.change_text}>
+              로그인
+            </Link>
+          </div>
+        </Form>
       </div>
-    </>
+    </div>
   );
 }
