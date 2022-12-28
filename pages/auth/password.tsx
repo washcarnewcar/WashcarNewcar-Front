@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import { FormikHelpers, useFormik } from 'formik';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import { Button, Form, Toast, ToastContainer } from 'react-bootstrap';
@@ -79,6 +80,9 @@ export default function Password() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 비밀번호 변경</title>
+      </Head>
       <div className={styles.container}>
         <AuthHeader />
 

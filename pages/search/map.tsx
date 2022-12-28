@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { BiCurrentLocation } from 'react-icons/bi';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 function SelectMap() {
   const router = useRouter();
@@ -170,6 +171,9 @@ function SelectMap() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 세차장 검색</title>
+      </Head>
       <Header type={1} />
       <div className={styles.body}>
         <div className={styles.address_container}>

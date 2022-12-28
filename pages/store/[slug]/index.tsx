@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -69,6 +70,9 @@ export default function Store() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - {storeInfo ? storeInfo.name : '매장 정보'}</title>
+      </Head>
       <Header type={1} />
       <Carousel>
         {storeInfo?.store_image

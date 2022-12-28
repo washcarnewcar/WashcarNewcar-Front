@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, ListGroup } from 'react-bootstrap';
@@ -40,6 +41,9 @@ export default function Reservation() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 예약 정보</title>
+      </Head>
       <Header type={1} />
       <div className={styles.container}>
         <div className={styles.state_container}>

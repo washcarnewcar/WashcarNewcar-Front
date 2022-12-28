@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Link from 'next/link';
 import Header from '../src/components/Header';
 import styles from '../styles/Home.module.scss';
@@ -5,6 +6,9 @@ import styles from '../styles/Home.module.scss';
 export default function Home() {
   return (
     <>
+      <Head>
+        <title>세차새차 - 손세차 중계 플랫폼</title>
+      </Head>
       <Header type={1} />
       <div className={styles.card_grid}>
         <Link className={styles.card_grid_item} href="/search">

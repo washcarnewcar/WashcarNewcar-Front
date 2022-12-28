@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { authClient } from '../../src/function/request';
 import Header from '../../src/components/Header';
 import Loading from '../../src/components/Loading';
+import Head from 'next/head';
 
 export default function ProviderCheck() {
   const router = useRouter();
@@ -38,6 +39,9 @@ export default function ProviderCheck() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 손세차 중계 플랫폼</title>
+      </Head>
       <Header type={1} />
       <Loading fullscreen />
     </>

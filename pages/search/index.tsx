@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -99,6 +100,9 @@ export default function Search() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 세차장 검색</title>
+      </Head>
       <Header type={1} />
       <div className={styles.container}>
         <Link

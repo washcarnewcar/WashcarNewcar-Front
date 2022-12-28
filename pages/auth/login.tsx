@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import { FormikHelpers, useFormik } from 'formik';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -81,6 +82,9 @@ function Login() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 로그인</title>
+      </Head>
       <div className={styles.container}>
         <AuthHeader />
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -78,6 +79,9 @@ export default function FindList() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 세차 예약 확인</title>
+      </Head>
       <Header type={1} />
       <div className={styles.container}>
         <div className={styles.title}>예약한 세차</div>

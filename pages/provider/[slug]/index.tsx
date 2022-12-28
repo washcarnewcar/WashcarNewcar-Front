@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
@@ -131,54 +132,59 @@ export default function ProviderDashboard() {
   };
 
   return (
-    <LoginCheck>
-      <div className={styles.container}>
-        <div className={styles.status_container}>{renderStatus()}</div>
+    <>
+      <Head>
+        <title>세차새차 - 대시보드</title>
+      </Head>
+      <LoginCheck>
+        <div className={styles.container}>
+          <div className={styles.status_container}>{renderStatus()}</div>
 
-        <div className={styles.menus_container}>
-          <div className={styles.title}>세차 예약 요청</div>
-          <List />
-        </div>
+          <div className={styles.menus_container}>
+            <div className={styles.title}>세차 예약 요청</div>
+            <List />
+          </div>
 
-        <div className={styles.menus_container}>
-          <div className={styles.title}>오늘의 세차 스케줄</div>
-          <List />
-        </div>
+          <div className={styles.menus_container}>
+            <div className={styles.title}>오늘의 세차 스케줄</div>
+            <List />
+          </div>
 
-        <div className={styles.menus_container}>
-          <div className={styles.title}>매장 관리</div>
-          <div className={styles.buttongroup}>
-            <Button
-              className={styles.button}
-              variant="outline-primary"
-              onClick={() => {
-                router.push(`/provider/${slug}/store`);
-              }}
-            >
-              매장 정보 설정
-            </Button>
-            <Button
-              className={styles.button}
-              variant="outline-primary"
-              onClick={() => {
-                router.push(`/provider/${slug}/menu`);
-              }}
-            >
-              메뉴 관리
-            </Button>
-            <Button
-              className={styles.button}
-              variant="outline-primary"
-              onClick={() => {
-                router.push(`/provider/${slug}/time`);
-              }}
-            >
-              매장 운영 시간 설정
-            </Button>
+          <div className={styles.menus_container}>
+            <div className={styles.title}>매장 관리</div>
+            <div className={styles.buttongroup}>
+              <Button
+                className={styles.button}
+                variant="outline-primary"
+                onClick={() => {
+                  router.push(`/provider/${slug}/store`);
+                }}
+              >
+                매장 정보 설정
+              </Button>
+              <Button
+                className={styles.button}
+                variant="outline-primary"
+                onClick={() => {
+                  router.push(`/provider/${slug}/menu`);
+                }}
+              >
+                메뉴 관리
+              </Button>
+              <Button
+                className={styles.button}
+                variant="outline-primary"
+                onClick={() => {
+                  router.push(`/provider/${slug}/time`);
+                }}
+              >
+                매장 운영 시간 설정
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    </LoginCheck>
+      </LoginCheck>
+    </>
   );
 }
 

@@ -1,4 +1,5 @@
 import { FormikHelpers, useFormik } from 'formik';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
@@ -78,82 +79,87 @@ function SignUpInfo() {
   }, [router.isReady]);
 
   return (
-    <div className={styles.container}>
-      <AuthHeader />
+    <>
+      <Head>
+        <title>세차새차 - 회원가입</title>
+      </Head>
+      <div className={styles.container}>
+        <AuthHeader />
 
-      <div className={styles.form_container}>
-        <div className={styles.title}>회원가입</div>
+        <div className={styles.form_container}>
+          <div className={styles.title}>회원가입</div>
 
-        <Form className={styles.form} onSubmit={formik.handleSubmit}>
-          <Form.Group>
-            <Form.Control
-              className={styles.inputs}
-              value={email || ''}
-              disabled
-              isValid={true}
-            />
-          </Form.Group>
-          <Form.Group>
-            <Form.Control
-              className={styles.inputs}
-              value={number || ''}
-              disabled
-              isValid={true}
-            />
-            <Form.Control.Feedback type="valid">
-              이메일이 인증되었습니다.
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group>
-            <Form.Control
-              type="password"
-              name="password"
-              className={styles.inputs}
-              placeholder="비밀번호"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              isInvalid={!!formik.errors.password && formik.touched.password}
-              autoComplete="off"
-            />
-            <Form.Control.Feedback type="invalid">
-              {formik.errors.password}
-            </Form.Control.Feedback>
-            <Form.Text>사용하실 비밀번호를 입력해주세요.</Form.Text>
-          </Form.Group>
-          <Form.Group>
-            <Form.Control
-              type="password"
-              name="passwordConfirm"
-              className={styles.inputs}
-              placeholder="비밀번호 확인"
-              value={formik.values.passwordConfirm}
-              onChange={formik.handleChange}
-              isInvalid={
-                !!formik.errors.passwordConfirm &&
-                formik.touched.passwordConfirm
-              }
-              autoComplete="off"
-            />
-            <Form.Control.Feedback type="invalid">
-              {formik.errors.passwordConfirm}
-            </Form.Control.Feedback>
-            <Form.Text>비밀번호를 한번 더 입력해주세요.</Form.Text>
-          </Form.Group>
-          <Button
-            variant="primary"
-            type="submit"
-            className={styles.submit_button}
-            disabled={formik.isSubmitting}
-          >
-            {formik.isSubmitting ? (
-              <BeatLoader color="white" size={10} />
-            ) : (
-              '회원가입'
-            )}
-          </Button>
-        </Form>
+          <Form className={styles.form} onSubmit={formik.handleSubmit}>
+            <Form.Group>
+              <Form.Control
+                className={styles.inputs}
+                value={email || ''}
+                disabled
+                isValid={true}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Control
+                className={styles.inputs}
+                value={number || ''}
+                disabled
+                isValid={true}
+              />
+              <Form.Control.Feedback type="valid">
+                이메일이 인증되었습니다.
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group>
+              <Form.Control
+                type="password"
+                name="password"
+                className={styles.inputs}
+                placeholder="비밀번호"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                isInvalid={!!formik.errors.password && formik.touched.password}
+                autoComplete="off"
+              />
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.password}
+              </Form.Control.Feedback>
+              <Form.Text>사용하실 비밀번호를 입력해주세요.</Form.Text>
+            </Form.Group>
+            <Form.Group>
+              <Form.Control
+                type="password"
+                name="passwordConfirm"
+                className={styles.inputs}
+                placeholder="비밀번호 확인"
+                value={formik.values.passwordConfirm}
+                onChange={formik.handleChange}
+                isInvalid={
+                  !!formik.errors.passwordConfirm &&
+                  formik.touched.passwordConfirm
+                }
+                autoComplete="off"
+              />
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.passwordConfirm}
+              </Form.Control.Feedback>
+              <Form.Text>비밀번호를 한번 더 입력해주세요.</Form.Text>
+            </Form.Group>
+            <Button
+              variant="primary"
+              type="submit"
+              className={styles.submit_button}
+              disabled={formik.isSubmitting}
+            >
+              {formik.isSubmitting ? (
+                <BeatLoader color="white" size={10} />
+              ) : (
+                '회원가입'
+              )}
+            </Button>
+          </Form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

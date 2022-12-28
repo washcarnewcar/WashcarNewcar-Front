@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import moment from 'moment';
 import 'moment/locale/ko';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
@@ -116,6 +117,9 @@ function MenuTime() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 세차 예약하기</title>
+      </Head>
       <Header type={1} />
 
       <div className={styles.date}>

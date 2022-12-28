@@ -1,4 +1,5 @@
 import { FormikHelpers, useFormik } from 'formik';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
@@ -76,52 +77,57 @@ export default function SigninCheck() {
   }, [router.isReady]);
 
   return (
-    <div className={styles.container}>
-      <AuthHeader />
+    <>
+      <Head>
+        <title>세차새차 - 회원가입</title>
+      </Head>
+      <div className={styles.container}>
+        <AuthHeader />
 
-      <div className={styles.form_container}>
-        <div className={styles.title}>회원가입</div>
+        <div className={styles.form_container}>
+          <div className={styles.title}>회원가입</div>
 
-        <Form className={styles.form} onSubmit={formik.handleSubmit}>
-          <Form.Group>
-            <Form.Control
-              className={styles.inputs}
-              value={email || ''}
-              disabled
-              isValid={true}
-            />
-            <Form.Control.Feedback type="valid">
-              이메일로 인증번호를 보냈습니다.
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group>
-            <Form.Control
-              className={styles.inputs}
-              value={formik.values.number}
-              onChange={formik.handleChange}
-              name="number"
-              isInvalid={!!formik.errors.number && formik.touched.number}
-              placeholder="인증번호"
-            />
-            <Form.Control.Feedback type="invalid">
-              {formik.errors.number}
-            </Form.Control.Feedback>
-            <Form.Text>이메일로 전송된 인증번호를 입력해주세요.</Form.Text>
-          </Form.Group>
-          <Button
-            variant="primary"
-            type="submit"
-            className={styles.submit_button}
-            disabled={formik.isSubmitting}
-          >
-            {formik.isSubmitting ? (
-              <BeatLoader color="white" size={10} />
-            ) : (
-              '확인'
-            )}
-          </Button>
-        </Form>
+          <Form className={styles.form} onSubmit={formik.handleSubmit}>
+            <Form.Group>
+              <Form.Control
+                className={styles.inputs}
+                value={email || ''}
+                disabled
+                isValid={true}
+              />
+              <Form.Control.Feedback type="valid">
+                이메일로 인증번호를 보냈습니다.
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group>
+              <Form.Control
+                className={styles.inputs}
+                value={formik.values.number}
+                onChange={formik.handleChange}
+                name="number"
+                isInvalid={!!formik.errors.number && formik.touched.number}
+                placeholder="인증번호"
+              />
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.number}
+              </Form.Control.Feedback>
+              <Form.Text>이메일로 전송된 인증번호를 입력해주세요.</Form.Text>
+            </Form.Group>
+            <Button
+              variant="primary"
+              type="submit"
+              className={styles.submit_button}
+              disabled={formik.isSubmitting}
+            >
+              {formik.isSubmitting ? (
+                <BeatLoader color="white" size={10} />
+              ) : (
+                '확인'
+              )}
+            </Button>
+          </Form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import LoginCheck from '../../../src/components/LoginCheck';
@@ -32,8 +33,13 @@ export default function EditStore() {
   }, [router.isReady]);
 
   return (
-    <LoginCheck>
-      <StoreForm data={data} />
-    </LoginCheck>
+    <>
+      <Head>
+        <title>세차새차 - 매장 정보 수정</title>
+      </Head>
+      <LoginCheck>
+        <StoreForm data={data} />
+      </LoginCheck>
+    </>
   );
 }

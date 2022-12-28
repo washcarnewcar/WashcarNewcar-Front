@@ -1,4 +1,5 @@
 import { FormikHelpers, useFormik } from 'formik';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
@@ -45,6 +46,9 @@ export default function Find() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 세차 예약 확인</title>
+      </Head>
       <Header type={1} />
       <div className={styles.body}>
         <Form className={styles.form} onSubmit={formik.handleSubmit}>

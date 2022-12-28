@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Button, Form } from 'react-bootstrap';
 import LoginCheck from '../../../../../src/components/LoginCheck';
@@ -13,18 +14,23 @@ export default function Reject() {
   }
 
   return (
-    <LoginCheck>
-      <div className={styles.container}>
-        <div className={styles.title}>예약 요청 거부 사유 입력</div>
-        <Form.Control
-          as="textarea"
-          className={styles.textarea}
-          rows={5}
-        ></Form.Control>
-        <Button variant="danger" className={styles.button} onClick={onClick}>
-          요청 거부
-        </Button>
-      </div>
-    </LoginCheck>
+    <>
+      <Head>
+        <title>세차새차 - 예약 확인</title>
+      </Head>
+      <LoginCheck>
+        <div className={styles.container}>
+          <div className={styles.title}>예약 요청 거부 사유 입력</div>
+          <Form.Control
+            as="textarea"
+            className={styles.textarea}
+            rows={5}
+          ></Form.Control>
+          <Button variant="danger" className={styles.button} onClick={onClick}>
+            요청 거부
+          </Button>
+        </div>
+      </LoginCheck>
+    </>
   );
 }

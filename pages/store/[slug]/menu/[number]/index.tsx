@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import moment from 'moment';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -160,6 +161,9 @@ export default function Menu() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 세차 예약하기</title>
+      </Head>
       <Header type={1} />
 
       <div className={styles.store}>

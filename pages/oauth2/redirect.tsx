@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useContext, useEffect } from 'react';
 import Loading from '../../src/components/Loading';
@@ -21,5 +22,12 @@ export default function OAuthRedirect() {
     router.replace('/');
   }, [router.isReady]);
 
-  return <Loading fullscreen />;
+  return (
+    <>
+      <Head>
+        <title>세차새차 - 손세차 중계 플랫폼</title>
+      </Head>
+      <Loading fullscreen />
+    </>
+  );
 }
