@@ -5,7 +5,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import Header from '../../../../../src/components/Header';
 import Seperator from '../../../../../src/components/Seperator';
@@ -58,22 +58,13 @@ interface Model {
   name: string;
 }
 
-interface Ready {
-  brand: boolean;
-  model: boolean;
-}
-
-const readyInitialData: Ready = {
-  brand: false,
-  model: true,
-};
-
 export default function Menu() {
   const router = useRouter();
   const { slug, number, date } = router.query;
   const [brands, setBrands] = useState<Brand[]>([]);
   const [models, setModels] = useState<Model[]>([]);
-  const [ready, setReady] = useState<Ready>(readyInitialData);
+  const tel2Ref = useRef<HTMLInputElement>(null);
+  const tel3Ref = useRef<HTMLInputElement>(null);
 
   /**
    * 차 브랜드를 받아오는 함수
@@ -158,6 +149,19 @@ export default function Menu() {
       }));
     }
   }, [router.isReady]);
+
+  // 전화번호 자동 포커스 이동
+  useEffect(() => {
+    if (formik.values.tel1.length === 3) {
+      tel2Ref.current?.focus();
+    }
+  }, [formik.values.tel1]);
+
+  useEffect(() => {
+    if (formik.values.tel2.length === 4) {
+      tel3Ref.current?.focus();
+    }
+  }, [formik.values.tel2]);
 
   return (
     <>
@@ -254,6 +258,7 @@ export default function Menu() {
               value={formik.values.tel2}
               onChange={formik.handleChange}
               isInvalid={!!formik.errors.tel2 && formik.touched.tel2}
+              ref={tel2Ref}
             />
             -
             <Form.Control
@@ -264,6 +269,7 @@ export default function Menu() {
               value={formik.values.tel3}
               onChange={formik.handleChange}
               isInvalid={!!formik.errors.tel3 && formik.touched.tel3}
+              ref={tel3Ref}
             />
           </div>
         </Form.Group>

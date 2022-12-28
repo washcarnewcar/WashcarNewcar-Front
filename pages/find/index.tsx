@@ -1,7 +1,7 @@
 import { FormikHelpers, useFormik } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { number, object } from 'yup';
 import Header from '../../src/components/Header';
@@ -28,6 +28,9 @@ const schema = object().shape({
 
 export default function Find() {
   const router = useRouter();
+  const tel1Ref = useRef<HTMLInputElement>(null);
+  const tel2Ref = useRef<HTMLInputElement>(null);
+  const tel3Ref = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (
     values: Values,
@@ -43,6 +46,23 @@ export default function Find() {
     onSubmit: handleSubmit,
     validationSchema: schema,
   });
+
+  // 자동 포커스 이동
+  useEffect(() => {
+    tel1Ref.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (formik.values.tel1.length === 3) {
+      tel2Ref.current?.focus();
+    }
+  }, [formik.values.tel1]);
+
+  useEffect(() => {
+    if (formik.values.tel2.length === 4) {
+      tel3Ref.current?.focus();
+    }
+  }, [formik.values.tel2]);
 
   return (
     <>
@@ -64,6 +84,7 @@ export default function Find() {
                 value={formik.values.tel1}
                 onChange={formik.handleChange}
                 isInvalid={!!formik.errors.tel1 && formik.touched.tel1}
+                ref={tel1Ref}
               />
               -
               <Form.Control
@@ -74,6 +95,7 @@ export default function Find() {
                 value={formik.values.tel2}
                 onChange={formik.handleChange}
                 isInvalid={!!formik.errors.tel2 && formik.touched.tel2}
+                ref={tel2Ref}
               />
               -
               <Form.Control
@@ -84,6 +106,7 @@ export default function Find() {
                 value={formik.values.tel3}
                 onChange={formik.handleChange}
                 isInvalid={!!formik.errors.tel3 && formik.touched.tel3}
+                ref={tel3Ref}
               />
             </div>
           </Form.Group>
