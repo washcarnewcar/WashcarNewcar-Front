@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import { Button, Form } from 'react-bootstrap';
+import { useCookies } from 'react-cookie';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../src/components/AuthHeader';
 import UserContext from '../../src/context/UserProvider';
+import { httpOnly, secure } from '../../src/function/config';
 import { client } from '../../src/function/request';
 import styles from '../../styles/Auth.module.scss';
 
@@ -30,9 +32,13 @@ const schema = object().shape({
   password: string().required('비밀번호를 입력해주세요'),
 });
 
-function Login() {
+export default function Login() {
   const router = useRouter();
   const { user, setUser } = useContext(UserContext);
+  const [cookies, setCookie, removeCookie] = useCookies([
+    'access_token',
+    'refresh_token',
+  ]);
 
   const handleSubmit = async (
     values: Values,
@@ -49,16 +55,31 @@ function Login() {
     try {
       const response = await client.post(`/login`, form);
 
-      // 토큰 저장
-      const token = response.data.access_token;
-      const refToken = response.data.refresh_token;
-      localStorage.setItem('token', token);
-      localStorage.setItem('refresh_token', refToken);
+      const data = response?.data;
+      if (data) {
+        // 토큰 저장
+        const accessToken = response.data.access_token;
+        const refreshToken = response.data.refresh_token;
+        setCookie('access_token', accessToken, {
+          secure: secure,
+          httpOnly: httpOnly,
+          path: '/',
+        });
+        setCookie('refresh_token', refreshToken, {
+          secure: secure,
+          httpOnly: httpOnly,
+          path: '/',
+        });
+        // localStorage.setItem('token', accessToken);
+        // localStorage.setItem('refresh_token', refreshToken);
 
-      setUser({ isLogined: true });
+        setUser({ isLogined: true });
 
-      // 홈화면으로
-      router.replace('/');
+        // 홈화면으로
+        router.replace('/');
+      } else {
+        console.error('잘못된 응답');
+      }
     } catch (error) {
       // 사용자 정보가 없을 시
       if (error instanceof AxiosError && error.response?.status === 401) {
@@ -67,7 +88,6 @@ function Login() {
           password: '이메일 또는 비밀번호가 틀렸습니다.',
         });
       } else {
-        alert('알 수 없는 오류가 발생했습니다.');
         console.error(error);
       }
     }
@@ -164,5 +184,3 @@ function Login() {
     </>
   );
 }
-
-export default Login;
