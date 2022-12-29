@@ -60,6 +60,8 @@ export default function Login() {
         // 토큰 저장
         const accessToken = response.data.access_token;
         const refreshToken = response.data.refresh_token;
+        console.log(secure, httpOnly);
+
         setCookie('access_token', accessToken, {
           secure: secure,
           httpOnly: httpOnly,
