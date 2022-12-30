@@ -6,12 +6,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { useCookies } from 'react-cookie';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../src/components/AuthHeader';
 import UserContext from '../../src/context/UserProvider';
-import { httpOnly, secure } from '../../src/function/config';
 import { client } from '../../src/function/request';
 import styles from '../../styles/Auth.module.scss';
 
@@ -26,24 +24,15 @@ const initialValues: Values = {
 };
 
 const schema = object().shape({
-  email: string()
-    .required('이메일을 입력해주세요')
-    .email('이메일 형식이 아닙니다'),
+  email: string().required('이메일을 입력해주세요').email('이메일 형식이 아닙니다'),
   password: string().required('비밀번호를 입력해주세요'),
 });
 
-export default function Login() {
+function Login() {
   const router = useRouter();
   const { user, setUser } = useContext(UserContext);
-  const [cookies, setCookie, removeCookie] = useCookies([
-    'access_token',
-    'refresh_token',
-  ]);
 
-  const handleSubmit = async (
-    values: Values,
-    { setSubmitting, setErrors }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setSubmitting, setErrors }: FormikHelpers<Values>) => {
     setSubmitting(true);
 
     // form data 생성
@@ -55,33 +44,16 @@ export default function Login() {
     try {
       const response = await client.post(`/login`, form);
 
-      const data = response?.data;
-      if (data) {
-        // 토큰 저장
-        const accessToken = response.data.access_token;
-        const refreshToken = response.data.refresh_token;
-        console.log(secure, httpOnly);
+      // 토큰 저장
+      const token = response.data.access_token;
+      const refToken = response.data.refresh_token;
+      localStorage.setItem('token', token);
+      localStorage.setItem('refresh_token', refToken);
 
-        setCookie('access_token', accessToken, {
-          secure: secure,
-          httpOnly: httpOnly,
-          path: '/',
-        });
-        setCookie('refresh_token', refreshToken, {
-          secure: secure,
-          httpOnly: httpOnly,
-          path: '/',
-        });
-        // localStorage.setItem('token', accessToken);
-        // localStorage.setItem('refresh_token', refreshToken);
+      setUser({ isLogined: true });
 
-        setUser({ isLogined: true });
-
-        // 홈화면으로
-        router.replace('/');
-      } else {
-        console.error('잘못된 응답');
-      }
+      // 홈화면으로
+      router.replace('/');
     } catch (error) {
       // 사용자 정보가 없을 시
       if (error instanceof AxiosError && error.response?.status === 401) {
@@ -90,6 +62,7 @@ export default function Login() {
           password: '이메일 또는 비밀번호가 틀렸습니다.',
         });
       } else {
+        alert('알 수 없는 오류가 발생했습니다.');
         console.error(error);
       }
     }
@@ -125,9 +98,7 @@ export default function Login() {
                 isInvalid={!!formik.errors.email && formik.touched.email}
                 autoComplete="on"
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.email}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.email}</Form.Control.Feedback>
             </Form.Group>
             <Form.Group>
               <Form.Control
@@ -140,32 +111,13 @@ export default function Login() {
                 isInvalid={!!formik.errors.password && formik.touched.password}
                 autoComplete="on"
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.password}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.password}</Form.Control.Feedback>
             </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              className={styles.submit_button}
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? (
-                <BeatLoader color="white" size={10} />
-              ) : (
-                '로그인'
-              )}
+            <Button variant="primary" type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+              {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : '로그인'}
             </Button>
-            <a
-              href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}
-            >
-              <Image
-                src="/kakao_login_large_wide.png"
-                alt="카카오 로그인"
-                height={45}
-                width={300}
-                priority
-              />
+            <a href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}>
+              <Image src="/kakao_login_large_wide.png" alt="카카오 로그인" height={45} width={300} priority />
             </a>
 
             <div className={styles.change}>
@@ -186,3 +138,5 @@ export default function Login() {
     </>
   );
 }
+
+export default Login;
