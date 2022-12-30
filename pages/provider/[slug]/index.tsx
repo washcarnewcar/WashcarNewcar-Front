@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { Alert, Button, ListGroup } from 'react-bootstrap';
+import { useCookies } from 'react-cookie';
 import { IoIosArrowForward } from 'react-icons/io';
 import Loading from '../../../src/components/Loading';
 import LoginCheck from '../../../src/components/LoginCheck';
 import UserContext from '../../../src/context/UserProvider';
 import { RequestDto, ScheduleDto } from '../../../src/dto';
-import { authClient } from '../../../src/function/request';
+import { authClient, Cookies } from '../../../src/function/request';
 import styles from '../../../styles/ProviderDashboard.module.scss';
 
 interface Ready {
@@ -38,12 +39,15 @@ export default function ProviderDashboard() {
     request: false,
     schedule: false,
   });
+  const [cookies, setCookie, removeCookie] = useCookies(['access_token', 'refresh_token']);
 
   useEffect(() => {
     if (!router.isReady) return;
 
     const getStoreState = async () => {
-      const response = await authClient.get(`/provider/${slug}/approve`);
+      console.log(cookies);
+
+      const response = await authClient(cookies).get(`/provider/${slug}/approve`);
       const data = response?.data;
       console.debug(`GET /provider/${slug}/approve`, data);
       switch (data.status) {
@@ -78,13 +82,13 @@ export default function ProviderDashboard() {
     };
 
     const getRequestList = async () => {
-      const response = await authClient.get(`/provider/${slug}/request`);
+      const response = await authClient(cookies).get(`/provider/${slug}/request`);
       const list: RequestDto[] = response.data.list;
       console.debug(`GET /provider/${slug}/request`, list);
     };
 
     const getScheduleList = async () => {
-      const response = await authClient.get(`/provider/${slug}/schedule`);
+      const response = await authClient(cookies).get(`/provider/${slug}/schedule`);
       const list: ScheduleDto[] = response.data.list;
       console.debug(`GET /provider/${slug}/schedule`, list);
     };
@@ -197,9 +201,7 @@ function List() {
             <div>
               <div className={styles.menu}>외부 세차</div>
               <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>
-                {moment().format('YYYY.MM.DD(dd) HH:mm')}
-              </div>
+              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
             </div>
             <div className={styles.arrow}>
               <IoIosArrowForward size={25} />
@@ -213,9 +215,7 @@ function List() {
             <div>
               <div className={styles.menu}>외부 세차</div>
               <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>
-                {moment().format('YYYY.MM.DD(dd) HH:mm')}
-              </div>
+              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
             </div>
             <div className={styles.arrow}>
               <IoIosArrowForward size={25} />
@@ -229,9 +229,7 @@ function List() {
             <div>
               <div className={styles.menu}>외부 세차</div>
               <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>
-                {moment().format('YYYY.MM.DD(dd) HH:mm')}
-              </div>
+              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
             </div>
             <div className={styles.arrow}>
               <IoIosArrowForward size={25} />

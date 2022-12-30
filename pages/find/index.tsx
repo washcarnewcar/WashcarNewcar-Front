@@ -1,11 +1,10 @@
 import { FormikHelpers, useFormik } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { number, object } from 'yup';
 import Header from '../../src/components/Header';
-import { authClient } from '../../src/function/request';
 import styles from '../../styles/Find.module.scss';
 
 interface Values {
@@ -32,10 +31,7 @@ export default function Find() {
   const tel2Ref = useRef<HTMLInputElement>(null);
   const tel3Ref = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (
-    values: Values,
-    { setSubmitting }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
     setSubmitting(true);
     router.push(`/find/${values.tel1}-${values.tel2}-${values.tel3}`);
     setSubmitting(false);
@@ -110,12 +106,7 @@ export default function Find() {
               />
             </div>
           </Form.Group>
-          <Button
-            variant="primary"
-            className={styles.submit}
-            type="submit"
-            disabled={formik.isSubmitting}
-          >
+          <Button variant="primary" className={styles.submit} type="submit" disabled={formik.isSubmitting}>
             확인
           </Button>
         </Form>
