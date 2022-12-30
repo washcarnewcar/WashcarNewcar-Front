@@ -42,17 +42,9 @@ function Login() {
 
     // 로그인 요청
     try {
-      const response = await client.post(`/login`, form);
-
-      // 토큰 저장
-      const token = response.data.access_token;
-      const refToken = response.data.refresh_token;
-      localStorage.setItem('token', token);
-      localStorage.setItem('refresh_token', refToken);
-
+      // withCredentials 옵션을 붙혀주면 알아서 쿠키가 설정된다.
+      await client.post(`/login`, form, { withCredentials: true });
       setUser({ isLogined: true });
-
-      // 홈화면으로
       router.replace('/');
     } catch (error) {
       // 사용자 정보가 없을 시
@@ -62,7 +54,6 @@ function Login() {
           password: '이메일 또는 비밀번호가 틀렸습니다.',
         });
       } else {
-        alert('알 수 없는 오류가 발생했습니다.');
         console.error(error);
       }
     }

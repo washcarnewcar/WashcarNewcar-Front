@@ -141,9 +141,7 @@ export default function StoreForm({ data }: StoreFormProps) {
     }
 
     try {
-      const response = await authClient.get(
-        `/provider/check-slug/${formik.values.slug}`
-      );
+      const response = await authClient.get(`/provider/check-slug/${formik.values.slug}`);
       console.debug(`GET /provider/check-slug/${formik.values.slug}`);
 
       console.debug(response?.data);
@@ -289,11 +287,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   /**
    * 백엔드에 정보 전송
    */
-  const postToApi = async (
-    values: Values,
-    previewImageUrl: string,
-    storeImageUrls: string[]
-  ) => {
+  const postToApi = async (values: Values, previewImageUrl: string, storeImageUrls: string[]) => {
     const storeDto: StoreDto = {
       name: values.name,
       tel: `${values.tel1}-${values.tel2}-${values.tel3}`,
@@ -312,10 +306,7 @@ export default function StoreForm({ data }: StoreFormProps) {
 
     // provider/:slug/store 일때
     if (data) {
-      const response = await authClient.post(
-        `/provider/${data.slug}/store`,
-        storeDto
-      );
+      const response = await authClient.post(`/provider/${data.slug}/store`, storeDto);
       console.debug(`POST /provider/${data.slug}/store`, storeDto);
       console.debug(response?.data);
 
@@ -370,10 +361,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   /**
    * 승인 요청 버튼을 눌렀을 때
    */
-  const handleSubmit = async (
-    values: Values,
-    { setSubmitting, setErrors }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setSubmitting, setErrors }: FormikHelpers<Values>) => {
     // slug 유효한지 확인
     if (!slugValid) {
       setErrors({
@@ -403,9 +391,7 @@ export default function StoreForm({ data }: StoreFormProps) {
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 500) {
-          alert(
-            '서버에 전송하는 도중 오류가 발생했습니다.\n다시 시도해주세요.'
-          );
+          alert('서버에 전송하는 도중 오류가 발생했습니다.\n다시 시도해주세요.');
           setSubmitting(false);
           return;
         }
@@ -516,9 +502,7 @@ export default function StoreForm({ data }: StoreFormProps) {
             onChange={formik.handleChange}
             isInvalid={!!formik.errors.name && formik.touched.name}
           />
-          <Form.Control.Feedback type="invalid">
-            {formik.errors.name}
-          </Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">{formik.errors.name}</Form.Control.Feedback>
         </Form.Group>
 
         {/* 매장 전화번호 */}
@@ -555,9 +539,7 @@ export default function StoreForm({ data }: StoreFormProps) {
               isInvalid={!!formik.errors.tel3 && formik.touched.tel3}
             />
           </div>
-          <Form.Text>
-            확인을 위해 연락을 취할 수 있으니 정확하게 적어주시기 바랍니다.
-          </Form.Text>
+          <Form.Text>확인을 위해 연락을 취할 수 있으니 정확하게 적어주시기 바랍니다.</Form.Text>
         </Form.Group>
 
         {/* 매장 주소 */}
@@ -573,9 +555,7 @@ export default function StoreForm({ data }: StoreFormProps) {
               isInvalid={!!formik.errors.address && formik.touched.address}
             />
             <Button onClick={handleAddressClick}>주소 찾기</Button>
-            <Form.Control.Feedback type="invalid">
-              {formik.errors.address}
-            </Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">{formik.errors.address}</Form.Control.Feedback>
           </InputGroup>
           <Form.Control
             type="text"
@@ -623,18 +603,12 @@ export default function StoreForm({ data }: StoreFormProps) {
               중복 확인
             </Button>
             {formik.errors.slug ? (
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.slug}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.slug}</Form.Control.Feedback>
             ) : (
-              <Form.Control.Feedback type="valid">
-                {slugValid}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="valid">{slugValid}</Form.Control.Feedback>
             )}
           </InputGroup>
-          <Form.Text>
-            영문 대소문자와 숫자, 언더바(_)만 입력 가능합니다.
-          </Form.Text>
+          <Form.Text>영문 대소문자와 숫자, 언더바(_)만 입력 가능합니다.</Form.Text>
         </Form.Group>
 
         {/* 찾아오는 길 */}
@@ -676,11 +650,7 @@ export default function StoreForm({ data }: StoreFormProps) {
           {!previewImage.previewUrl ? null : (
             <div className={styles.image_container}>
               <div className={styles.image_wrapper}>
-                <button
-                  type="button"
-                  className={styles.close_wrapper}
-                  onClick={handlePreviewImageCloseClick}
-                >
+                <button type="button" className={styles.close_wrapper} onClick={handlePreviewImageCloseClick}>
                   <IoClose />
                 </button>
                 <Image
@@ -702,12 +672,7 @@ export default function StoreForm({ data }: StoreFormProps) {
         {/* 매장 사진 */}
         <Form.Group className={styles.form_group}>
           <Form.Label>매장 사진</Form.Label>
-          <Form.Control
-            type="file"
-            multiple
-            accept="image/png, image/jpeg"
-            onChange={handleStoreImageChange}
-          />
+          <Form.Control type="file" multiple accept="image/png, image/jpeg" onChange={handleStoreImageChange} />
           {/* 매장 사진 표시 */}
           {storeImages.length === 0 ? null : (
             <div className={styles.image_container}>
@@ -737,18 +702,8 @@ export default function StoreForm({ data }: StoreFormProps) {
           )}
         </Form.Group>
 
-        <Button
-          type="submit"
-          className={styles.submit_button}
-          disabled={formik.isSubmitting}
-        >
-          {formik.isSubmitting ? (
-            <BeatLoader color="white" size="10px" />
-          ) : data ? (
-            '정보 수정'
-          ) : (
-            '승인 요청'
-          )}
+        <Button type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+          {formik.isSubmitting ? <BeatLoader color="white" size="10px" /> : data ? '정보 수정' : '승인 요청'}
         </Button>
       </Form>
     </div>
