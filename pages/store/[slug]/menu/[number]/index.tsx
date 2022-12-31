@@ -70,13 +70,10 @@ export default function Menu() {
    * 차 브랜드를 받아오는 함수
    */
   const getBrand = async () => {
-    try {
-      const response = await client.get(`/car/brand`);
-      console.debug(`GET /car/brand`);
-      setBrands(response.data.brand);
-    } catch (error) {
-      console.error(error);
-    }
+    const response = await client.get(`/car/brand`);
+    const { brand } = response?.data;
+    console.debug(`GET /car/brand`, brand);
+    if (brand) setBrands(brand);
   };
 
   /**
@@ -84,8 +81,9 @@ export default function Menu() {
    */
   const getModel = async (brandNumber: string) => {
     const response = await client.get(`/car/brand/${brandNumber}`);
-    console.debug(`GET /car/brand/${brandNumber}`);
-    setModels(response.data.model);
+    const { model } = response?.data;
+    console.debug(`GET /car/brand/${brandNumber}`, model);
+    if (model) setModels(model);
   };
 
   /**
@@ -121,10 +119,7 @@ export default function Menu() {
     }
   };
 
-  const handleSubmit = (
-    values: Values,
-    { setSubmitting, setErrors }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = (values: Values, { setSubmitting, setErrors }: FormikHelpers<Values>) => {
     setSubmitting(true);
 
     setSubmitting(false);
@@ -172,13 +167,7 @@ export default function Menu() {
 
       <div className={styles.store}>
         <div className={styles.image_container}>
-          <Image
-            src="/style_carcare.jpg"
-            alt="menu_image"
-            width={200}
-            height={200}
-            className={styles.image}
-          />
+          <Image src="/style_carcare.jpg" alt="menu_image" width={200} height={200} className={styles.image} />
         </div>
         <div className={styles.menu_info}>
           <div className={styles.menu_title}>{tempData.title}</div>
@@ -188,9 +177,7 @@ export default function Menu() {
 
       <div className={styles.price}>
         <div className={styles.price_title}>가격</div>
-        <div className={styles.price_value}>
-          {Intl.NumberFormat().format(tempData.price)}원
-        </div>
+        <div className={styles.price_value}>{Intl.NumberFormat().format(tempData.price)}원</div>
       </div>
 
       <Seperator />
@@ -205,9 +192,7 @@ export default function Menu() {
               [styles.date_input_unselected]: !formik.values.date,
             })}
           >
-            {formik.values.date
-              ? moment(formik.values.date).format('MM월 D일 a h시 mm분')
-              : '예약 날짜를 선택해주세요'}
+            {formik.values.date ? moment(formik.values.date).format('MM월 D일 a h시 mm분') : '예약 날짜를 선택해주세요'}
           </Link>
         </Form.Group>
 
@@ -278,10 +263,7 @@ export default function Menu() {
 
         <Form.Group className={styles.form_group}>
           <Form.Label className={styles.form_label}>요청사항</Form.Label>
-          <Form.Control
-            as="textarea"
-            className={styles.request_input}
-          ></Form.Control>
+          <Form.Control as="textarea" className={styles.request_input}></Form.Control>
         </Form.Group>
 
         <div className={styles.blank}></div>
@@ -289,15 +271,9 @@ export default function Menu() {
         <div className={styles.result}>
           <div className={styles.result_price}>
             <div className={styles.result_price_title}>총 결제 금액</div>
-            <div className={styles.result_price_value}>
-              {Intl.NumberFormat().format(tempData.price)}원
-            </div>
+            <div className={styles.result_price_value}>{Intl.NumberFormat().format(tempData.price)}원</div>
           </div>
-          <Button
-            className={styles.result_submit}
-            type="submit"
-            disabled={formik.isSubmitting}
-          >
+          <Button className={styles.result_submit} type="submit" disabled={formik.isSubmitting}>
             예약하기
           </Button>
         </div>

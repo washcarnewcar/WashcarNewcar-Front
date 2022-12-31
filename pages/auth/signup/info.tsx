@@ -43,8 +43,8 @@ export default function SignUpInfo() {
     };
     console.debug(`POST /signup`);
     const response = await client.post(`/signup`, data);
-    const status = response?.data?.status;
-    if (status) {
+    const { status, message } = response?.data;
+    if (status && message) {
       switch (status) {
         // 회원가입 성공
         case 1800:
@@ -56,10 +56,10 @@ export default function SignUpInfo() {
           alert('회원가입에 실패했습니다.');
           break;
         default:
-          console.error('알 수 없는 상태코드');
+          throw new Error(message);
       }
     } else {
-      console.error('잘못된 응답');
+      throw new Error('잘못된 응답');
     }
 
     setSubmitting(false);
@@ -135,19 +135,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const response = await server.post(`/signup/check/number`, { data: { email: email, number: number } });
-  const { status } = response.data;
-  if (status) {
+  const { status, message } = response.data;
+  if (status && message) {
     switch (status) {
       // number 유효
       case 2700:
         return { props: {} };
       // number 유효하지 않음
       case 2701:
-        return { redirect: { destination: `/`, statusCode: 302 } };
       default:
-        return { redirect: { destination: `/error`, statusCode: 302 } };
+        throw new Error(message);
     }
   } else {
-    return { redirect: { destination: `/error`, statusCode: 302 } };
+    throw new Error('잘못된 응답');
   }
 };

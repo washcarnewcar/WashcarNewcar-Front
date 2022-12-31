@@ -44,48 +44,52 @@ export default function ProviderDashboard() {
 
     const getStoreState = async () => {
       const response = await authClient.get(`/provider/${slug}/approve`);
-      const data = response?.data;
-      console.debug(`GET /provider/${slug}/approve`, data);
-      switch (data.status) {
-        // 세차장 승인, 페이지 운영중
-        case 1500:
-          setStoreStatus(Status.Operation);
-          setReady((ready) => ({
-            ...ready,
-            status: true,
-          }));
-          return;
-        // 세차장 승인 대기중
-        case 1501:
-          setStoreStatus(Status.Waiting);
-          setReady((ready) => ({
-            ...ready,
-            status: true,
-          }));
-          return;
-        // 세차장 승인 거부
-        case 1502:
-          setStoreStatus(Status.Abort);
-          setReady((ready) => ({
-            ...ready,
-            status: true,
-          }));
-          return;
-        // 정상적인 접근 아님
-        default:
-          throw Error('잘못된 응답');
+      const { status, message } = response?.data;
+      console.debug(`GET /provider/${slug}/approve`, response?.data);
+      if (status && message) {
+        switch (status) {
+          // 세차장 승인, 페이지 운영중
+          case 1500:
+            setStoreStatus(Status.Operation);
+            setReady((ready) => ({
+              ...ready,
+              status: true,
+            }));
+            return;
+          // 세차장 승인 대기중
+          case 1501:
+            setStoreStatus(Status.Waiting);
+            setReady((ready) => ({
+              ...ready,
+              status: true,
+            }));
+            return;
+          // 세차장 승인 거부
+          case 1502:
+            setStoreStatus(Status.Abort);
+            setReady((ready) => ({
+              ...ready,
+              status: true,
+            }));
+            return;
+          // 정상적인 접근 아님
+          default:
+            throw new Error(message);
+        }
+      } else {
+        throw new Error('잘못된 응답');
       }
     };
 
     const getRequestList = async () => {
       const response = await authClient.get(`/provider/${slug}/request`);
-      const list: RequestDto[] = response.data.list;
+      const list: RequestDto[] = response?.data.list;
       console.debug(`GET /provider/${slug}/request`, list);
     };
 
     const getScheduleList = async () => {
       const response = await authClient.get(`/provider/${slug}/schedule`);
-      const list: ScheduleDto[] = response.data.list;
+      const list: ScheduleDto[] = response?.data.list;
       console.debug(`GET /provider/${slug}/schedule`, list);
     };
 
@@ -197,9 +201,7 @@ function List() {
             <div>
               <div className={styles.menu}>외부 세차</div>
               <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>
-                {moment().format('YYYY.MM.DD(dd) HH:mm')}
-              </div>
+              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
             </div>
             <div className={styles.arrow}>
               <IoIosArrowForward size={25} />
@@ -213,9 +215,7 @@ function List() {
             <div>
               <div className={styles.menu}>외부 세차</div>
               <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>
-                {moment().format('YYYY.MM.DD(dd) HH:mm')}
-              </div>
+              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
             </div>
             <div className={styles.arrow}>
               <IoIosArrowForward size={25} />
@@ -229,9 +229,7 @@ function List() {
             <div>
               <div className={styles.menu}>외부 세차</div>
               <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>
-                {moment().format('YYYY.MM.DD(dd) HH:mm')}
-              </div>
+              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
             </div>
             <div className={styles.arrow}>
               <IoIosArrowForward size={25} />

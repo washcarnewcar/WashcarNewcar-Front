@@ -140,12 +140,10 @@ export default function StoreForm({ data }: StoreFormProps) {
       return;
     }
 
-    try {
-      const response = await authClient.get(`/provider/check-slug/${formik.values.slug}`);
-      console.debug(`GET /provider/check-slug/${formik.values.slug}`);
-
-      console.debug(response?.data);
-      const status: number = response.data.status;
+    const response = await authClient.get(`/provider/check-slug/${formik.values.slug}`);
+    console.debug(`GET /provider/check-slug/${formik.values.slug}`, response?.data);
+    const { status, message } = response?.data;
+    if (status && message) {
       switch (status) {
         case 1400:
           formik.setErrors({
@@ -162,11 +160,10 @@ export default function StoreForm({ data }: StoreFormProps) {
           setSlugValid('');
           return;
         default:
-          throw Error('알 수 없는 상태코드');
+          throw new Error(message);
       }
-    } catch (error) {
-      console.error(error);
-      return;
+    } else {
+      throw new Error('잘못된 응답');
     }
   };
 
@@ -306,12 +303,11 @@ export default function StoreForm({ data }: StoreFormProps) {
 
     // provider/:slug/store 일때
     if (data) {
-      const response = await authClient.post(`/provider/${data.slug}/store`, storeDto);
       console.debug(`POST /provider/${data.slug}/store`, storeDto);
-      console.debug(response?.data);
-
-      if (response) {
-        switch (response.data.status) {
+      const response = await authClient.post(`/provider/${data.slug}/store`, storeDto);
+      const { status, message } = response?.data;
+      if (status && message) {
+        switch (status) {
           case 2500:
             alert('수정되었습니다.');
             router.replace(`/provider/${formik.values.slug}`);
@@ -326,18 +322,21 @@ export default function StoreForm({ data }: StoreFormProps) {
             return;
           default:
             formik.setSubmitting(false);
-            throw Error('알 수 없는 상태코드 수신');
+            throw new Error(message);
         }
+      } else {
+        throw new Error('잘못된 응답');
       }
     }
+
     // provider/new 일때
     else if (data === null) {
       const response = await authClient.post(`/provider/new`, storeDto);
       console.debug(`POST /provider/new`, storeDto);
-      console.debug(response.data);
+      const { status, message } = response?.data;
 
-      if (response) {
-        switch (response.data.status) {
+      if (status && message) {
+        switch (status) {
           case 1300:
             alert('성공적으로 요청되었습니다.');
             router.replace(`/provider/${formik.values.slug}`);
@@ -351,9 +350,10 @@ export default function StoreForm({ data }: StoreFormProps) {
             formik.setSubmitting(false);
             return;
           default:
-            formik.setSubmitting(false);
-            throw Error('알 수 없는 상태코드 수신');
+            throw new Error(message);
         }
+      } else {
+        throw new Error('잘못된 응답');
       }
     }
   };

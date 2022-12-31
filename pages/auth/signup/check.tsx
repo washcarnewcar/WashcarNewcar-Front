@@ -34,8 +34,8 @@ export default function SigninCheck() {
     };
     console.debug(`POST /signup/check/number`, data);
     const response = await client.post(`/signup/check/number`, data);
-    const status: number | undefined = response?.data?.status;
-    if (status) {
+    const { status, message } = response?.data;
+    if (status && message) {
       switch (status) {
         // 인증번호 유효
         case 2700:
@@ -48,10 +48,10 @@ export default function SigninCheck() {
           setErrors({ number: '유효하지 않은 인증번호입니다.' });
           break;
         default:
-          console.error('알 수 없는 상태코드');
+          throw new Error(message);
       }
     } else {
-      console.error('잘못된 응답');
+      throw new Error('잘못된 응답');
     }
 
     setSubmitting(false);
@@ -108,8 +108,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const response = await server.post(`/signup/check/email`, { data: { email: email } });
-  const { status } = response.data;
-  if (status) {
+  const { status, message } = response.data;
+  if (status && message) {
     switch (status) {
       // email 유효
       case 1700:
@@ -117,11 +117,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       // email 유효하지 않음
       case 1701:
       case 1702:
-        return { redirect: { destination: `/`, statusCode: 302 } };
       default:
-        return { redirect: { destination: `/error`, statusCode: 302 } };
+        throw new Error(message);
     }
   } else {
-    return { redirect: { destination: `/error`, statusCode: 302 } };
+    throw new Error('잘못된 응답');
   }
 };

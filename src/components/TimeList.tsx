@@ -53,11 +53,7 @@ export default function TimeList() {
   const router = useRouter();
   const { slug } = router.query;
 
-  const setDayOfWeek = (
-    dayOfWeek: number,
-    startEnd: string,
-    time: string | null
-  ) => {
+  const setDayOfWeek = (dayOfWeek: number, startEnd: string, time: string | null) => {
     let oneDay = timeList[dayOfWeek];
 
     // 시작 시간을 입력했을 때
@@ -112,15 +108,11 @@ export default function TimeList() {
         saturday: timeList[6],
       };
 
-      try {
-        const response = await authClient.post(
-          `/provider/${slug}/time`,
-          timeDto
-        );
-        console.debug(`POST /provider/${slug}/time`, timeDto);
-        const data = response?.data;
-        console.debug('time response data', data);
-        switch (data?.status) {
+      const response = await authClient.post(`/provider/${slug}/time`, timeDto);
+      console.debug(`POST /provider/${slug}/time`, timeDto);
+      const { status, message } = response?.data;
+      if (status && message) {
+        switch (status) {
           case 2000:
             alert('적용되었습니다.');
             return;
@@ -128,10 +120,10 @@ export default function TimeList() {
             alert('운영 시간을 다시 확인해주세요');
             break;
           default:
-            throw Error('잘못된 응답');
+            throw new Error(message);
         }
-      } catch (error) {
-        console.error(error);
+      } else {
+        throw new Error('잘못된 응답');
       }
     }
     setSubmitting(false);
@@ -142,9 +134,8 @@ export default function TimeList() {
 
     const getData = async () => {
       const response = await authClient.get(`/provider/${slug}/time`);
-      console.debug(`GET /provider/${slug}/time`);
+      console.debug(`GET /provider/${slug}/time`, response?.data);
       const data: TimeDto = response?.data;
-      console.debug('time data', data);
       if (data) {
         const arr: (Time | null)[] = [null, null, null, null, null, null, null];
         arr[0] = data.sunday;
@@ -183,10 +174,7 @@ export default function TimeList() {
     return (
       <div className={styles.item_container}>
         <button
-          className={classNames(
-            styles.day_of_week,
-            time ? styles.day_of_week_activate : styles.day_of_week_deactivate
-          )}
+          className={classNames(styles.day_of_week, time ? styles.day_of_week_activate : styles.day_of_week_deactivate)}
           onClick={handleClick}
         >
           {displayDayOfWeek()}
@@ -210,10 +198,7 @@ export default function TimeList() {
     };
 
     const handleEndChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      if (
-        start.current &&
-        e.target.selectedIndex <= start.current.selectedIndex
-      ) {
+      if (start.current && e.target.selectedIndex <= start.current.selectedIndex) {
         setErrors(dayOfWeek, true);
       } else {
         setErrors(dayOfWeek, false);
@@ -261,9 +246,7 @@ export default function TimeList() {
             {generateTime()}
           </Form.Select>
         </div>
-        <Form.Text className={styles.error_message}>
-          {error[dayOfWeek]}
-        </Form.Text>
+        <Form.Text className={styles.error_message}>{error[dayOfWeek]}</Form.Text>
       </div>
     );
   }
@@ -281,11 +264,7 @@ export default function TimeList() {
         </div>
       ))}
       <div className={styles.button_container}>
-        <Button
-          className={styles.button}
-          onClick={handleSubmit}
-          disabled={error.some((error) => error) || isSubmiting}
-        >
+        <Button className={styles.button} onClick={handleSubmit} disabled={error.some((error) => error) || isSubmiting}>
           {isSubmiting ? <BeatLoader color="white" size="10px" /> : '적용'}
         </Button>
       </div>

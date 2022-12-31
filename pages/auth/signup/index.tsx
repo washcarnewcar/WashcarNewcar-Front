@@ -32,8 +32,8 @@ export default function SignUp() {
       email: values.email,
     });
     console.debug(`POST /signup/check/email`, response?.data);
-    const status: number | undefined = response?.data?.status;
-    if (status) {
+    const { status, message } = response?.data;
+    if (status && message) {
       switch (status) {
         // email 전송함
         case 1700:
@@ -50,10 +50,10 @@ export default function SignUp() {
           setErrors({ email: '이메일 형식에 맞지 않습니다' });
           break;
         default:
-          console.error('알 수 없는 상태코드');
+          throw new Error(message);
       }
     } else {
-      console.error('잘못된 응답');
+      throw new Error('잘못된 응답');
     }
 
     setSubmitting(false);
