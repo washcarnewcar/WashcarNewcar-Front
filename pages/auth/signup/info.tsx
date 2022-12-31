@@ -135,7 +135,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const response = await server.post(`/signup/check/number`, { data: { email: email, number: number } });
-  const { status, message } = response.data;
+  const { status, message } = response?.data;
   if (status && message) {
     switch (status) {
       // number 유효
