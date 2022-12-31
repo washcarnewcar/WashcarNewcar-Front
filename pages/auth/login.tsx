@@ -28,7 +28,7 @@ const schema = object().shape({
   password: string().required('비밀번호를 입력해주세요'),
 });
 
-function Login() {
+export default function Login() {
   const router = useRouter();
   const { user, setUser } = useContext(UserContext);
 
@@ -129,5 +129,3 @@ function Login() {
     </>
   );
 }
-
-export default Login;

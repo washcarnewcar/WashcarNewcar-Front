@@ -1,12 +1,12 @@
 import { FormikHelpers, useFormik } from 'formik';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { number, object } from 'yup';
 import AuthHeader from '../../../src/components/AuthHeader';
-import { client } from '../../../src/function/request';
+import { client, server } from '../../../src/function/request';
 import styles from '../../../styles/Auth.module.scss';
 
 interface Values {
@@ -18,19 +18,14 @@ const initialValues: Values = {
 };
 
 const schema = object({
-  number: number()
-    .typeError('숫자만 입력할 수 있습니다.')
-    .required('인증번호를 정확하게 입력해주세요'),
+  number: number().typeError('숫자만 입력할 수 있습니다.').required('인증번호를 정확하게 입력해주세요'),
 });
 
 export default function SigninCheck() {
   const router = useRouter();
   const { email } = router.query;
 
-  const handleSubmit = async (
-    values: Values,
-    { setSubmitting, setErrors }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setSubmitting, setErrors }: FormikHelpers<Values>) => {
     setSubmitting(true);
 
     const data = {
@@ -68,14 +63,6 @@ export default function SigninCheck() {
     validationSchema: schema,
   });
 
-  // email이 유효한지 확인
-  useEffect(() => {
-    if (!router.isReady) return;
-    if (!email) {
-      router.replace('/');
-    }
-  }, [router.isReady]);
-
   return (
     <>
       <Head>
@@ -89,15 +76,8 @@ export default function SigninCheck() {
 
           <Form className={styles.form} onSubmit={formik.handleSubmit}>
             <Form.Group>
-              <Form.Control
-                className={styles.inputs}
-                value={email || ''}
-                disabled
-                isValid={true}
-              />
-              <Form.Control.Feedback type="valid">
-                이메일로 인증번호를 보냈습니다.
-              </Form.Control.Feedback>
+              <Form.Control className={styles.inputs} value={email || ''} disabled isValid={true} />
+              <Form.Control.Feedback type="valid">이메일로 인증번호를 보냈습니다.</Form.Control.Feedback>
             </Form.Group>
             <Form.Group>
               <Form.Control
@@ -108,22 +88,11 @@ export default function SigninCheck() {
                 isInvalid={!!formik.errors.number && formik.touched.number}
                 placeholder="인증번호"
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.number}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.number}</Form.Control.Feedback>
               <Form.Text>이메일로 전송된 인증번호를 입력해주세요.</Form.Text>
             </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              className={styles.submit_button}
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? (
-                <BeatLoader color="white" size={10} />
-              ) : (
-                '확인'
-              )}
+            <Button variant="primary" type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+              {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : '확인'}
             </Button>
           </Form>
         </div>
@@ -131,3 +100,28 @@ export default function SigninCheck() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { email } = context.query;
+  if (!email) {
+    return { redirect: { destination: `/`, statusCode: 302 } };
+  }
+
+  const response = await server.post(`/signup/check/email`, { data: { email: email } });
+  const { status } = response.data;
+  if (status) {
+    switch (status) {
+      // email 유효
+      case 1700:
+        return { props: {} };
+      // email 유효하지 않음
+      case 1701:
+      case 1702:
+        return { redirect: { destination: `/`, statusCode: 302 } };
+      default:
+        return { redirect: { destination: `/error`, statusCode: 302 } };
+    }
+  } else {
+    return { redirect: { destination: `/error`, statusCode: 302 } };
+  }
+};
