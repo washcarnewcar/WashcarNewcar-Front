@@ -93,7 +93,8 @@ export default function Except() {
 
     console.debug(`POST /provider/${slug}/except`, sendData);
     const response = await authClient.post(`/provider/${slug}/except`, sendData);
-    const { status, message } = response?.data;
+    const status = response?.data?.status;
+    const message = response?.data?.message;
     if (status && message) {
       switch (status) {
         case 2100:

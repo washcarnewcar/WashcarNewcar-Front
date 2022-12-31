@@ -44,7 +44,8 @@ export default function ProviderDashboard() {
 
     const getStoreState = async () => {
       const response = await authClient.get(`/provider/${slug}/approve`);
-      const { status, message } = response?.data;
+      const status = response?.data?.status;
+      const message = response?.data?.message;
       console.debug(`GET /provider/${slug}/approve`, response?.data);
       if (status && message) {
         switch (status) {

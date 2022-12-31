@@ -82,7 +82,8 @@ export default function MenuForm({ data }: MenuFormProps) {
     if (data) {
       const response = await authClient.put(`/provider/menu/${number}`, menuDto);
       console.debug(`PUT /provider/menu/${number}`, menuDto);
-      const { status, message } = response?.data;
+      const status = response?.data?.status;
+      const message = response?.data?.message;
       if (status && message) {
         switch (status) {
           case 2400:
@@ -104,7 +105,8 @@ export default function MenuForm({ data }: MenuFormProps) {
     else if (data === null) {
       const response = await authClient.post(`provider/${slug}/menu`, menuDto);
       console.debug(`POST provider/${slug}/menu`, menuDto);
-      const { status, message } = response?.data;
+      const status = response?.data?.status;
+      const message = response?.data?.message;
       if (status && message) {
         switch (status) {
           case 2200:
@@ -156,7 +158,8 @@ export default function MenuForm({ data }: MenuFormProps) {
 
   const handleDeleteClick = async () => {
     const response = await authClient.delete(`/provider/menu/${number}`);
-    const { status, message } = response?.data;
+    const status = response?.data?.status;
+    const message = response?.data?.message;
     if (status && message) {
       switch (status) {
         case 2300:

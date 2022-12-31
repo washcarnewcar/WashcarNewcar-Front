@@ -43,7 +43,8 @@ export default function SignUpInfo() {
     };
     console.debug(`POST /signup`);
     const response = await client.post(`/signup`, data);
-    const { status, message } = response?.data;
+    const status = response?.data?.status;
+    const message = response?.data?.message;
     if (status && message) {
       switch (status) {
         // 회원가입 성공
@@ -135,7 +136,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const response = await server.post(`/signup/check/number`, { data: { email: email, number: number } });
-  const { status, message } = response?.data;
+  const status = response?.data?.status;
+  const message = response?.data?.message;
   if (status && message) {
     switch (status) {
       // number 유효

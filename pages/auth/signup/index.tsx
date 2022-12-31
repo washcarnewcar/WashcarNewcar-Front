@@ -32,7 +32,8 @@ export default function SignUp() {
       email: values.email,
     });
     console.debug(`POST /signup/check/email`, response?.data);
-    const { status, message } = response?.data;
+    const status = response?.data?.status;
+    const message = response?.data?.message;
     if (status && message) {
       switch (status) {
         // email 전송함

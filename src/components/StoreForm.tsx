@@ -13,7 +13,6 @@ import { StoreDto } from '../dto';
 import { compressImage } from '../function/processingImage';
 import { authClient } from '../function/request';
 import { Images, uploadImage, uploadImages } from '../function/S3Utils';
-import Loading from './Loading';
 
 interface Values {
   name: string;
@@ -74,8 +73,6 @@ export default function StoreForm({ data }: StoreFormProps) {
   });
   const [storeImages, setStoreImages] = useState<Images[]>([]);
   const previewImageInput = useRef<HTMLInputElement>(null);
-
-  const [ready, setReady] = useState(false);
 
   /**
    * 주소 팝업창 처리하는 함수
@@ -142,7 +139,8 @@ export default function StoreForm({ data }: StoreFormProps) {
 
     const response = await authClient.get(`/provider/check-slug/${formik.values.slug}`);
     console.debug(`GET /provider/check-slug/${formik.values.slug}`, response?.data);
-    const { status, message } = response?.data;
+    const status = response?.data?.status;
+    const message = response?.data?.message;
     if (status && message) {
       switch (status) {
         case 1400:
@@ -305,7 +303,8 @@ export default function StoreForm({ data }: StoreFormProps) {
     if (data) {
       console.debug(`POST /provider/${data.slug}/store`, storeDto);
       const response = await authClient.post(`/provider/${data.slug}/store`, storeDto);
-      const { status, message } = response?.data;
+      const status = response?.data?.status;
+      const message = response?.data?.message;
       if (status && message) {
         switch (status) {
           case 2500:
@@ -333,7 +332,8 @@ export default function StoreForm({ data }: StoreFormProps) {
     else if (data === null) {
       const response = await authClient.post(`/provider/new`, storeDto);
       console.debug(`POST /provider/new`, storeDto);
-      const { status, message } = response?.data;
+      const status = response?.data?.status;
+      const message = response?.data?.message;
 
       if (status && message) {
         switch (status) {
@@ -473,19 +473,6 @@ export default function StoreForm({ data }: StoreFormProps) {
       setIsMapLoad(true);
     });
   }, []);
-
-  useEffect(() => {
-    if (data === null) {
-      setReady(true);
-    } else if (data) {
-      setData(data);
-      setReady(true);
-    }
-  }, [data]);
-
-  if (!ready) {
-    return <Loading fullscreen />;
-  }
 
   return (
     <div className={styles.container}>

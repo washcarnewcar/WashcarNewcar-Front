@@ -110,7 +110,8 @@ export default function TimeList() {
 
       const response = await authClient.post(`/provider/${slug}/time`, timeDto);
       console.debug(`POST /provider/${slug}/time`, timeDto);
-      const { status, message } = response?.data;
+      const status = response?.data?.status;
+      const message = response?.data?.message;
       if (status && message) {
         switch (status) {
           case 2000:

@@ -34,7 +34,8 @@ export default function SigninCheck() {
     };
     console.debug(`POST /signup/check/number`, data);
     const response = await client.post(`/signup/check/number`, data);
-    const { status, message } = response?.data;
+    const status = response?.data?.status;
+    const message = response?.data?.message;
     if (status && message) {
       switch (status) {
         // 인증번호 유효
@@ -108,7 +109,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const response = await server.post(`/signup/check/email`, { data: { email: email } });
-  const { status, message } = response?.data;
+  const status = response?.data?.status;
+  const message = response?.data?.message;
   if (status && message) {
     switch (status) {
       // email 유효
