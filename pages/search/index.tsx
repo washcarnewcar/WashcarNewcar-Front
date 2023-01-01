@@ -104,7 +104,7 @@ export default function Search() {
               foundLocation: foundLocation,
             },
           }}
-          className="d-flex justify-content-between align-items-center text-decoration-none p-3 text-black rounded shadow m-3 mb-4 btn btn-light"
+          className="d-flex justify-content-between align-items-center text-decoration-none p-3 text-black rounded shadow my-3 mb-4 btn btn-light"
         >
           <div className="fs-5 fw-bold">검색 위치</div>
           <div className="d-flex align-items-center">
@@ -131,7 +131,7 @@ function Item({ slug }: ItemProps) {
   return (
     <Link
       href={`/store/${slug}`}
-      className="d-block text-decoration-none text-black rounded shadow m-3 shadow btn btn-light text-start p-3"
+      className="d-block text-decoration-none text-black rounded shadow my-3 shadow btn btn-light text-start p-3"
     >
       <div className="d-flex">
         <Image
