@@ -4,15 +4,10 @@ import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import { Container, Nav, Navbar, Offcanvas } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
-import styles from '../../styles/Header.module.scss';
 import UserContext from '../context/UserProvider';
 import { authClient } from '../function/request';
 
-interface HeaderProps {
-  type: number;
-}
-
-export default function Header({ type }: HeaderProps) {
+export default function Header() {
   const router = useRouter();
   const { user, setUser } = useContext(UserContext);
 
@@ -25,22 +20,22 @@ export default function Header({ type }: HeaderProps) {
   };
 
   return (
-    <Navbar sticky="top" bg="white" expand="sm" className={styles.container}>
+    <Navbar sticky="top" bg="white" expand="sm" className="shadow-sm">
       <Container>
-        <Link href="/" style={{ display: 'flex' }}>
-          <Image className={styles.main_logo} src="/row_logo.png" alt="세차새차" width={146} height={40} priority />
+        <Link href="/" className="flex">
+          <Image src="/row_logo.png" alt="세차새차" width={146} height={40} priority />
         </Link>
         <Navbar.Toggle />
-        <Navbar.Offcanvas placement="end" style={{ width: '300px' }}>
+        <Navbar.Offcanvas placement="end" className="w-75">
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>
               <Link href="/">
-                <Image className={styles.main_logo} src="/row_logo.png" alt="세차새차" width={146} height={40} priority />
+                <Image src="/row_logo.png" alt="세차새차" width={146} height={40} priority />
               </Link>
             </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
-            <Nav className={styles.nav_item}>
+            <Nav className="w-100 justify-content-end">
               {user === null ? (
                 <BeatLoader color="lightGray" />
               ) : user.isLogined ? (
