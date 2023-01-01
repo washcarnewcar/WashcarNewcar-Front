@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
-import { Alert, Button, ListGroup } from 'react-bootstrap';
+import { Alert, Button, Col, Container, ListGroup, Row } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import Loading from '../../../src/components/Loading';
 import LoginCheck from '../../../src/components/LoginCheck';
@@ -14,7 +14,6 @@ import { authClient } from '../../../src/function/request';
 import styles from '../../../styles/ProviderDashboard.module.scss';
 
 interface Ready {
-  status: boolean;
   request: boolean;
   schedule: boolean;
 }
@@ -26,15 +25,19 @@ enum Status {
   Abort,
 }
 
+interface StoreStatus {
+  status: Status;
+  message: string;
+  reason?: string;
+}
+
 export default function ProviderDashboard() {
   const router = useRouter();
   const { slug } = router.query;
-  const { user, setUser } = useContext(UserContext);
   // 임시로 true
-  const [storeStatus, setStoreStatus] = useState<Status>(Status.Loading);
+  const [storeStatus, setStoreStatus] = useState<StoreStatus>({ status: Status.Loading, message: '' });
   const [storeRequests, setStoreRequests] = useState<RequestDto[]>([]);
   const [ready, setReady] = useState<Ready>({
-    status: false,
     request: false,
     schedule: false,
   });
@@ -46,32 +49,21 @@ export default function ProviderDashboard() {
       const response = await authClient.get(`/provider/${slug}/approve`);
       const status = response?.data?.status;
       const message = response?.data?.message;
+      const reason = response?.data?.reason;
       console.debug(`GET /provider/${slug}/approve`, response?.data);
       if (status && message) {
         switch (status) {
           // 세차장 승인, 페이지 운영중
           case 1500:
-            setStoreStatus(Status.Operation);
-            setReady((ready) => ({
-              ...ready,
-              status: true,
-            }));
+            setStoreStatus({ status: Status.Operation, message: message });
             return;
           // 세차장 승인 대기중
           case 1501:
-            setStoreStatus(Status.Waiting);
-            setReady((ready) => ({
-              ...ready,
-              status: true,
-            }));
+            setStoreStatus({ status: Status.Waiting, message: message });
             return;
           // 세차장 승인 거부
           case 1502:
-            setStoreStatus(Status.Abort);
-            setReady((ready) => ({
-              ...ready,
-              status: true,
-            }));
+            setStoreStatus({ status: Status.Abort, message: message, reason: reason });
             return;
           // 정상적인 접근 아님
           default:
@@ -103,36 +95,35 @@ export default function ProviderDashboard() {
     }
   }, [router.isReady]);
 
-  const renderStatus = () => {
-    if (!ready.status) {
-      return (
-        <Alert className={styles.status}>
-          <Loading />
-        </Alert>
-      );
-    }
-
-    switch (storeStatus) {
+  const RenderStatus = () => {
+    switch (storeStatus.status) {
       case Status.Loading:
-        return null;
+        return (
+          <Alert className="text-center">
+            <Loading />
+          </Alert>
+        );
       case Status.Operation:
         return (
-          <Alert variant="success" className={styles.status}>
-            세차장이 승인되었으며, 운영중입니다.
+          <Alert variant="success" className="text-center">
+            {storeStatus.message}
           </Alert>
         );
       case Status.Waiting:
         return (
-          <Alert variant="primary" className={styles.status}>
-            세차장 승인 대기중입니다.
+          <Alert variant="primary" className="text-center">
+            {storeStatus.message}
           </Alert>
         );
       case Status.Abort:
         return (
-          <Alert variant="danger" className={styles.status}>
-            세차장 승인 대기중입니다.
+          <Alert variant="danger" className="text-center">
+            {storeStatus.message}
+            이유 : {storeStatus.reason}
           </Alert>
         );
+      default:
+        return null;
     }
   };
 
@@ -142,101 +133,82 @@ export default function ProviderDashboard() {
         <title>세차새차 - 대시보드</title>
       </Head>
       <LoginCheck>
-        <div className={styles.container}>
-          <div className={styles.status_container}>{renderStatus()}</div>
+        <Container className="pt-4">
+          <RenderStatus />
 
-          <div className={styles.menus_container}>
-            <div className={styles.title}>세차 예약 요청</div>
-            <List />
-          </div>
+          <Row>
+            <Col md className="mt-4">
+              <div>
+                <h5 className="fw-bold">세차 예약 요청</h5>
+                <List />
+              </div>
+            </Col>
+            <Col md className="mt-4">
+              <div>
+                <h5 className="fw-bold">오늘의 세차 스케줄</h5>
+                <List />
+              </div>
+            </Col>
+          </Row>
 
-          <div className={styles.menus_container}>
-            <div className={styles.title}>오늘의 세차 스케줄</div>
-            <List />
-          </div>
-
-          <div className={styles.menus_container}>
-            <div className={styles.title}>매장 관리</div>
-            <div className={styles.buttongroup}>
+          <h5 className="fw-bold mt-4">매장 관리</h5>
+          <Row>
+            <Col sm className="mt-2">
               <Button
-                className={styles.button}
-                variant="outline-primary"
+                className="w-100 shadow"
+                variant="outline-secondary"
                 onClick={() => {
                   router.push(`/provider/${slug}/store`);
                 }}
               >
                 매장 정보 설정
               </Button>
+            </Col>
+            <Col sm className="mt-2">
               <Button
-                className={styles.button}
-                variant="outline-primary"
+                className="w-100 shadow"
+                variant="outline-secondary"
                 onClick={() => {
                   router.push(`/provider/${slug}/menu`);
                 }}
               >
                 메뉴 관리
               </Button>
+            </Col>
+            <Col sm className="mt-2">
               <Button
-                className={styles.button}
-                variant="outline-primary"
+                className="w-100 shadow"
+                variant="outline-secondary"
                 onClick={() => {
                   router.push(`/provider/${slug}/time`);
                 }}
               >
                 매장 운영 시간 설정
               </Button>
-            </div>
-          </div>
-        </div>
+            </Col>
+          </Row>
+        </Container>
       </LoginCheck>
     </>
   );
 }
 
 function List() {
+  const router = useRouter();
+
   return (
-    <ListGroup className={classNames(styles.list, styles.reqest)}>
-      <ListGroup.Item>
-        <Link href="/provider/hello/reservation/1" className={styles.link}>
-          <div className={styles.content_container}>
-            <div>
-              <div className={styles.menu}>외부 세차</div>
-              <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
-            </div>
-            <div className={styles.arrow}>
-              <IoIosArrowForward size={25} />
-            </div>
+    <ListGroup className="shadow">
+      <ListGroup.Item action onClick={() => router.push('/provider/hello/reservation/1')}>
+        <div className="d-flex justify-content-between">
+          <div>
+            <div>외부 세차</div>
+            <div className="fs-5 fw-bold">기아 EV6 / 31하 1450</div>
+            <div>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
           </div>
-        </Link>
-      </ListGroup.Item>
-      <ListGroup.Item>
-        <Link href="/" className={styles.link}>
-          <div className={styles.content_container}>
-            <div>
-              <div className={styles.menu}>외부 세차</div>
-              <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
-            </div>
-            <div className={styles.arrow}>
-              <IoIosArrowForward size={25} />
-            </div>
+          <div className="d-flex align-items-center">
+            <IoIosArrowForward size={25} />
           </div>
-        </Link>
-      </ListGroup.Item>
-      <ListGroup.Item>
-        <Link href="/" className={styles.link}>
-          <div className={styles.content_container}>
-            <div>
-              <div className={styles.menu}>외부 세차</div>
-              <div className={styles.car}>기아 EV6 / 31하 1450</div>
-              <div className={styles.date}>{moment().format('YYYY.MM.DD(dd) HH:mm')}</div>
-            </div>
-            <div className={styles.arrow}>
-              <IoIosArrowForward size={25} />
-            </div>
-          </div>
-        </Link>
+        </div>
       </ListGroup.Item>
     </ListGroup>
   );

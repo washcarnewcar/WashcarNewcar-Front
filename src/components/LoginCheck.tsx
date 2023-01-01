@@ -25,7 +25,7 @@ export default function LoginCheck({ children }: LoginCheckProps) {
 
   return (
     <>
-      <Header type={1} />
+      <Header />
       {ready ? children : <Loading fullscreen />}
     </>
   );
