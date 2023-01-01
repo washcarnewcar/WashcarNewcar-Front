@@ -474,6 +474,10 @@ export default function StoreForm({ data }: StoreFormProps) {
     });
   }, []);
 
+  useEffect(() => {
+    if (data) setData(data);
+  }, [data]);
+
   return (
     <div className={styles.container}>
       <div className={styles.title}>매장 정보 변경</div>
