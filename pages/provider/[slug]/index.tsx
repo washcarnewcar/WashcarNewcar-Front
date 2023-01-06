@@ -1,17 +1,13 @@
-import classNames from 'classnames';
 import moment from 'moment';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Button, Col, Container, ListGroup, Row } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import Loading from '../../../src/components/Loading';
 import LoginCheck from '../../../src/components/LoginCheck';
-import UserContext from '../../../src/context/UserProvider';
 import { RequestDto, ScheduleDto } from '../../../src/dto';
 import { authClient } from '../../../src/function/request';
-import styles from '../../../styles/ProviderDashboard.module.scss';
 
 interface Ready {
   request: boolean;
@@ -155,7 +151,7 @@ export default function ProviderDashboard() {
           <Row>
             <Col sm className="mt-2">
               <Button
-                className="w-100 shadow"
+                className="w-100"
                 variant="outline-secondary"
                 onClick={() => {
                   router.push(`/provider/${slug}/store`);
@@ -166,7 +162,7 @@ export default function ProviderDashboard() {
             </Col>
             <Col sm className="mt-2">
               <Button
-                className="w-100 shadow"
+                className="w-100"
                 variant="outline-secondary"
                 onClick={() => {
                   router.push(`/provider/${slug}/menu`);
@@ -177,7 +173,7 @@ export default function ProviderDashboard() {
             </Col>
             <Col sm className="mt-2">
               <Button
-                className="w-100 shadow"
+                className="w-100"
                 variant="outline-secondary"
                 onClick={() => {
                   router.push(`/provider/${slug}/time`);
@@ -197,7 +193,7 @@ function List() {
   const router = useRouter();
 
   return (
-    <ListGroup className="shadow">
+    <ListGroup>
       <ListGroup.Item action onClick={() => router.push('/provider/hello/reservation/1')}>
         <div className="d-flex justify-content-between">
           <div>
