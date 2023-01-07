@@ -20,7 +20,7 @@ export default function Header() {
   };
 
   return (
-    <Navbar sticky="top" bg="white" expand="sm" className="shadow-sm">
+    <Navbar sticky="top" bg="white" expand="sm" className="shadow-sm" id="navbar">
       <Container>
         <Link href="/" className="flex">
           <Image src="/row_logo.png" alt="세차새차" width={146} height={40} priority />

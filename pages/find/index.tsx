@@ -65,7 +65,7 @@ export default function Find() {
       <Head>
         <title>세차새차 - 세차 예약 확인</title>
       </Head>
-      <Header type={1} />
+      <Header />
       <div className={styles.body}>
         <Form className={styles.form} onSubmit={formik.handleSubmit}>
           <div className={styles.title}>예약한 휴대폰 번호를 입력해주세요</div>

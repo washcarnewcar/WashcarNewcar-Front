@@ -120,15 +120,11 @@ function MenuTime() {
       <Head>
         <title>세차새차 - 세차 예약하기</title>
       </Head>
-      <Header type={1} />
+      <Header />
 
       <div className={styles.date}>
         <div className={styles.date_title}>날짜 선택</div>
-        <Datepicker
-          onClickDate={onClickDate}
-          setIsDaySelect={setIsDaySelect}
-          availableDays={availableDays}
-        />
+        <Datepicker onClickDate={onClickDate} setIsDaySelect={setIsDaySelect} availableDays={availableDays} />
       </div>
 
       <div className={styles.time}>
@@ -147,10 +143,7 @@ function MenuTime() {
                         <Button
                           key={amTime.time.toISOString()}
                           variant="outline-primary"
-                          className={classNames(
-                            styles.time_item,
-                            styles.time_item_available
-                          )}
+                          className={classNames(styles.time_item, styles.time_item_available)}
                           onClick={() => onClickTime(amTime.time)}
                         >
                           {moment(amTime.time).format('HH:mm')}
@@ -162,10 +155,7 @@ function MenuTime() {
                           key={amTime.time.toISOString()}
                           variant="outline-secondary"
                           disabled={true}
-                          className={classNames(
-                            styles.time_item,
-                            styles.time_item_unavailable
-                          )}
+                          className={classNames(styles.time_item, styles.time_item_unavailable)}
                         >
                           {moment(amTime.time).format('HH:mm')}
                         </Button>
@@ -187,10 +177,7 @@ function MenuTime() {
                         <Button
                           key={pmTime.time.toISOString()}
                           variant="outline-primary"
-                          className={classNames(
-                            styles.time_item,
-                            styles.time_item_available
-                          )}
+                          className={classNames(styles.time_item, styles.time_item_available)}
                           onClick={() => onClickTime(pmTime.time)}
                         >
                           {moment(pmTime.time).format('HH:mm')}
@@ -202,10 +189,7 @@ function MenuTime() {
                           key={pmTime.time.toISOString()}
                           variant="outline-secondary"
                           disabled={true}
-                          className={classNames(
-                            styles.time_item,
-                            styles.time_item_unavailable
-                          )}
+                          className={classNames(styles.time_item, styles.time_item_unavailable)}
                         >
                           {moment(pmTime.time).format('HH:mm')}
                         </Button>
@@ -221,15 +205,9 @@ function MenuTime() {
 
       <div className={styles.result}>
         <div className={styles.result_date}>
-          {isDaySelect
-            ? moment(selectedDate).format('MM월 D일 a h시 mm분')
-            : '시간을 선택해주세요'}
+          {isDaySelect ? moment(selectedDate).format('MM월 D일 a h시 mm분') : '시간을 선택해주세요'}
         </div>
-        <Button
-          className={styles.result_submit}
-          disabled={!isDaySelect}
-          onClick={onClickSubmit}
-        >
+        <Button className={styles.result_submit} disabled={!isDaySelect} onClick={onClickSubmit}>
           선택
         </Button>
       </div>

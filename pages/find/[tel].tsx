@@ -82,7 +82,7 @@ export default function FindList() {
       <Head>
         <title>세차새차 - 세차 예약 확인</title>
       </Head>
-      <Header type={1} />
+      <Header />
       <div className={styles.container}>
         <div className={styles.title}>예약한 세차</div>
         <div className={styles.blank} />

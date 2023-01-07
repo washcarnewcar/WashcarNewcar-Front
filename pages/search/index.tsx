@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Container } from 'react-bootstrap';
+import { Button, Container, ListGroup } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import { BeatLoader } from 'react-spinners';
 import Header from '../../src/components/Header';
@@ -95,29 +95,34 @@ export default function Search() {
       </Head>
       <Header />
       <Container>
-        <Link
-          href={{
-            pathname: '/search/map',
-            query: {
-              longitude: coordinate.longitude,
-              latitude: coordinate.latitude,
-              foundLocation: foundLocation,
-            },
-          }}
-          className="d-flex justify-content-between align-items-center text-decoration-none p-3 text-black rounded shadow my-3 mb-4 btn btn-light"
+        <Button
+          variant="light"
+          className="d-flex justify-content-between align-items-center p-3 rounded shadow my-4 w-100"
+          onClick={() =>
+            router.push({
+              pathname: '/search/map',
+              query: {
+                longitude: coordinate.longitude,
+                latitude: coordinate.latitude,
+                foundLocation: foundLocation,
+              },
+            })
+          }
         >
           <div className="fs-5 fw-bold">검색 위치</div>
           <div className="d-flex align-items-center">
             <div className="me-2">{foundLocation ? textLocation : <BeatLoader size={10} />}</div>
             <IoIosArrowForward size={20} />
           </div>
-        </Link>
+        </Button>
 
-        <Item slug="stylecarcare" />
-        <Item slug="test" />
-        <Item slug="test" />
-        <Item slug="test" />
-        <Item slug="test" />
+        <ListGroup variant="flush">
+          <Item slug="stylecarcare" />
+          <Item slug="test" />
+          <Item slug="test" />
+          <Item slug="test" />
+          <Item slug="test" />
+        </ListGroup>
       </Container>
     </>
   );
@@ -129,35 +134,34 @@ interface ItemProps {
 
 function Item({ slug }: ItemProps) {
   return (
-    <Link
-      href={`/store/${slug}`}
-      className="d-block text-decoration-none text-black rounded shadow my-3 shadow btn btn-light text-start p-3"
-    >
-      <div className="d-flex">
-        <Image
-          src="/style_carcare.jpg"
-          alt="스타일카케어"
-          width={60}
-          height={60}
-          style={{ objectFit: 'cover' }}
-          className="rounded"
-        />
-        <div className="ps-3">
-          <div className="fs-4 fw-bold">스타일카케어</div>
-          <div className="d-flex align-items-center">
-            <div className="me-3">0.3km</div>
-            <div>
-              ⭐️ <strong>4.7</strong> (200+)
+    <ListGroup.Item className="p-3" action>
+      <Link href={`/store/${slug}`} className="text-decoration-none text-black rounded">
+        <div className="d-flex">
+          <Image
+            src="/style_carcare.jpg"
+            alt="스타일카케어"
+            width={60}
+            height={60}
+            style={{ objectFit: 'cover' }}
+            className="rounded"
+          />
+          <div className="ps-3">
+            <div className="fs-4 fw-bold">스타일카케어</div>
+            <div className="d-flex align-items-center">
+              <div className="me-3">0.3km</div>
+              <div>
+                ⭐️ <strong>4.7</strong> (200+)
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="overflow-scroll d-flex pt-3" style={{ gap: '5px' }}>
-        <Tag text="기본세차 38,500원" />
-        <Tag text="스페셜세차 66,000원" />
-        <Tag text="프리미엄세차 126,000원" />
-      </div>
-    </Link>
+        <div className="overflow-scroll d-flex pt-3" style={{ gap: '5px' }}>
+          <Tag text="기본세차 38,500원" />
+          <Tag text="스페셜세차 66,000원" />
+          <Tag text="프리미엄세차 126,000원" />
+        </div>
+      </Link>
+    </ListGroup.Item>
   );
 }
 

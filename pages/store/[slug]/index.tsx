@@ -4,29 +4,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Carousel, Placeholder, Tab, Tabs } from 'react-bootstrap';
-import {
-  IoCallOutline,
-  IoInformationCircleOutline,
-  IoLocationOutline,
-  IoNavigateOutline,
-} from 'react-icons/io5';
+import { Carousel, Container, ListGroup, Placeholder, Tab, Tabs } from 'react-bootstrap';
+import { IoCallOutline, IoInformationCircleOutline, IoLocationOutline, IoNavigateOutline } from 'react-icons/io5';
 import Header from '../../../src/components/Header';
-import Seperator from '../../../src/components/Seperator';
 import TempImage from '../../../src/components/TempImage';
 import { MenuListDto, StoreDto } from '../../../src/dto';
 import { client } from '../../../src/function/request';
-import styles from '../../../styles/Store.module.scss';
 
 export default function Store() {
   const router = useRouter();
   const { slug } = router.query;
   const [storeInfo, setStoreInfo] = useState<StoreDto>();
-  const [menuList, setMenuList] = useState<MenuListDto[] | null[]>([
-    null,
-    null,
-    null,
-  ]);
+  const [menuList, setMenuList] = useState<MenuListDto[] | null[]>([null, null, null]);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -74,79 +63,76 @@ export default function Store() {
       <Head>
         <title>세차새차 - {storeInfo ? storeInfo.name : '매장 정보'}</title>
       </Head>
-      <Header type={1} />
-      <Carousel>
-        {storeInfo?.store_image
-          ? storeInfo?.store_image.map((storeImage, index) => (
-              <Carousel.Item className={styles.carousel_item} key={index}>
-                <Image
-                  className={styles.carousel_image}
-                  src={process.env.NEXT_PUBLIC_S3_URL + storeImage}
-                  alt="매장사진"
-                  fill
-                />
-              </Carousel.Item>
-            ))
-          : null}
-      </Carousel>
+      <Header />
 
-      {/* storeInfo가 없을 땐 placeholder 표시 */}
-      {storeInfo ? (
-        <div className={styles.title}>
-          <div className={styles.title_image_container}>
-            {/* preview_image가 없을 땐 임시 이미지 표시 */}
-            {storeInfo.preview_image ? (
-              <Image
-                className={styles.title_image}
-                width={60}
-                height={60}
-                src={process.env.NEXT_PUBLIC_S3_URL + storeInfo.preview_image}
-                alt=""
-              />
-            ) : (
-              <TempImage width={50} height={50} />
-            )}
-          </div>
-          <div className={styles.title_content}>
-            <div className={styles.title_name}>{storeInfo.name}</div>
-          </div>
-        </div>
-      ) : (
-        <Placeholder className={styles.title} animation="glow">
-          <Placeholder className={styles.title_image} />
-          <div className={styles.title_content}>
-            <Placeholder
-              style={{ width: '100px' }}
-              className={styles.title_name}
-            />
-          </div>
-        </Placeholder>
-      )}
-
-      <Tabs defaultActiveKey="wash" className={styles.tabs} justify id="tabs">
-        <Tab eventKey="wash" title="세차" tabClassName={styles.tab}>
-          {menuList?.map((menuItem, index) => (
-            <div key={index}>
-              <MenuItem data={menuItem} />
-              <Seperator />
-            </div>
+      <Container className="p-0">
+        <Carousel>
+          {storeInfo?.store_image.map((storeImage, index) => (
+            <Carousel.Item className="text-center" style={{ height: 300 }} key={index}>
+              <Image style={{ objectFit: 'cover' }} src={process.env.NEXT_PUBLIC_S3_URL + storeImage} alt="" fill />
+            </Carousel.Item>
           ))}
-        </Tab>
+        </Carousel>
+      </Container>
+      <Container>
+        {/* storeInfo가 없을 땐 placeholder 표시 */}
+        {storeInfo ? (
+          <div className="d-flex align-items-center m-3">
+            <div
+              className="d-flex justify-content-center align-items-center rounded-3 overflow-hidden bg-secondary bg-opacity-25"
+              style={{ width: 60, height: 60 }}
+            >
+              {/* preview_image가 없을 땐 임시 이미지 표시 */}
+              {storeInfo.preview_image ? (
+                <Image
+                  style={{ objectFit: 'cover' }}
+                  width={60}
+                  height={60}
+                  src={process.env.NEXT_PUBLIC_S3_URL + storeInfo.preview_image}
+                  alt=""
+                />
+              ) : (
+                <TempImage width={50} height={50} />
+              )}
+            </div>
+            <div className="ms-3 fw-bold fs-3">{storeInfo.name}</div>
+          </div>
+        ) : (
+          <Placeholder className="d-flex align-items-center m-3" animation="glow">
+            <Placeholder
+              className="d-flex justify-content-center align-items-center rounded-3 overflow-hidden"
+              style={{ height: 60, width: 60 }}
+            />
+            <Placeholder className="ms-3 fw-bold fs-3" style={{ width: 100 }} />
+          </Placeholder>
+        )}
 
-        <Tab eventKey="info" title="정보" tabClassName={styles.tab}>
-          <InfoItem type="tel" data={storeInfo?.tel} />
-          <InfoItem
-            type="address"
-            data={
-              storeInfo?.address || storeInfo?.address_detail
-                ? `${storeInfo?.address} ${storeInfo?.address_detail}`
-                : undefined
-            }
-          />
-          <InfoItem type="wayto" data={storeInfo?.wayto} />
-          <InfoItem type="information" data={storeInfo?.description} />
-        </Tab>
-      </Tabs>
+        <Tabs defaultActiveKey="wash" justify id="tabs">
+          <Tab eventKey="wash" title="세차">
+            <ListGroup variant="flush">
+              {menuList?.map((menuItem, index) => (
+                <MenuItem data={menuItem} key={index} />
+              ))}
+            </ListGroup>
+          </Tab>
+
+          <Tab eventKey="info" title="정보">
+            <ListGroup variant="flush">
+              <InfoItem type="tel" data={storeInfo?.tel} />
+              <InfoItem
+                type="address"
+                data={
+                  storeInfo?.address || storeInfo?.address_detail
+                    ? `${storeInfo?.address} ${storeInfo?.address_detail}`
+                    : undefined
+                }
+              />
+              <InfoItem type="wayto" data={storeInfo?.wayto} />
+              <InfoItem type="information" data={storeInfo?.description} />
+            </ListGroup>
+          </Tab>
+        </Tabs>
+      </Container>
     </>
   );
 }
@@ -157,80 +143,43 @@ interface InfoItemProps {
 }
 
 function InfoItem({ type, data }: InfoItemProps) {
-  // placeholder
-  if (data === undefined) {
-    return (
-      <>
-        <Placeholder className={styles.info_flex} animation="glow">
-          <div className={styles.icon}>
-            <Placeholder
-              style={{ width: '20px', height: '20px', borderRadius: '4px' }}
-            />
-          </div>
-          <div className={styles.info_content}>
-            <Placeholder style={{ width: '150px' }} />
-          </div>
-        </Placeholder>
-        <Seperator />
-      </>
-    );
-  }
-
   // 데이터가 없으면 표시하지 않음
   if (data === '' || data === null) {
     return null;
   }
 
-  // 유형에 따라 정보 표시
+  let icon = null;
+  // 유형에 따라 아이콘 표시
   switch (type) {
     case 'tel':
-      return (
-        <>
-          <div className={styles.info_flex}>
-            <IoCallOutline className={styles.icon} size={20} color="gray" />
-            <div className={styles.info_content}>{data}</div>
-          </div>
-          <Seperator />
-        </>
-      );
+      icon = <IoCallOutline size={20} color="gray" />;
+      break;
     case 'address':
-      return (
-        <>
-          <div className={styles.info_flex}>
-            <IoLocationOutline className={styles.icon} size={20} color="gray" />
-            <div className={styles.info_content}>{data}</div>
-          </div>
-          <Seperator />
-        </>
-      );
+      icon = <IoLocationOutline size={20} color="gray" />;
+      break;
     case 'wayto':
-      return (
-        <>
-          <div className={styles.info_flex}>
-            <IoNavigateOutline className={styles.icon} size={20} color="gray" />
-            <div className={styles.info_content}>{data}</div>
-          </div>
-          <Seperator />
-        </>
-      );
+      icon = <IoNavigateOutline size={20} color="gray" />;
+      break;
     case 'information':
-      return (
-        <>
-          <div className={styles.info_flex}>
-            <IoInformationCircleOutline
-              className={styles.icon}
-              size={20}
-              color="gray"
-            />
-            <div className={styles.info_content}>{data}</div>
-          </div>
-          <Seperator />
-        </>
-      );
+      icon = <IoInformationCircleOutline size={20} color="gray" />;
+      break;
     default:
       console.error('잘못된 info 타입');
       return null;
   }
+
+  return (
+    <ListGroup.Item className="p-2">
+      <table>
+        <tbody>
+          <tr>
+            <td>{data !== undefined ? icon : <Placeholder className="rounded tw-w-[20px] tw-h-[20px]" />}</td>
+            <td className="ps-3">{data !== undefined ? data : <Placeholder className="w-100" />}</td>
+          </tr>
+        </tbody>
+      </table>
+    </ListGroup.Item>
+  );
 }
 
 interface MenuItemProps {
@@ -244,26 +193,15 @@ function MenuItem({ data }: MenuItemProps) {
   // Placeholder
   if (!data) {
     return (
-      <Placeholder className={styles.link} animation="glow">
-        <div className={styles.container}>
-          <div className={styles.image_wrapper}>
-            <Placeholder
-              style={{ width: 100, height: 100 }}
-              className={styles.image}
-            />
-          </div>
-          <div className={styles.content}>
-            <div className={styles.menu_title_description}>
-              <Placeholder
-                style={{ width: 90 }}
-                className={styles.menu_title}
-              />
-              <Placeholder
-                style={{ width: 90, marginTop: 10 }}
-                className={styles.menu_description}
-              />
+      <Placeholder as={ListGroup.Item} className="p-3" animation="glow">
+        <div className="d-flex align-items-center">
+          <Placeholder className="flex-shrink-0 rounded tw-w-[100px] tw-h-[100px]" />
+          <div className="ms-3 d-flex flex-column justify-content-between w-100 tw-min-h-[100px]">
+            <div>
+              <Placeholder className="fs-3 w-100" />
+              <Placeholder className="w-100" />
             </div>
-            <Placeholder style={{ width: 90 }} className={styles.menu_price} />
+            <Placeholder className="w-100" />
           </div>
         </div>
       </Placeholder>
@@ -271,27 +209,29 @@ function MenuItem({ data }: MenuItemProps) {
   }
 
   return (
-    <Link href={`/store/${slug}/menu/${data.number}`} className={styles.link}>
-      <div className={styles.container}>
-        <div className={styles.image_wrapper}>
+    <ListGroup.Item action className="p-3">
+      <Link
+        href={`/store/${slug}/menu/${data.number}`}
+        className="d-flex align-items-center text-decoration-none text-black"
+      >
+        <div className="d-flex flex-shrink-0 tw-w-px-100 tw-w-[100px] tw-h-[100px]">
           <Image
             width={100}
             height={100}
-            className={styles.image}
+            className="rounded"
+            style={{ objectFit: 'cover' }}
             src="/style_carcare.jpg"
             alt="menu_image"
           />
         </div>
-        <div className={styles.content}>
-          <div className={styles.menu_title_description}>
-            <div className={styles.menu_title}>{data.name}</div>
-            <div className={styles.menu_description}>{data.description}</div>
+        <div className="ms-3 d-flex flex-column justify-content-between tw-min-h-[100px]">
+          <div>
+            <div className="fs-3 fw-bold">{data.name}</div>
+            <div>{data.description}</div>
           </div>
-          <div className={styles.menu_price}>
-            {data.price.toLocaleString()}원
-          </div>
+          <div className="fw-bold">{data.price.toLocaleString()}원</div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </ListGroup.Item>
   );
 }
