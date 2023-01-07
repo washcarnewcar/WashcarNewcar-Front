@@ -2,7 +2,7 @@ import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Form, InputGroup } from 'react-bootstrap';
+import { Button, Container, Form, InputGroup } from 'react-bootstrap';
 import { IoClose, IoImage } from 'react-icons/io5';
 import styles from '../../styles/MenuForm.module.scss';
 import { MenuDto } from '../dto';
@@ -275,46 +275,47 @@ export default function MenuForm({ data }: MenuFormProps) {
   }
 
   return (
-    <div className={styles.container}>
+    <Container className="pt-3">
       <Form onSubmit={formik.handleSubmit}>
-        <div className={styles.image_container}>
-          <div className={styles.image_wrapper}>
-            {image.previewUrl ? (
-              <>
-                <label htmlFor="file" className={styles.change_wrapper}>
-                  <IoImage size="100%" />
-                </label>
-                <button className={styles.delete_button} onClick={handleImageDeleteClick}>
-                  <IoClose />
-                </button>
-                <Image
-                  src={image.uploaded ? process.env.NEXT_PUBLIC_S3_URL + image.previewUrl : image.previewUrl}
-                  alt=""
-                  width={200}
-                  height={200}
-                  className={styles.image}
-                />
-              </>
-            ) : (
-              <>
-                <label htmlFor="file" className={styles.no_image_wrapper}>
-                  <IoImage size="80px" />
-                </label>
-              </>
-            )}
-            <input
-              type="file"
-              id="file"
-              style={{ display: 'none' }}
-              accept="image/png, image/jpeg"
-              onChange={handleImageChange}
-              ref={inputFile}
-            />
-          </div>
+        <div className="d-flex justify-content-center align-items-center mx-auto position-relative overflow-hidden rounded-4 tw-bg-gray-300 tw-h-[200px] tw-w-[200px]">
+          {image.previewUrl ? (
+            <>
+              <label
+                htmlFor="file"
+                className="d-flex justify-content-center align-items-center rounded-5 position-absolute bg-white p-2 tw-bottom-3 tw-right-3 tw-z-10 tw-w-[35px] tw-h-[35px]"
+              >
+                <IoImage size="100%" />
+              </label>
+              <button
+                onClick={handleImageDeleteClick}
+                className="d-flex justify-content-center align-items-center position-absolute rounded-5 bg-white p-2 tw-z-10 tw-right-14 tw-bottom-3 tw-w-[35px] tw-h-[35px]"
+              >
+                <IoClose size="100%" />
+              </button>
+              <Image
+                src={image.uploaded ? process.env.NEXT_PUBLIC_S3_URL + image.previewUrl : image.previewUrl}
+                alt=""
+                fill
+                sizes="200px"
+                className="tw-object-cover"
+              />
+            </>
+          ) : (
+            <label htmlFor="file">
+              <IoImage size="80px" />
+            </label>
+          )}
+          <input
+            type="file"
+            id="file"
+            className="d-none"
+            accept="image/png, image/jpeg"
+            onChange={handleImageChange}
+            ref={inputFile}
+          />
         </div>
-
         {/* 메뉴 이름 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>메뉴 이름</Form.Label>
           <Form.Control
             type="text"
@@ -328,7 +329,7 @@ export default function MenuForm({ data }: MenuFormProps) {
         </Form.Group>
 
         {/* 메뉴 설명 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>메뉴 설명</Form.Label>
           <Form.Control
             as="textarea"
@@ -343,7 +344,7 @@ export default function MenuForm({ data }: MenuFormProps) {
         </Form.Group>
 
         {/* 메뉴 가격 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>메뉴 가격</Form.Label>
           <InputGroup hasValidation>
             <Form.Control
@@ -360,9 +361,9 @@ export default function MenuForm({ data }: MenuFormProps) {
         </Form.Group>
 
         {/* 예상 시간 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>예상 시간</Form.Label>
-          <div className={styles.time}>
+          <div className="d-flex gap-3">
             <InputGroup>
               <Form.Select
                 name="hour"
@@ -388,7 +389,7 @@ export default function MenuForm({ data }: MenuFormProps) {
           </div>
         </Form.Group>
 
-        <div className={styles.button_group}>
+        <div className="mt-4 d-flex gap-3">
           {ready ? (
             data ? (
               <>
@@ -407,6 +408,6 @@ export default function MenuForm({ data }: MenuFormProps) {
           ) : null}
         </div>
       </Form>
-    </div>
+    </Container>
   );
 }

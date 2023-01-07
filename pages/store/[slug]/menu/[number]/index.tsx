@@ -1,16 +1,12 @@
-import classNames from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import moment from 'moment';
 import Head from 'next/head';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import Header from '../../../../../src/components/Header';
-import Seperator from '../../../../../src/components/Seperator';
 import { client } from '../../../../../src/function/request';
-import styles from '../../../../../styles/Menu.module.scss';
 
 const tempData = {
   title: '외부 세차',

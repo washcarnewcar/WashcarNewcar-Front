@@ -68,8 +68,15 @@ export default function Store() {
       <Container className="p-0">
         <Carousel>
           {storeInfo?.store_image.map((storeImage, index) => (
-            <Carousel.Item className="text-center" style={{ height: 300 }} key={index}>
-              <Image style={{ objectFit: 'cover' }} src={process.env.NEXT_PUBLIC_S3_URL + storeImage} alt="" fill />
+            <Carousel.Item className="tw-h-[300px]" key={index}>
+              <Image
+                src={process.env.NEXT_PUBLIC_S3_URL + storeImage}
+                alt=""
+                fill
+                priority
+                sizes="300px"
+                className="tw-object-cover"
+              />
             </Carousel.Item>
           ))}
         </Carousel>
@@ -78,18 +85,15 @@ export default function Store() {
         {/* storeInfo가 없을 땐 placeholder 표시 */}
         {storeInfo ? (
           <div className="d-flex align-items-center m-3">
-            <div
-              className="d-flex justify-content-center align-items-center rounded-3 overflow-hidden bg-secondary bg-opacity-25"
-              style={{ width: 60, height: 60 }}
-            >
+            <div className="d-flex justify-content-center align-items-center rounded-3 overflow-hidden tw-bg-gray-200 position-relative tw-h-[60px] tw-w-[60px]">
               {/* preview_image가 없을 땐 임시 이미지 표시 */}
               {storeInfo.preview_image ? (
                 <Image
-                  style={{ objectFit: 'cover' }}
-                  width={60}
-                  height={60}
                   src={process.env.NEXT_PUBLIC_S3_URL + storeInfo.preview_image}
                   alt=""
+                  fill
+                  sizes="60px"
+                  className="tw-object-cover"
                 />
               ) : (
                 <TempImage width={50} height={50} />
@@ -214,20 +218,13 @@ function MenuItem({ data }: MenuItemProps) {
         href={`/store/${slug}/menu/${data.number}`}
         className="d-flex align-items-center text-decoration-none text-black"
       >
-        <div className="d-flex flex-shrink-0 tw-w-px-100 tw-w-[100px] tw-h-[100px]">
-          <Image
-            width={100}
-            height={100}
-            className="rounded"
-            style={{ objectFit: 'cover' }}
-            src="/style_carcare.jpg"
-            alt="menu_image"
-          />
+        <div className="d-flex flex-shrink-0 tw-w-[100px] tw-h-[100px] rounded position-relative overflow-hidden">
+          <Image fill alt="" src="/style_carcare.jpg" className="tw-object-cover" sizes="100px" />
         </div>
         <div className="ms-3 d-flex flex-column justify-content-between tw-min-h-[100px]">
           <div>
             <div className="fs-3 fw-bold">{data.name}</div>
-            <div>{data.description}</div>
+            <div className="tw-text-gray-600">{data.description}</div>
           </div>
           <div className="fw-bold">{data.price.toLocaleString()}원</div>
         </div>

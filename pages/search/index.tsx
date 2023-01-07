@@ -136,14 +136,14 @@ function Item({ slug }: ItemProps) {
   return (
     <ListGroup.Item className="p-3" action>
       <Link href={`/store/${slug}`} className="text-decoration-none text-black rounded">
-        <div className="d-flex">
+        <div className="d-flex flex-shrink-0">
           <Image
             src="/style_carcare.jpg"
             alt="스타일카케어"
             width={60}
             height={60}
             style={{ objectFit: 'cover' }}
-            className="rounded"
+            className="rounded tw-w-[60px] tw-h-[60px]"
           />
           <div className="ps-3">
             <div className="fs-4 fw-bold">스타일카케어</div>

@@ -4,12 +4,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Button, Container, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { IoAdd } from 'react-icons/io5';
 import LoginCheck from '../../../../src/components/LoginCheck';
+import TempImage from '../../../../src/components/TempImage';
 import { MenuListDto } from '../../../../src/dto';
 import { authClient } from '../../../../src/function/request';
-import styles from '../../../../styles/MenuList.module.scss';
 
 export default function MenuList() {
   const router = useRouter();
@@ -39,27 +39,23 @@ export default function MenuList() {
         <title>세차새차 - 메뉴 관리</title>
       </Head>
       <LoginCheck>
-        <div className={styles.container}>
-          <div className={styles.title}>메뉴 관리</div>
-          <div className={styles.plus_button_wrapper}>
-            <Button
-              className={styles.plus_button}
-              onClick={() => {
-                router.push(`/provider/${slug}/menu/new`);
-              }}
-            >
-              <IoAdd size={20} className={styles.plus_icon} />
-              메뉴 추가
-            </Button>
-          </div>
-          <ListGroup>
+        <Container className="pt-4">
+          <h3 className="fw-bold">메뉴 관리</h3>
+          <Button
+            className="mt-3 d-flex align-items-center"
+            onClick={() => {
+              router.push(`/provider/${slug}/menu/new`);
+            }}
+          >
+            <IoAdd size={20} className="me-1" />
+            메뉴 추가
+          </Button>
+          <ListGroup className="mt-3">
             {menus.map((menu, index) => (
-              <ListGroupItem key={index}>
-                <MenuItem data={menu} />
-              </ListGroupItem>
+              <MenuItem data={menu} key={index} />
             ))}
           </ListGroup>
-        </div>
+        </Container>
       </LoginCheck>
     </>
   );
@@ -74,47 +70,32 @@ function MenuItem({ data }: MenuItemProps) {
   const { slug } = router.query;
 
   return (
-    <Link
-      href={`/provider/${slug}/menu/${data.number}`}
-      className={styles.link}
-    >
-      <div className={styles.link_container}>
-        {data.image ? (
-          <div className={styles.image_wrapper}>
+    <ListGroupItem action>
+      <Link
+        href={`/provider/${slug}/menu/${data.number}`}
+        className="text-decoration-none text-black d-flex align-items-center"
+      >
+        <div className="d-flex align-items-center justify-content-center rounded overflow-hidden flex-shrink-0 position-relative tw-bg-gray-200 tw-h-[100px] tw-w-[100px]">
+          {data.image ? (
             <Image
-              width={100}
-              height={100}
-              className={styles.image}
+              fill
+              sizes="100px"
+              className="tw-object-cover"
               src={process.env.NEXT_PUBLIC_S3_URL + data.image}
               alt=""
             />
-          </div>
-        ) : (
-          <div
-            className={classNames(
-              styles.image_wrapper,
-              styles.image_wrapper_alt
-            )}
-          >
-            <Image
-              width={50}
-              height={50}
-              className={classNames(styles.image, styles.image_alt)}
-              src="/main_logo.png"
-              alt="menu"
-            />
-          </div>
-        )}
-        <div className={styles.content}>
-          <div className={styles.menu_title_description}>
-            <div className={styles.menu_title}>{data.name}</div>
-            <div className={styles.menu_description}>{data.description}</div>
-          </div>
-          <div className={styles.menu_price}>
-            {data.price.toLocaleString()}원
-          </div>
+          ) : (
+            <TempImage width={50} height={50} />
+          )}
         </div>
-      </div>
-    </Link>
+        <div className="ms-3 d-flex flex-column justify-content-between tw-min-h-[100px]">
+          <div>
+            <div className="fs-3 fw-bold">{data.name}</div>
+            <div className="tw-text-gray-600">{data.description}</div>
+          </div>
+          <div className="fw-bold">{data.price.toLocaleString()}원</div>
+        </div>
+      </Link>
+    </ListGroupItem>
   );
 }

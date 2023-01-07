@@ -3,12 +3,11 @@ import { FormikHelpers, useFormik } from 'formik';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { Button, Form, InputGroup } from 'react-bootstrap';
+import { Button, Container, Form, InputGroup } from 'react-bootstrap';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import { IoClose } from 'react-icons/io5';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { BeatLoader } from 'react-spinners';
-import styles from '../../styles/StoreForm.module.scss';
 import { StoreDto } from '../dto';
 import { compressImage } from '../function/processingImage';
 import { authClient } from '../function/request';
@@ -479,11 +478,11 @@ export default function StoreForm({ data }: StoreFormProps) {
   }, [data]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>매장 정보 변경</div>
+    <Container className="pt-4">
+      <h3 className="fw-bold">매장 정보 변경</h3>
       <Form noValidate onSubmit={formik.handleSubmit}>
         {/* 매장 이름 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>매장 이름 *</Form.Label>
           <Form.Control
             type="text"
@@ -497,9 +496,9 @@ export default function StoreForm({ data }: StoreFormProps) {
         </Form.Group>
 
         {/* 매장 전화번호 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>매장 전화번호 *</Form.Label>
-          <div className={styles.tel_container}>
+          <div className="d-flex gap-2 align-items-center">
             <Form.Control
               type="tel"
               name="tel1"
@@ -534,7 +533,7 @@ export default function StoreForm({ data }: StoreFormProps) {
         </Form.Group>
 
         {/* 매장 주소 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>매장 주소 *</Form.Label>
           <InputGroup hasValidation>
             <Form.Control
@@ -555,7 +554,7 @@ export default function StoreForm({ data }: StoreFormProps) {
             value={formik.values.addressDetail}
             onChange={formik.handleChange}
             disabled={!formik.values.address}
-            className={styles.address_detail}
+            className="my-2"
           />
           {isMapLoad ? (
             <Map
@@ -563,7 +562,7 @@ export default function StoreForm({ data }: StoreFormProps) {
                 lat: formik.values.latitude,
                 lng: formik.values.longitude,
               }}
-              className={styles.map}
+              className="w-100 rounded tw-h-[200px]"
             >
               {formik.values.address ? (
                 <MapMarker
@@ -578,7 +577,7 @@ export default function StoreForm({ data }: StoreFormProps) {
         </Form.Group>
 
         {/* 매장 홈페이지 주소 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>매장 홈페이지 주소 *</Form.Label>
           <InputGroup hasValidation>
             <InputGroup.Text>wcnc.co.kr/</InputGroup.Text>
@@ -603,7 +602,7 @@ export default function StoreForm({ data }: StoreFormProps) {
         </Form.Group>
 
         {/* 찾아오는 길 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>찾아오는 길</Form.Label>
           <Form.Control
             as="textarea"
@@ -616,7 +615,7 @@ export default function StoreForm({ data }: StoreFormProps) {
         </Form.Group>
 
         {/* 매장 설명 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>매장 설명</Form.Label>
           <Form.Control
             as="textarea"
@@ -629,7 +628,7 @@ export default function StoreForm({ data }: StoreFormProps) {
         </Form.Group>
 
         {/* 미리보기 사진 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>미리보기 사진</Form.Label>
           <Form.Control
             type="file"
@@ -639,9 +638,13 @@ export default function StoreForm({ data }: StoreFormProps) {
           />
           {/* 미리보기 사진 표시 */}
           {!previewImage.previewUrl ? null : (
-            <div className={styles.image_container}>
-              <div className={styles.image_wrapper}>
-                <button type="button" className={styles.close_wrapper} onClick={handlePreviewImageCloseClick}>
+            <div className="d-flex flex-wrap mt-2">
+              <div className="m-1 position-relative rounded overflow-hidden tw-h-[100px] tw-w-[100px]">
+                <button
+                  type="button"
+                  className="position-absolute d-flex align-items-center justify-content-center p-0 tw-z-10 tw-w-[20px] tw-h-[20px] tw-top-2 tw-right-2 rounded-5 bg-white"
+                  onClick={handlePreviewImageCloseClick}
+                >
                   <IoClose />
                 </button>
                 <Image
@@ -651,9 +654,9 @@ export default function StoreForm({ data }: StoreFormProps) {
                       ? `${process.env.NEXT_PUBLIC_S3_URL}${previewImage.previewUrl}`
                       : previewImage.previewUrl
                   }
-                  width={100}
-                  height={100}
-                  className={styles.image}
+                  fill
+                  sizes="100px"
+                  className="tw-object-cover"
                 />
               </div>
             </div>
@@ -661,17 +664,17 @@ export default function StoreForm({ data }: StoreFormProps) {
         </Form.Group>
 
         {/* 매장 사진 */}
-        <Form.Group className={styles.form_group}>
+        <Form.Group className="mt-3">
           <Form.Label>매장 사진</Form.Label>
           <Form.Control type="file" multiple accept="image/png, image/jpeg" onChange={handleStoreImageChange} />
           {/* 매장 사진 표시 */}
           {storeImages.length === 0 ? null : (
-            <div className={styles.image_container}>
+            <div className="d-flex flex-wrap mt-2">
               {storeImages.map((storeImage, index) => (
-                <div key={index} className={styles.image_wrapper}>
+                <div key={index} className="m-1 position-relative rounded overflow-hidden tw-h-[100px] tw-w-[100px]">
                   <button
                     type="button"
-                    className={styles.close_wrapper}
+                    className="position-absolute d-flex align-items-center justify-content-center p-0 tw-z-10 tw-w-[20px] tw-h-[20px] tw-top-2 tw-right-2 rounded-5 bg-white"
                     onClick={() => handleStoreImageCloseClick(index)}
                   >
                     <IoClose />
@@ -683,9 +686,9 @@ export default function StoreForm({ data }: StoreFormProps) {
                         ? `${process.env.NEXT_PUBLIC_S3_URL}${storeImage.previewUrl}`
                         : storeImage.previewUrl
                     }
-                    width={100}
-                    height={100}
-                    className={styles.image}
+                    fill
+                    sizes="100px"
+                    className="tw-object-cover"
                   />
                 </div>
               ))}
@@ -693,10 +696,10 @@ export default function StoreForm({ data }: StoreFormProps) {
           )}
         </Form.Group>
 
-        <Button type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
-          {formik.isSubmitting ? <BeatLoader color="white" size="10px" /> : data ? '정보 수정' : '승인 요청'}
+        <Button type="submit" className="w-100 mt-4 align-items-center" disabled={formik.isSubmitting}>
+          {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : data ? '정보 수정' : '승인 요청'}
         </Button>
       </Form>
-    </div>
+    </Container>
   );
 }
