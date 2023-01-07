@@ -1,13 +1,7 @@
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
-import {
-  Button,
-  Form,
-  InputGroup,
-  ListGroup,
-  ListGroupItem,
-} from 'react-bootstrap';
+import { Button, Form, InputGroup, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { IoAdd, IoTrash } from 'react-icons/io5';
 import { BeatLoader } from 'react-spinners';
 import styles from '../../styles/Except.module.scss';
@@ -42,12 +36,7 @@ export default function Except() {
     setExceptList(newList);
   };
 
-  const setData = (
-    index: number,
-    allday: boolean,
-    start: string,
-    end: string
-  ) => {
+  const setData = (index: number, allday: boolean, start: string, end: string) => {
     let error = '';
     // 입력했는지 확인
     if (!start || !end) {
@@ -86,32 +75,28 @@ export default function Except() {
 
     setSubmitting(true);
 
-    const mappedExceptList: (ExceptDto | undefined)[] = exceptList.map(
-      (except) => {
-        // 하루종일인 경우 2022-11-11 => 2122-11-11 00:00
-        if (except.allday) {
-          return {
-            start: moment(except.start).format('YYYY-MM-DD HH:mm'),
-            end: moment(except.end).format('YYYY-MM-DD HH:mm'),
-            allday: except.allday,
-            error: except.error,
-          };
-        } else {
-          return { ...except };
-        }
+    const mappedExceptList: (ExceptDto | undefined)[] = exceptList.map((except) => {
+      // 하루종일인 경우 2022-11-11 => 2122-11-11 00:00
+      if (except.allday) {
+        return {
+          start: moment(except.start).format('YYYY-MM-DD HH:mm'),
+          end: moment(except.end).format('YYYY-MM-DD HH:mm'),
+          allday: except.allday,
+          error: except.error,
+        };
+      } else {
+        return { ...except };
       }
-    );
+    });
 
     const sendData = { except: mappedExceptList };
 
-    try {
-      console.debug(`POST /provider/${slug}/except`, sendData);
-      const response = await authClient.post(
-        `/provider/${slug}/except`,
-        sendData
-      );
-      const data = response?.data;
-      switch (data?.status) {
+    console.debug(`POST /provider/${slug}/except`, sendData);
+    const response = await authClient.post(`/provider/${slug}/except`, sendData);
+    const status = response?.data?.status;
+    const message = response?.data?.message;
+    if (status && message) {
+      switch (status) {
         case 2100:
           alert('저장되었습니다.');
           break;
@@ -119,11 +104,12 @@ export default function Except() {
           alert('저장중에 오류가 발생했습니다.');
           break;
         default:
-          throw new Error('잘못된 응답');
+          throw new Error(message);
       }
-    } finally {
-      setSubmitting(false);
+    } else {
+      throw new Error('잘못된 응답');
     }
+    setSubmitting(false);
   };
 
   useEffect(() => {
@@ -131,10 +117,10 @@ export default function Except() {
 
     const getData = async () => {
       const response = await authClient.get(`/provider/${slug}/except`);
-      const data: ExceptDto[] = response?.data?.except;
-      console.debug(`GET /provider/${slug}/except`, data);
-      if (data) {
-        const mappedData = data.map((except) => {
+      const excepts: ExceptDto[] = response?.data?.except;
+      console.debug(`GET /provider/${slug}/except`, excepts);
+      if (excepts) {
+        const mappedData = excepts.map((except) => {
           // 하루종일인 경우 2022-11-11 00:00 => 2122-11-11
           if (except.allday) {
             return {
@@ -163,11 +149,7 @@ export default function Except() {
   return (
     <div className={styles.except_wrapper}>
       <div className={styles.button_wrapper}>
-        <Button
-          className={styles.button}
-          onClick={handleAddClick}
-          variant="outline-primary"
-        >
+        <Button className={styles.button} onClick={handleAddClick} variant="outline-primary">
           <IoAdd size={20} className={styles.except_plus_icon} />
           예외 일자 추가
         </Button>
@@ -189,12 +171,7 @@ export default function Except() {
         ) : (
           exceptList.map((except, index) => (
             <ListGroupItem key={index}>
-              <ExceptItem
-                except={except}
-                index={index}
-                deleteItem={deleteItem}
-                setData={setData}
-              />
+              <ExceptItem except={except} index={index} deleteItem={deleteItem} setData={setData} />
             </ListGroupItem>
           ))
         )}
@@ -260,13 +237,7 @@ function ExceptItem({ except, index, deleteItem, setData }: ExceptItemProps) {
       </InputGroup>
       <InputGroup>
         <InputGroup.Text>종료</InputGroup.Text>
-        <Form.Control
-          type="date"
-          value={except.end}
-          onChange={handleEndChange}
-          ref={end}
-          isInvalid={!!except.error}
-        />
+        <Form.Control type="date" value={except.end} onChange={handleEndChange} ref={end} isInvalid={!!except.error} />
       </InputGroup>
     </div>
   );

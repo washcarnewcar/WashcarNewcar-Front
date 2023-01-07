@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import LoginCheck from '../../../../src/components/LoginCheck';
@@ -28,8 +29,13 @@ export default function MenuEdit() {
   }, [router.isReady]);
 
   return (
-    <LoginCheck>
-      <MenuForm data={menu} />
-    </LoginCheck>
+    <>
+      <Head>
+        <title>세차새차 - 메뉴 수정</title>
+      </Head>
+      <LoginCheck>
+        <MenuForm data={menu} />
+      </LoginCheck>
+    </>
   );
 }

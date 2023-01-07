@@ -1,5 +1,6 @@
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import React, { createContext, useEffect, useState } from 'react';
+import { authClient, client } from '../function/request';
 
 export interface User {
   isLogined: boolean;
@@ -20,27 +21,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   const getUser = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.debug('token not exist');
-      setUser({ isLogined: false });
-      return;
-    }
-
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API}/user`, {
-        headers: {
-          Authorization: 'Bearer ' + token,
-        },
-      });
-      if (response.status === 200) {
-        console.debug('logined');
-        setUser({ isLogined: true });
-      }
+      // 정상적으로 처리되면 로그인 된 것
+      await client.get(`/user`, { withCredentials: true });
+      console.debug('logined');
+      setUser({ isLogined: true });
     } catch (error) {
       // 로그인 되지 않거나, 토큰 만료됨
       if (error instanceof AxiosError && error.response?.status === 401) {
-        console.debug('token expired');
+        console.debug('not logined');
         setUser({ isLogined: false });
         return;
       } else {

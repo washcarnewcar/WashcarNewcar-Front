@@ -13,7 +13,6 @@ import { StoreDto } from '../dto';
 import { compressImage } from '../function/processingImage';
 import { authClient } from '../function/request';
 import { Images, uploadImage, uploadImages } from '../function/S3Utils';
-import Loading from './Loading';
 
 interface Values {
   name: string;
@@ -74,8 +73,6 @@ export default function StoreForm({ data }: StoreFormProps) {
   });
   const [storeImages, setStoreImages] = useState<Images[]>([]);
   const previewImageInput = useRef<HTMLInputElement>(null);
-
-  const [ready, setReady] = useState(false);
 
   /**
    * 주소 팝업창 처리하는 함수
@@ -140,14 +137,11 @@ export default function StoreForm({ data }: StoreFormProps) {
       return;
     }
 
-    try {
-      const response = await authClient.get(
-        `/provider/check-slug/${formik.values.slug}`
-      );
-      console.debug(`GET /provider/check-slug/${formik.values.slug}`);
-
-      console.debug(response?.data);
-      const status: number = response.data.status;
+    const response = await authClient.get(`/provider/check-slug/${formik.values.slug}`);
+    console.debug(`GET /provider/check-slug/${formik.values.slug}`, response?.data);
+    const status = response?.data?.status;
+    const message = response?.data?.message;
+    if (status && message) {
       switch (status) {
         case 1400:
           formik.setErrors({
@@ -164,11 +158,10 @@ export default function StoreForm({ data }: StoreFormProps) {
           setSlugValid('');
           return;
         default:
-          throw Error('알 수 없는 상태코드');
+          throw new Error(message);
       }
-    } catch (error) {
-      console.error(error);
-      return;
+    } else {
+      throw new Error('잘못된 응답');
     }
   };
 
@@ -289,11 +282,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   /**
    * 백엔드에 정보 전송
    */
-  const postToApi = async (
-    values: Values,
-    previewImageUrl: string,
-    storeImageUrls: string[]
-  ) => {
+  const postToApi = async (values: Values, previewImageUrl: string, storeImageUrls: string[]) => {
     const storeDto: StoreDto = {
       name: values.name,
       tel: `${values.tel1}-${values.tel2}-${values.tel3}`,
@@ -312,15 +301,12 @@ export default function StoreForm({ data }: StoreFormProps) {
 
     // provider/:slug/store 일때
     if (data) {
-      const response = await authClient.post(
-        `/provider/${data.slug}/store`,
-        storeDto
-      );
       console.debug(`POST /provider/${data.slug}/store`, storeDto);
-      console.debug(response?.data);
-
-      if (response) {
-        switch (response.data.status) {
+      const response = await authClient.post(`/provider/${data.slug}/store`, storeDto);
+      const status = response?.data?.status;
+      const message = response?.data?.message;
+      if (status && message) {
+        switch (status) {
           case 2500:
             alert('수정되었습니다.');
             router.replace(`/provider/${formik.values.slug}`);
@@ -335,18 +321,22 @@ export default function StoreForm({ data }: StoreFormProps) {
             return;
           default:
             formik.setSubmitting(false);
-            throw Error('알 수 없는 상태코드 수신');
+            throw new Error(message);
         }
+      } else {
+        throw new Error('잘못된 응답');
       }
     }
+
     // provider/new 일때
     else if (data === null) {
       const response = await authClient.post(`/provider/new`, storeDto);
       console.debug(`POST /provider/new`, storeDto);
-      console.debug(response.data);
+      const status = response?.data?.status;
+      const message = response?.data?.message;
 
-      if (response) {
-        switch (response.data.status) {
+      if (status && message) {
+        switch (status) {
           case 1300:
             alert('성공적으로 요청되었습니다.');
             router.replace(`/provider/${formik.values.slug}`);
@@ -360,9 +350,10 @@ export default function StoreForm({ data }: StoreFormProps) {
             formik.setSubmitting(false);
             return;
           default:
-            formik.setSubmitting(false);
-            throw Error('알 수 없는 상태코드 수신');
+            throw new Error(message);
         }
+      } else {
+        throw new Error('잘못된 응답');
       }
     }
   };
@@ -370,10 +361,7 @@ export default function StoreForm({ data }: StoreFormProps) {
   /**
    * 승인 요청 버튼을 눌렀을 때
    */
-  const handleSubmit = async (
-    values: Values,
-    { setSubmitting, setErrors }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setSubmitting, setErrors }: FormikHelpers<Values>) => {
     // slug 유효한지 확인
     if (!slugValid) {
       setErrors({
@@ -403,9 +391,7 @@ export default function StoreForm({ data }: StoreFormProps) {
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 500) {
-          alert(
-            '서버에 전송하는 도중 오류가 발생했습니다.\n다시 시도해주세요.'
-          );
+          alert('서버에 전송하는 도중 오류가 발생했습니다.\n다시 시도해주세요.');
           setSubmitting(false);
           return;
         }
@@ -489,17 +475,8 @@ export default function StoreForm({ data }: StoreFormProps) {
   }, []);
 
   useEffect(() => {
-    if (data === null) {
-      setReady(true);
-    } else if (data) {
-      setData(data);
-      setReady(true);
-    }
+    if (data) setData(data);
   }, [data]);
-
-  if (!ready) {
-    return <Loading fullscreen />;
-  }
 
   return (
     <div className={styles.container}>
@@ -516,9 +493,7 @@ export default function StoreForm({ data }: StoreFormProps) {
             onChange={formik.handleChange}
             isInvalid={!!formik.errors.name && formik.touched.name}
           />
-          <Form.Control.Feedback type="invalid">
-            {formik.errors.name}
-          </Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">{formik.errors.name}</Form.Control.Feedback>
         </Form.Group>
 
         {/* 매장 전화번호 */}
@@ -555,9 +530,7 @@ export default function StoreForm({ data }: StoreFormProps) {
               isInvalid={!!formik.errors.tel3 && formik.touched.tel3}
             />
           </div>
-          <Form.Text>
-            확인을 위해 연락을 취할 수 있으니 정확하게 적어주시기 바랍니다.
-          </Form.Text>
+          <Form.Text>확인을 위해 연락을 취할 수 있으니 정확하게 적어주시기 바랍니다.</Form.Text>
         </Form.Group>
 
         {/* 매장 주소 */}
@@ -573,9 +546,7 @@ export default function StoreForm({ data }: StoreFormProps) {
               isInvalid={!!formik.errors.address && formik.touched.address}
             />
             <Button onClick={handleAddressClick}>주소 찾기</Button>
-            <Form.Control.Feedback type="invalid">
-              {formik.errors.address}
-            </Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">{formik.errors.address}</Form.Control.Feedback>
           </InputGroup>
           <Form.Control
             type="text"
@@ -623,18 +594,12 @@ export default function StoreForm({ data }: StoreFormProps) {
               중복 확인
             </Button>
             {formik.errors.slug ? (
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.slug}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.slug}</Form.Control.Feedback>
             ) : (
-              <Form.Control.Feedback type="valid">
-                {slugValid}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="valid">{slugValid}</Form.Control.Feedback>
             )}
           </InputGroup>
-          <Form.Text>
-            영문 대소문자와 숫자, 언더바(_)만 입력 가능합니다.
-          </Form.Text>
+          <Form.Text>영문 대소문자와 숫자, 언더바(_)만 입력 가능합니다.</Form.Text>
         </Form.Group>
 
         {/* 찾아오는 길 */}
@@ -676,11 +641,7 @@ export default function StoreForm({ data }: StoreFormProps) {
           {!previewImage.previewUrl ? null : (
             <div className={styles.image_container}>
               <div className={styles.image_wrapper}>
-                <button
-                  type="button"
-                  className={styles.close_wrapper}
-                  onClick={handlePreviewImageCloseClick}
-                >
+                <button type="button" className={styles.close_wrapper} onClick={handlePreviewImageCloseClick}>
                   <IoClose />
                 </button>
                 <Image
@@ -702,12 +663,7 @@ export default function StoreForm({ data }: StoreFormProps) {
         {/* 매장 사진 */}
         <Form.Group className={styles.form_group}>
           <Form.Label>매장 사진</Form.Label>
-          <Form.Control
-            type="file"
-            multiple
-            accept="image/png, image/jpeg"
-            onChange={handleStoreImageChange}
-          />
+          <Form.Control type="file" multiple accept="image/png, image/jpeg" onChange={handleStoreImageChange} />
           {/* 매장 사진 표시 */}
           {storeImages.length === 0 ? null : (
             <div className={styles.image_container}>
@@ -737,18 +693,8 @@ export default function StoreForm({ data }: StoreFormProps) {
           )}
         </Form.Group>
 
-        <Button
-          type="submit"
-          className={styles.submit_button}
-          disabled={formik.isSubmitting}
-        >
-          {formik.isSubmitting ? (
-            <BeatLoader color="white" size="10px" />
-          ) : data ? (
-            '정보 수정'
-          ) : (
-            '승인 요청'
-          )}
+        <Button type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+          {formik.isSubmitting ? <BeatLoader color="white" size="10px" /> : data ? '정보 수정' : '승인 요청'}
         </Button>
       </Form>
     </div>

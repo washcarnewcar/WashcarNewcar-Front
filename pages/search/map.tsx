@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { BiCurrentLocation } from 'react-icons/bi';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 function SelectMap() {
   const router = useRouter();
@@ -16,15 +17,12 @@ function SelectMap() {
   const [textLocation, setTextLocation] = useState('');
   const [locationLoaded, setLocationLoaded] = useState(false);
   const [mapReady, setMapReady] = useState(false);
+  const [bodyHeight, setBodyHeight] = useState(0);
 
   /**
    * 좌표를 받아와 현재 주소를 주소창에 표시하는 함수
    */
-  const displayLocation = (
-    geocoder: kakao.maps.services.Geocoder,
-    longitude: number,
-    latitude: number
-  ) => {
+  const displayLocation = (geocoder: kakao.maps.services.Geocoder, longitude: number, latitude: number) => {
     geocoder.coord2Address(
       longitude,
       latitude,
@@ -70,9 +68,7 @@ function SelectMap() {
   /**
    * 드래그 할 때 좌표값 변경
    */
-  const handleDrag = (
-    target: kakao.maps.Map | React.DragEvent<HTMLDivElement>
-  ) => {
+  const handleDrag = (target: kakao.maps.Map | React.DragEvent<HTMLDivElement>) => {
     const mapTarget = target as kakao.maps.Map;
     setCoordinate({
       latitude: mapTarget.getCenter().getLat(),
@@ -103,13 +99,8 @@ function SelectMap() {
   /**
    * 현위치 버튼을 클릭했을 때 현위치로 이동
    */
-  const handleCurrentLocationClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    navigator.geolocation.getCurrentPosition(
-      positionCallback,
-      positionErrorCallback
-    );
+  const handleCurrentLocationClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    navigator.geolocation.getCurrentPosition(positionCallback, positionErrorCallback);
   };
 
   /**
@@ -123,11 +114,12 @@ function SelectMap() {
   };
 
   /**
-   * 현재 스크린 사이즈를 계산하여 css에 적용
+   * 현재 스크린 사이즈를 계산
    */
   const setScreenSize = () => {
-    let vh = window.innerHeight;
-    document.documentElement.style.setProperty('--vh', `${vh - 56}px`);
+    const navbarHeight = document.getElementById('navbar')?.clientHeight;
+    const vh = window.innerHeight;
+    setBodyHeight(vh - (navbarHeight ? navbarHeight : 0));
   };
 
   useEffect(() => {
@@ -139,10 +131,7 @@ function SelectMap() {
 
     // search에서 위치정보를 찾지 못했을 때
     else if (!JSON.parse(foundLocation as string)) {
-      navigator.geolocation.getCurrentPosition(
-        positionCallback,
-        positionErrorCallback
-      );
+      navigator.geolocation.getCurrentPosition(positionCallback, positionErrorCallback);
     }
 
     // search에서 위치정보를 찾았을 때
@@ -156,9 +145,6 @@ function SelectMap() {
         displayLocation(geocoder, parsedLongitude, parsedLatitude);
       });
     }
-
-    setScreenSize();
-    window.addEventListener('resize', () => setScreenSize());
   }, [router.isReady]);
 
   useEffect(() => {
@@ -166,40 +152,43 @@ function SelectMap() {
       console.debug('카카오맵 준비됨');
       setMapReady(true);
     });
+
+    setScreenSize();
+    window.addEventListener('resize', () => setScreenSize());
   }, []);
 
   return (
     <>
-      <Header type={1} />
-      <div className={styles.body}>
-        <div className={styles.address_container}>
-          <div className={styles.address}>{textLocation}</div>
+      <Head>
+        <title>세차새차 - 세차장 검색</title>
+      </Head>
+      <Header />
+      <div style={{ height: bodyHeight }}>
+        <div className="position-fixed mx-auto tw-z-10 start-0 end-0 tw-bottom-16 tw-w-5/6">
           <Button
-            className={styles.submit_button}
-            onClick={handleSubmitClick}
-            disabled={!locationLoaded}
-          >
-            확인
-          </Button>
-          {/* TODO: 버튼을 누르면 현위치를 잡을 때까지 spinner 띄우면 좋음 */}
-          <button
-            className={styles.current_location}
+            variant="light"
+            className="ms-auto mb-3 tw-w-12 tw-h-12 bg-white rounded-5 shadow p-0 d-flex justify-content-center align-items-center"
             onClick={handleCurrentLocationClick}
           >
-            <BiCurrentLocation size={30} color="#2964F6" />
-          </button>
+            <BiCurrentLocation size={30} className="text-primary" />
+          </Button>
+          <div className="d-flex justify-content-between align-items-center p-2 rounded shadow bg-white">
+            <div className="fs-5 fw-bold ps-2">{textLocation}</div>
+            <Button className="fw-bold tw-break-keep" onClick={handleSubmitClick} disabled={!locationLoaded}>
+              확인
+            </Button>
+            {/* TODO: 버튼을 누르면 현위치를 잡을 때까지 spinner 띄우면 좋음 */}
+          </div>
         </div>
         {mapReady ? (
           <Map
             center={{ lat: coordinate.latitude, lng: coordinate.longitude }}
-            className={styles.map}
+            className="h-100"
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
             onZoomChanged={handleZoomChanged}
           >
-            <MapMarker
-              position={{ lat: coordinate.latitude, lng: coordinate.longitude }}
-            ></MapMarker>
+            <MapMarker position={{ lat: coordinate.latitude, lng: coordinate.longitude }}></MapMarker>
           </Map>
         ) : null}
       </div>

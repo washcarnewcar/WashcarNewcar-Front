@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import { FormikHelpers, useFormik } from 'formik';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -23,20 +24,15 @@ const initialValues: Values = {
 };
 
 const schema = object().shape({
-  email: string()
-    .required('이메일을 입력해주세요')
-    .email('이메일 형식이 아닙니다'),
+  email: string().required('이메일을 입력해주세요').email('이메일 형식이 아닙니다'),
   password: string().required('비밀번호를 입력해주세요'),
 });
 
-function Login() {
+export default function Login() {
   const router = useRouter();
   const { user, setUser } = useContext(UserContext);
 
-  const handleSubmit = async (
-    values: Values,
-    { setSubmitting, setErrors }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setSubmitting, setErrors }: FormikHelpers<Values>) => {
     setSubmitting(true);
 
     // form data 생성
@@ -46,17 +42,9 @@ function Login() {
 
     // 로그인 요청
     try {
-      const response = await client.post(`/login`, form);
-
-      // 토큰 저장
-      const token = response.data.access_token;
-      const refToken = response.data.refresh_token;
-      localStorage.setItem('token', token);
-      localStorage.setItem('refresh_token', refToken);
-
+      // withCredentials 옵션을 붙혀주면 알아서 쿠키가 설정된다.
+      await client.post(`/login`, form, { withCredentials: true });
       setUser({ isLogined: true });
-
-      // 홈화면으로
       router.replace('/');
     } catch (error) {
       // 사용자 정보가 없을 시
@@ -66,7 +54,6 @@ function Login() {
           password: '이메일 또는 비밀번호가 틀렸습니다.',
         });
       } else {
-        alert('알 수 없는 오류가 발생했습니다.');
         console.error(error);
       }
     }
@@ -81,6 +68,9 @@ function Login() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 로그인</title>
+      </Head>
       <div className={styles.container}>
         <AuthHeader />
 
@@ -99,9 +89,7 @@ function Login() {
                 isInvalid={!!formik.errors.email && formik.touched.email}
                 autoComplete="on"
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.email}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.email}</Form.Control.Feedback>
             </Form.Group>
             <Form.Group>
               <Form.Control
@@ -114,32 +102,13 @@ function Login() {
                 isInvalid={!!formik.errors.password && formik.touched.password}
                 autoComplete="on"
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.password}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.password}</Form.Control.Feedback>
             </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              className={styles.submit_button}
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? (
-                <BeatLoader color="white" size={10} />
-              ) : (
-                '로그인'
-              )}
+            <Button variant="primary" type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+              {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : '로그인'}
             </Button>
-            <a
-              href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}
-            >
-              <Image
-                src="/kakao_login_large_wide.png"
-                alt="카카오 로그인"
-                height={45}
-                width={300}
-                priority
-              />
+            <a href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}>
+              <Image src="/kakao_login_large_wide.png" alt="카카오 로그인" height={45} width={300} priority />
             </a>
 
             <div className={styles.change}>
@@ -160,5 +129,3 @@ function Login() {
     </>
   );
 }
-
-export default Login;

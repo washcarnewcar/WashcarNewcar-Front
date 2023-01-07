@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -78,7 +79,10 @@ export default function FindList() {
 
   return (
     <>
-      <Header type={1} />
+      <Head>
+        <title>세차새차 - 세차 예약 확인</title>
+      </Head>
+      <Header />
       <div className={styles.container}>
         <div className={styles.title}>예약한 세차</div>
         <div className={styles.blank} />
@@ -104,13 +108,7 @@ function FindListItem({ data }: FindListItemProps) {
       <div className={styles.item_left}>
         <div className={styles.item_date}>2022.9.6(화) 16:00</div>
         <div className={styles.item_info}>
-          <Image
-            src="/style_carcare.jpg"
-            alt="스타일 카케어"
-            width={65}
-            height={65}
-            className={styles.item_image}
-          />
+          <Image src="/style_carcare.jpg" alt="스타일 카케어" width={65} height={65} className={styles.item_image} />
           <div className={styles.item_info_text}>
             <div className={styles.item_menu}>외부세차</div>
             <div className={styles.item_store}>스타일 카케어</div>

@@ -1,39 +1,40 @@
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import LoginCheck from '../../../src/components/LoginCheck';
 import StoreForm from '../../../src/components/StoreForm';
 import { StoreDto } from '../../../src/dto';
-import { authClient } from '../../../src/function/request';
+import { AuthServer } from '../../../src/function/request';
 
-export default function EditStore() {
-  const router = useRouter();
-  const { slug } = router.query;
-  const [data, setData] = useState<StoreDto>();
+interface EditStoreProps {
+  data: StoreDto;
+}
 
-  useEffect(() => {
-    if (!router.isReady) return;
+export default function EditStore({ data }: EditStoreProps) {
+  return (
+    <>
+      <Head>
+        <title>세차새차 - 매장 정보 수정</title>
+      </Head>
+      <LoginCheck>
+        <StoreForm data={data} />
+      </LoginCheck>
+    </>
+  );
+}
 
-    const getData = async () => {
-      const response = await authClient.get(`/provider/${slug}/store`);
+export const getServerSideProps: GetServerSideProps<EditStoreProps> = async (context) => {
+  const slug = context.params?.slug;
+  if (slug) {
+    return await new AuthServer(context).get(`/provider/${slug}/store`, (response) => {
       const data: StoreDto | undefined = response?.data;
       console.debug(`GET /provider/${slug}/store`, data);
       if (data) {
-        setData(data);
+        return { props: { data: data } };
       } else {
         throw Error('data 전송되지 않음');
       }
-    };
-
-    if (slug) {
-      getData();
-    } else {
-      router.replace('/');
-    }
-  }, [router.isReady]);
-
-  return (
-    <LoginCheck>
-      <StoreForm data={data} />
-    </LoginCheck>
-  );
-}
+    });
+  } else {
+    throw new Error('slug 주어지지 않음');
+  }
+};

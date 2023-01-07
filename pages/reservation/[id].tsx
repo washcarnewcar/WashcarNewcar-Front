@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, ListGroup } from 'react-bootstrap';
@@ -40,7 +41,10 @@ export default function Reservation() {
 
   return (
     <>
-      <Header type={1} />
+      <Head>
+        <title>세차새차 - 예약 정보</title>
+      </Head>
+      <Header />
       <div className={styles.container}>
         <div className={styles.state_container}>
           <div className={styles.state}>{'예약을 확인중입니다.'}</div>
@@ -52,9 +56,7 @@ export default function Reservation() {
         </div>
         <div className={styles.info_container}>
           <ListGroup>
-            <ListGroup.Item className={classNames(styles.list, styles.title)}>
-              예약정보
-            </ListGroup.Item>
+            <ListGroup.Item className={classNames(styles.list, styles.title)}>예약정보</ListGroup.Item>
             <ListGroup.Item className={classNames(styles.list, styles.detail)}>
               <table>
                 <tbody>
@@ -68,9 +70,7 @@ export default function Reservation() {
                   </tr>
                   <tr>
                     <td className={styles.head}>세차장</td>
-                    <td
-                      className={styles.content}
-                    >{`루페스 디테일링 센터 인천논현점`}</td>
+                    <td className={styles.content}>{`루페스 디테일링 센터 인천논현점`}</td>
                   </tr>
                   <tr>
                     <td className={styles.head}>세차종류</td>
@@ -78,22 +78,15 @@ export default function Reservation() {
                   </tr>
                   <tr>
                     <td className={styles.head}>일정</td>
-                    <td className={styles.content}>
-                      {moment().format('YYYY.MM.DD(dd) a HH:mm')}
-                    </td>
+                    <td className={styles.content}>{moment().format('YYYY.MM.DD(dd) a HH:mm')}</td>
                   </tr>
                   <tr>
                     <td className={styles.head}>예상시간</td>
-                    <td className={styles.content}>
-                      {moment().format('H시간 mm분')}
-                    </td>
+                    <td className={styles.content}>{moment().format('H시간 mm분')}</td>
                   </tr>
                   <tr>
                     <td className={styles.head}>거부 사유</td>
-                    <td className={styles.content}>
-                      저희 세차장에서는 해당 차를 세차할 수 있는 공간이
-                      없습니다.
-                    </td>
+                    <td className={styles.content}>저희 세차장에서는 해당 차를 세차할 수 있는 공간이 없습니다.</td>
                   </tr>
                   <tr>
                     <td className={styles.head}>취소 사유</td>
@@ -101,9 +94,7 @@ export default function Reservation() {
                   </tr>
                   <tr>
                     <td className={styles.head}>완료 시간</td>
-                    <td className={styles.content}>
-                      {moment().format('YYYY.MM.DD(dd) a HH:mm')}
-                    </td>
+                    <td className={styles.content}>{moment().format('YYYY.MM.DD(dd) a HH:mm')}</td>
                   </tr>
                 </tbody>
               </table>

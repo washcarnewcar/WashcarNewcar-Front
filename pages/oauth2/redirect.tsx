@@ -1,25 +1,14 @@
-import { useRouter } from 'next/router';
-import { useContext, useEffect } from 'react';
-import Loading from '../../src/components/Loading';
-import UserContext from '../../src/context/UserProvider';
+import { GetServerSideProps } from 'next';
 
-export default function OAuthRedirect() {
-  const { user, setUser } = useContext(UserContext);
-  const router = useRouter();
-  const { token, refresh } = router.query;
+export default function OAuthRedirect() {}
 
-  useEffect(() => {
-    if (!router.isReady) return;
-    // 토큰 값이 잘 전달됐다면
-    if (typeof token === 'string' && typeof refresh === 'string') {
-      // 토큰 저장
-      localStorage.setItem('token', token);
-      localStorage.setItem('refresh_token', refresh);
-      setUser({ isLogined: true });
-    }
-    // 홈화면으로
-    router.replace('/');
-  }, [router.isReady]);
-
-  return <Loading fullscreen />;
-}
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { token, refresh } = context.query;
+  if (token || refresh) {
+    context.res.setHeader('Set-Cookie', [
+      `access_token=${token}; Path=/; Secure; HttpOnly`,
+      `refresh_token=${refresh}; Path=/; Secure; HttpOnly`,
+    ]);
+  }
+  return { redirect: { destination: '/', statusCode: 302 } };
+};

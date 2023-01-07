@@ -56,10 +56,7 @@ export default function MenuForm({ data }: MenuFormProps) {
   });
   const [ready, setReady] = useState(false);
 
-  const handleSubmit = async (
-    values: Values,
-    { setErrors, setSubmitting }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setErrors, setSubmitting }: FormikHelpers<Values>) => {
     setSubmitting(true);
 
     // aws 이미지 업로드
@@ -81,17 +78,14 @@ export default function MenuForm({ data }: MenuFormProps) {
       expected_minute: values.minute,
     };
 
-    try {
-      // 수정 요청일 때
-      if (data) {
-        const response = await authClient.put(
-          `/provider/menu/${number}`,
-          menuDto
-        );
-        console.debug(`PUT /provider/menu/${number}`, menuDto);
-        const data = response?.data;
-        console.debug(data);
-        switch (data?.status) {
+    // 수정 요청일 때
+    if (data) {
+      const response = await authClient.put(`/provider/menu/${number}`, menuDto);
+      console.debug(`PUT /provider/menu/${number}`, menuDto);
+      const status = response?.data?.status;
+      const message = response?.data?.message;
+      if (status && message) {
+        switch (status) {
           case 2400:
             alert('수정되었습니다.');
             router.push(`/provider/${slug}/menu`);
@@ -100,21 +94,21 @@ export default function MenuForm({ data }: MenuFormProps) {
             alert('필수 정보가 입력되지 않았습니다.');
             return;
           default:
-            alert('오류가 발생했습니다. 다시 시도해주세요.');
-            return;
+            throw new Error(message);
         }
+      } else {
+        throw new Error('잘못된 응답');
       }
+    }
 
-      // 생성 요청일 때
-      else if (data === null) {
-        const response = await authClient.post(
-          `provider/${slug}/menu`,
-          menuDto
-        );
-        console.debug(`POST provider/${slug}/menu`, menuDto);
-        const data = response?.data;
-        console.debug(data);
-        switch (data?.status) {
+    // 생성 요청일 때
+    else if (data === null) {
+      const response = await authClient.post(`provider/${slug}/menu`, menuDto);
+      console.debug(`POST provider/${slug}/menu`, menuDto);
+      const status = response?.data?.status;
+      const message = response?.data?.message;
+      if (status && message) {
+        switch (status) {
           case 2200:
             alert('추가되었습니다.');
             router.push(`/provider/${slug}/menu`);
@@ -123,12 +117,11 @@ export default function MenuForm({ data }: MenuFormProps) {
             alert('필수 정보가 입력되지 않았습니다.');
             return;
           default:
-            alert('오류가 발생했습니다. 다시 시도해주세요.');
-            return;
+            throw new Error(message);
         }
+      } else {
+        throw new Error('잘못된 응답');
       }
-    } catch (error) {
-      console.error(error);
     }
 
     setSubmitting(false);
@@ -164,19 +157,20 @@ export default function MenuForm({ data }: MenuFormProps) {
   });
 
   const handleDeleteClick = async () => {
-    try {
-      const response = await authClient.delete(`/provider/menu/${number}`);
-      const data = response?.data;
-      switch (data?.status) {
+    const response = await authClient.delete(`/provider/menu/${number}`);
+    const status = response?.data?.status;
+    const message = response?.data?.message;
+    if (status && message) {
+      switch (status) {
         case 2300:
           alert('삭제되었습니다.');
           router.replace(`/provider/${slug}/menu`);
           return;
         default:
-          alert('오류가 발생했습니다. 다시 시도해주세요.');
+          throw new Error(message);
       }
-    } catch (error) {
-      console.error(error);
+    } else {
+      throw new Error('잘못된 응답');
     }
   };
 
@@ -290,18 +284,11 @@ export default function MenuForm({ data }: MenuFormProps) {
                 <label htmlFor="file" className={styles.change_wrapper}>
                   <IoImage size="100%" />
                 </label>
-                <button
-                  className={styles.delete_button}
-                  onClick={handleImageDeleteClick}
-                >
+                <button className={styles.delete_button} onClick={handleImageDeleteClick}>
                   <IoClose />
                 </button>
                 <Image
-                  src={
-                    image.uploaded
-                      ? process.env.NEXT_PUBLIC_S3_URL + image.previewUrl
-                      : image.previewUrl
-                  }
+                  src={image.uploaded ? process.env.NEXT_PUBLIC_S3_URL + image.previewUrl : image.previewUrl}
                   alt=""
                   width={200}
                   height={200}
@@ -337,9 +324,7 @@ export default function MenuForm({ data }: MenuFormProps) {
             onChange={formik.handleChange}
             isInvalid={!!formik.errors.name && formik.touched.name}
           />
-          <Form.Control.Feedback type="invalid">
-            {formik.errors.name}
-          </Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">{formik.errors.name}</Form.Control.Feedback>
         </Form.Group>
 
         {/* 메뉴 설명 */}
@@ -352,13 +337,9 @@ export default function MenuForm({ data }: MenuFormProps) {
             name="description"
             value={formik.values.description}
             onChange={formik.handleChange}
-            isInvalid={
-              !!formik.errors.description && formik.touched.description
-            }
+            isInvalid={!!formik.errors.description && formik.touched.description}
           />
-          <Form.Control.Feedback type="invalid">
-            {formik.errors.name}
-          </Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">{formik.errors.name}</Form.Control.Feedback>
         </Form.Group>
 
         {/* 메뉴 가격 */}
@@ -374,9 +355,7 @@ export default function MenuForm({ data }: MenuFormProps) {
               isInvalid={!!formik.errors.price && formik.touched.price}
             />
             <InputGroup.Text>원</InputGroup.Text>
-            <Form.Control.Feedback type="invalid">
-              {formik.errors.price}
-            </Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">{formik.errors.price}</Form.Control.Feedback>
           </InputGroup>
         </Form.Group>
 
@@ -413,12 +392,7 @@ export default function MenuForm({ data }: MenuFormProps) {
           {ready ? (
             data ? (
               <>
-                <Button
-                  type="button"
-                  variant="outline-danger"
-                  className={styles.button}
-                  onClick={handleDeleteClick}
-                >
+                <Button type="button" variant="outline-danger" className={styles.button} onClick={handleDeleteClick}>
                   삭제
                 </Button>
                 <Button type="submit" className={styles.button}>

@@ -1,43 +1,24 @@
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { authClient } from '../../src/function/request';
-import Header from '../../src/components/Header';
-import Loading from '../../src/components/Loading';
+import { GetServerSideProps } from 'next';
+import { AuthServer } from '../../src/function/request';
 
-export default function ProviderCheck() {
-  const router = useRouter();
+export default function ProviderCheck() {}
 
-  useEffect(() => {
-    if (!router.isReady) return;
-
-    const check = async () => {
-      const response = await authClient.get(`/provider/slug`);
-      const data = response?.data;
-      console.debug(`GET /provider/slug`, data);
-      if (data) {
-        const { status, slug } = data;
-        switch (status) {
-          // slug 존재
-          case 2600:
-            router.replace(`/provider/${slug}`);
-            return;
-          // 세차장 만들지 않음
-          case 2601:
-            router.replace(`/provider/new`);
-            return;
-          default:
-            throw new Error('알 수 없는 상태코드');
-        }
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return await new AuthServer(context).get(`/provider/slug`, (response) => {
+    const { status, message, slug } = response?.data;
+    if (status && slug) {
+      switch (status) {
+        // slug 존재
+        case 2600:
+          return { redirect: { destination: `/provider/${slug}`, statusCode: 302 } };
+        // 세차장 만들지 않음
+        case 2601:
+          return { redirect: { destination: `/provider/new`, statusCode: 302 } };
+        default:
+          throw new Error(message);
       }
-    };
-
-    check();
-  }, [router.isReady]);
-
-  return (
-    <>
-      <Header type={1} />
-      <Loading fullscreen />
-    </>
-  );
-}
+    } else {
+      throw new Error('잘못된 응답');
+    }
+  });
+};

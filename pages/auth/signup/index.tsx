@@ -1,4 +1,5 @@
 import { FormikHelpers, useFormik } from 'formik';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -18,26 +19,22 @@ const initialValues: Values = {
 };
 
 const schema = object().shape({
-  email: string()
-    .required('이메일을 입력해주세요')
-    .email('이메일 형식에 맞지 않습니다'),
+  email: string().required('이메일을 입력해주세요').email('이메일 형식에 맞지 않습니다'),
 });
 
 export default function SignUp() {
   const router = useRouter();
 
-  const handleSubmit = async (
-    values: Values,
-    { setSubmitting, setErrors }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setSubmitting, setErrors }: FormikHelpers<Values>) => {
     setSubmitting(true);
 
     const response = await client.post(`/signup/check/email`, {
       email: values.email,
     });
-    console.debug(`GET /signup/check/email`, response?.data);
-    const status: number | undefined = response?.data?.status;
-    if (status) {
+    console.debug(`POST /signup/check/email`, response?.data);
+    const status = response?.data?.status;
+    const message = response?.data?.message;
+    if (status && message) {
       switch (status) {
         // email 전송함
         case 1700:
@@ -54,10 +51,10 @@ export default function SignUp() {
           setErrors({ email: '이메일 형식에 맞지 않습니다' });
           break;
         default:
-          console.error('알 수 없는 상태코드');
+          throw new Error(message);
       }
     } else {
-      console.error('잘못된 응답');
+      throw new Error('잘못된 응답');
     }
 
     setSubmitting(false);
@@ -71,6 +68,9 @@ export default function SignUp() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 회원가입</title>
+      </Head>
       <div className={styles.container}>
         <AuthHeader />
 
@@ -88,32 +88,13 @@ export default function SignUp() {
                 onChange={formik.handleChange}
                 isInvalid={!!formik.errors.email && formik.touched.email}
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.email}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.email}</Form.Control.Feedback>
             </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              className={styles.submit_button}
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? (
-                <BeatLoader color="white" size={10} />
-              ) : (
-                '시작하기'
-              )}
+            <Button variant="primary" type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+              {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : '시작하기'}
             </Button>
-            <a
-              href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}
-            >
-              <Image
-                src="/kakao_login_large_wide.png"
-                alt="카카오 로그인"
-                height={45}
-                width={300}
-                priority
-              />
+            <a href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}>
+              <Image src="/kakao_login_large_wide.png" alt="카카오 로그인" height={45} width={300} priority />
             </a>
 
             <div className={styles.change}>

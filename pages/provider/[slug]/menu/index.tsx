@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -33,29 +34,34 @@ export default function MenuList() {
   }, [router.isReady]);
 
   return (
-    <LoginCheck>
-      <div className={styles.container}>
-        <div className={styles.title}>메뉴 관리</div>
-        <div className={styles.plus_button_wrapper}>
-          <Button
-            className={styles.plus_button}
-            onClick={() => {
-              router.push(`/provider/${slug}/menu/new`);
-            }}
-          >
-            <IoAdd size={20} className={styles.plus_icon} />
-            메뉴 추가
-          </Button>
+    <>
+      <Head>
+        <title>세차새차 - 메뉴 관리</title>
+      </Head>
+      <LoginCheck>
+        <div className={styles.container}>
+          <div className={styles.title}>메뉴 관리</div>
+          <div className={styles.plus_button_wrapper}>
+            <Button
+              className={styles.plus_button}
+              onClick={() => {
+                router.push(`/provider/${slug}/menu/new`);
+              }}
+            >
+              <IoAdd size={20} className={styles.plus_icon} />
+              메뉴 추가
+            </Button>
+          </div>
+          <ListGroup>
+            {menus.map((menu, index) => (
+              <ListGroupItem key={index}>
+                <MenuItem data={menu} />
+              </ListGroupItem>
+            ))}
+          </ListGroup>
         </div>
-        <ListGroup>
-          {menus.map((menu, index) => (
-            <ListGroupItem key={index}>
-              <MenuItem data={menu} />
-            </ListGroupItem>
-          ))}
-        </ListGroup>
-      </div>
-    </LoginCheck>
+      </LoginCheck>
+    </>
   );
 }
 

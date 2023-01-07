@@ -1,49 +1,44 @@
-import styles from '../../styles/Header.module.scss';
-import { Container, Nav, Navbar, Offcanvas } from 'react-bootstrap';
-import Link from 'next/link';
 import Image from 'next/image';
-import { useContext } from 'react';
-import UserContext from '../context/UserProvider';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useContext } from 'react';
+import { Container, Nav, Navbar, Offcanvas } from 'react-bootstrap';
+import { BeatLoader } from 'react-spinners';
+import UserContext from '../context/UserProvider';
+import { authClient } from '../function/request';
 
-interface HeaderProps {
-  type: number;
-}
-
-export default function Header({ type }: HeaderProps) {
+export default function Header() {
   const router = useRouter();
   const { user, setUser } = useContext(UserContext);
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = async () => {
     if (confirm('로그아웃 하시겠습니까?')) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refresh_token');
-      setUser(null);
+      await authClient.get('/logout');
+      setUser({ isLogined: false });
       router.replace('/');
     }
   };
 
   return (
-    <Navbar sticky="top" bg="white" expand={false} className={styles.container}>
+    <Navbar sticky="top" bg="white" expand="sm" className="shadow-sm" id="navbar">
       <Container>
-        <Link href="/" style={{ display: 'flex' }}>
-          <Image
-            className={styles.main_logo}
-            src="/row_logo.png"
-            alt="세차새차"
-            width={146}
-            height={40}
-            priority
-          />
+        <Link href="/" className="flex">
+          <Image src="/row_logo.png" alt="세차새차" width={146} height={40} priority />
         </Link>
         <Navbar.Toggle />
-        <Navbar.Offcanvas placement="end" style={{ width: '300px' }}>
+        <Navbar.Offcanvas placement="end" className="w-75">
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title>세차새차</Offcanvas.Title>
+            <Offcanvas.Title>
+              <Link href="/">
+                <Image src="/row_logo.png" alt="세차새차" width={146} height={40} priority />
+              </Link>
+            </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
-            <Nav>
-              {user?.isLogined ? (
+            <Nav className="w-100 justify-content-end">
+              {user === null ? (
+                <BeatLoader color="lightGray" />
+              ) : user.isLogined ? (
                 <>
                   <Nav.Link onClick={handleLogoutClick}>로그아웃</Nav.Link>
                 </>

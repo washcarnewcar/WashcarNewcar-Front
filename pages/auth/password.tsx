@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import { FormikHelpers, useFormik } from 'formik';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import { Button, Form, Toast, ToastContainer } from 'react-bootstrap';
@@ -21,9 +22,7 @@ const initialValues: Values = {
 };
 
 const schema = object().shape({
-  email: string()
-    .required('이메일을 입력해주세요')
-    .email('이메일 형식이 아닙니다'),
+  email: string().required('이메일을 입력해주세요').email('이메일 형식이 아닙니다'),
   password: string().required('비밀번호를 입력해주세요'),
 });
 
@@ -31,10 +30,7 @@ export default function Password() {
   const router = useRouter();
   const { user, setUser } = useContext(UserContext);
 
-  const handleSubmit = async (
-    values: Values,
-    { setSubmitting, setErrors }: FormikHelpers<Values>
-  ) => {
+  const handleSubmit = async (values: Values, { setSubmitting, setErrors }: FormikHelpers<Values>) => {
     setSubmitting(true);
 
     // form data 생성
@@ -47,8 +43,8 @@ export default function Password() {
       const response = await client.post(`/login`, form);
 
       // 토큰 저장
-      const token = response.data.access_token;
-      const refToken = response.data.refresh_token;
+      const token = response?.data?.access_token;
+      const refToken = response?.data?.refresh_token;
       localStorage.setItem('token', token);
       localStorage.setItem('refresh_token', refToken);
 
@@ -79,6 +75,9 @@ export default function Password() {
 
   return (
     <>
+      <Head>
+        <title>세차새차 - 비밀번호 변경</title>
+      </Head>
       <div className={styles.container}>
         <AuthHeader />
 
@@ -97,21 +96,10 @@ export default function Password() {
                 onChange={formik.handleChange}
                 isInvalid={!!formik.errors.email && formik.touched.email}
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.email}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.email}</Form.Control.Feedback>
             </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              className={styles.submit_button}
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? (
-                <BeatLoader color="white" size={10} />
-              ) : (
-                '메일 보내기'
-              )}
+            <Button variant="primary" type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+              {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : '메일 보내기'}
             </Button>
           </Form>
         </div>
