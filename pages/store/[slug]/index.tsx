@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';

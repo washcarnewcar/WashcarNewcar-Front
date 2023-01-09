@@ -1,13 +1,11 @@
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
-import styles from '../../styles/TimeList.module.scss';
 import { TimeDto } from '../dto';
 import { authClient } from '../function/request';
 import Loading from './Loading';
-import Seperator from './Seperator';
 
 interface Time {
   start: string;
@@ -49,7 +47,7 @@ export default function TimeList() {
   const [timeList, setTimeList] = useState<(Time | null)[]>(initialTimeList);
   const [error, setError] = useState<string[]>(['', '', '', '', '', '', '']);
   const [isSubmiting, setSubmitting] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(true);
   const router = useRouter();
   const { slug } = router.query;
 
@@ -173,15 +171,18 @@ export default function TimeList() {
     };
 
     return (
-      <div className={styles.item_container}>
+      <ListGroupItem className="d-flex align-items-center gap-3">
         <button
-          className={classNames(styles.day_of_week, time ? styles.day_of_week_activate : styles.day_of_week_deactivate)}
+          className={classNames(
+            'd-flex justify-content-center align-items-center fw-bold rounded tw-w-[40px] tw-h-[40px]',
+            time ? 'btn btn-primary' : 'hover:tw-bg-gray-100 tw-bg-white tw-border border-primary text-primary'
+          )}
           onClick={handleClick}
         >
           {displayDayOfWeek()}
         </button>
         {time ? <TimeListItemSelect time={time} dayOfWeek={dayOfWeek} /> : null}
-      </div>
+      </ListGroupItem>
     );
   }
 
@@ -226,9 +227,9 @@ export default function TimeList() {
 
     return (
       <div>
-        <div className={styles.select_group}>
+        <div className="d-flex align-items-center gap-2">
           <Form.Select
-            className={styles.select}
+            className="tw-text-xs"
             value={time?.start}
             onChange={handleStartChange}
             isInvalid={!!error[dayOfWeek]}
@@ -238,7 +239,7 @@ export default function TimeList() {
           </Form.Select>
           ~
           <Form.Select
-            className={styles.select}
+            className="tw-text-sm"
             value={time?.end}
             onChange={handleEndChange}
             isInvalid={!!error[dayOfWeek]}
@@ -247,7 +248,7 @@ export default function TimeList() {
             {generateTime()}
           </Form.Select>
         </div>
-        <Form.Text className={styles.error_message}>{error[dayOfWeek]}</Form.Text>
+        <Form.Text className="text-danger">{error[dayOfWeek]}</Form.Text>
       </div>
     );
   }
@@ -258,15 +259,14 @@ export default function TimeList() {
 
   return (
     <>
-      {timeList.map((time, index) => (
-        <div key={index}>
-          <TimeListItem time={time} dayOfWeek={index} />
-          <Seperator />
-        </div>
-      ))}
-      <div className={styles.button_container}>
-        <Button className={styles.button} onClick={handleSubmit} disabled={error.some((error) => error) || isSubmiting}>
-          {isSubmiting ? <BeatLoader color="white" size="10px" /> : '적용'}
+      <ListGroup variant="flush">
+        {timeList.map((time, index) => (
+          <TimeListItem key={index} time={time} dayOfWeek={index} />
+        ))}
+      </ListGroup>
+      <div className="mt-3 w-100 text-center">
+        <Button className="tw-w-[120px]" onClick={handleSubmit} disabled={error.some((error) => error) || isSubmiting}>
+          {isSubmiting ? <BeatLoader color="white" size="10px" /> : '저장'}
         </Button>
       </div>
     </>
