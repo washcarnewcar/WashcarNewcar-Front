@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Form, InputGroup, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { IoAdd, IoTrash } from 'react-icons/io5';
 import { BeatLoader } from 'react-spinners';
-import styles from '../../styles/Except.module.scss';
 import { ExceptDto } from '../dto';
 import { authClient } from '../function/request';
 import Loading from './Loading';
@@ -147,14 +146,14 @@ export default function Except() {
   }, [router.isReady]);
 
   return (
-    <div className={styles.except_wrapper}>
-      <div className={styles.button_wrapper}>
-        <Button className={styles.button} onClick={handleAddClick} variant="outline-primary">
-          <IoAdd size={20} className={styles.except_plus_icon} />
+    <div className="mt-3">
+      <div className="d-flex gap-2">
+        <Button className="d-flex align-items-center" onClick={handleAddClick} variant="outline-primary">
+          <IoAdd size={20} className="me-1" />
           예외 일자 추가
         </Button>
         <Button
-          className={styles.button}
+          className="d-flex align-items-center"
           onClick={handleSubmit}
           disabled={exceptList.some((except) => except.error) || isSubmitting}
         >
@@ -162,7 +161,7 @@ export default function Except() {
         </Button>
       </div>
 
-      <ListGroup>
+      <ListGroup className="mt-3">
         {/* 로딩중인 경우 Loading 컴포넌트 표시 */}
         {!ready ? (
           <ListGroupItem>
@@ -224,8 +223,8 @@ function ExceptItem({ except, index, deleteItem, setData }: ExceptItemProps) {
   };
 
   const renderAllDay = () => (
-    <div className={styles.date_wrapper}>
-      <InputGroup className={styles.input_group}>
+    <div>
+      <InputGroup className="my-2">
         <InputGroup.Text>시작</InputGroup.Text>
         <Form.Control
           type="date"
@@ -243,8 +242,8 @@ function ExceptItem({ except, index, deleteItem, setData }: ExceptItemProps) {
   );
 
   const renderPartDay = () => (
-    <div className={styles.date_wrapper}>
-      <InputGroup className={styles.input_group}>
+    <>
+      <InputGroup className="my-2">
         <InputGroup.Text>시작</InputGroup.Text>
         <Form.Control
           type="datetime-local"
@@ -264,30 +263,26 @@ function ExceptItem({ except, index, deleteItem, setData }: ExceptItemProps) {
           isInvalid={!!except.error || !except.end}
         />
       </InputGroup>
-    </div>
+    </>
   );
 
   return (
-    <div className={styles.except_item_container}>
-      <div className={styles.switch_trash_wrapper}>
+    <div>
+      <div className="d-flex gap-2 align-items-center">
         <Form.Check
           type="switch"
           label="하루종일"
           onChange={handleAllDayChange}
           checked={except.allday}
-          className={styles.switch}
+          className="m-0"
         />
-        <button className={styles.trash} onClick={handleTrashClick}>
+        <button onClick={handleTrashClick}>
           <IoTrash size={20} />
         </button>
       </div>
-      <div className={styles.form_wrapper}>
+      <div>
         {except.allday ? renderAllDay() : renderPartDay()}
-        {except.error ? (
-          <Form.Control.Feedback type="invalid" style={{ display: 'inline' }}>
-            {except.error}
-          </Form.Control.Feedback>
-        ) : null}
+        {except.error ? <Form.Text className="text-danger">{except.error}</Form.Text> : null}
       </div>
     </div>
   );

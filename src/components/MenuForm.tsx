@@ -157,20 +157,22 @@ export default function MenuForm({ data }: MenuFormProps) {
   });
 
   const handleDeleteClick = async () => {
-    const response = await authClient.delete(`/provider/menu/${number}`);
-    const status = response?.data?.status;
-    const message = response?.data?.message;
-    if (status && message) {
-      switch (status) {
-        case 2300:
-          alert('삭제되었습니다.');
-          router.replace(`/provider/${slug}/menu`);
-          return;
-        default:
-          throw new Error(message);
+    if (confirm('정말로 메뉴를 삭제하시겠습니까?')) {
+      const response = await authClient.delete(`/provider/menu/${number}`);
+      const status = response?.data?.status;
+      const message = response?.data?.message;
+      if (status && message) {
+        switch (status) {
+          case 2300:
+            alert('삭제되었습니다.');
+            router.replace(`/provider/${slug}/menu`);
+            return;
+          default:
+            throw new Error(message);
+        }
+      } else {
+        throw new Error('잘못된 응답');
       }
-    } else {
-      throw new Error('잘못된 응답');
     }
   };
 
@@ -393,15 +395,15 @@ export default function MenuForm({ data }: MenuFormProps) {
           {ready ? (
             data ? (
               <>
-                <Button type="button" variant="outline-danger" className={styles.button} onClick={handleDeleteClick}>
+                <Button type="button" variant="outline-danger" className="w-100" onClick={handleDeleteClick}>
                   삭제
                 </Button>
-                <Button type="submit" className={styles.button}>
+                <Button type="submit" className="w-100">
                   수정
                 </Button>
               </>
             ) : (
-              <Button type="submit" className={styles.button}>
+              <Button type="submit" className="w-100">
                 등록
               </Button>
             )
