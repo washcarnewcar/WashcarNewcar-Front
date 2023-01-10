@@ -2,12 +2,11 @@ import { FormikHelpers, useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Container, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { object, ref, string } from 'yup';
 import AuthHeader from '../../../src/components/AuthHeader';
 import { client, server } from '../../../src/function/request';
-import styles from '../../../styles/Auth.module.scss';
 
 interface Values {
   password: string;
@@ -77,25 +76,25 @@ export default function SignUpInfo() {
       <Head>
         <title>세차새차 - 회원가입</title>
       </Head>
-      <div className={styles.container}>
+      <Container className="pt-5 d-flex flex-column align-items-center">
         <AuthHeader />
 
-        <div className={styles.form_container}>
-          <div className={styles.title}>회원가입</div>
+        <div className="mt-5 tw-w-[300px]">
+          <h1 className="fw-bold">회원가입</h1>
 
-          <Form className={styles.form} onSubmit={formik.handleSubmit}>
+          <Form className="d-flex flex-column mt-3 gap-2" onSubmit={formik.handleSubmit}>
             <Form.Group>
-              <Form.Control className={styles.inputs} value={email || ''} disabled isValid={true} />
+              <Form.Control className="tw-h-[45px]" value={email || ''} disabled isValid={true} />
             </Form.Group>
             <Form.Group>
-              <Form.Control className={styles.inputs} value={number || ''} disabled isValid={true} />
+              <Form.Control className="tw-h-[45px]" value={number || ''} disabled isValid={true} />
               <Form.Control.Feedback type="valid">이메일이 인증되었습니다.</Form.Control.Feedback>
             </Form.Group>
             <Form.Group>
               <Form.Control
                 type="password"
                 name="password"
-                className={styles.inputs}
+                className="tw-h-[45px]"
                 placeholder="비밀번호"
                 value={formik.values.password}
                 onChange={formik.handleChange}
@@ -109,7 +108,7 @@ export default function SignUpInfo() {
               <Form.Control
                 type="password"
                 name="passwordConfirm"
-                className={styles.inputs}
+                className="tw-h-[45px]"
                 placeholder="비밀번호 확인"
                 value={formik.values.passwordConfirm}
                 onChange={formik.handleChange}
@@ -119,12 +118,17 @@ export default function SignUpInfo() {
               <Form.Control.Feedback type="invalid">{formik.errors.passwordConfirm}</Form.Control.Feedback>
               <Form.Text>비밀번호를 한번 더 입력해주세요.</Form.Text>
             </Form.Group>
-            <Button variant="primary" type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+            <Button
+              variant="primary"
+              type="submit"
+              className="d-flex align-items-center justify-content-center tw-h-[45px]"
+              disabled={formik.isSubmitting}
+            >
               {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : '회원가입'}
             </Button>
           </Form>
         </div>
-      </div>
+      </Container>
     </>
   );
 }

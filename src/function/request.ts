@@ -50,9 +50,14 @@ export class AuthServer {
     });
   }
 
-  async request(url: string, method: string, callback: (response: AxiosResponse) => GetServerSidePropsResult<any>, config?: AxiosRequestConfig): Promise<GetServerSidePropsResult<any>> {
+  async request(
+    url: string,
+    method: string,
+    callback: (response: AxiosResponse) => GetServerSidePropsResult<any>,
+    config?: AxiosRequestConfig
+  ): Promise<GetServerSidePropsResult<any>> {
     try {
-      const response = await this.authServer(url, { method: method, ...config });
+      const response = await this.authServer(url, { withCredentials: true, method: method, ...config });
       return callback(response);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -71,19 +76,35 @@ export class AuthServer {
     }
   }
 
-  async get(url: string, callback: (response: AxiosResponse) => GetServerSidePropsResult<any>, config?: AxiosRequestConfig) {
+  async get(
+    url: string,
+    callback: (response: AxiosResponse) => GetServerSidePropsResult<any>,
+    config?: AxiosRequestConfig
+  ) {
     return this.request(url, 'get', callback, config);
   }
 
-  async post(url: string, callback: (response: AxiosResponse) => GetServerSidePropsResult<any>, config?: AxiosRequestConfig) {
+  async post(
+    url: string,
+    callback: (response: AxiosResponse) => GetServerSidePropsResult<any>,
+    config?: AxiosRequestConfig
+  ) {
     return this.request(url, 'post', callback, config);
   }
 
-  async put(url: string, callback: (response: AxiosResponse) => GetServerSidePropsResult<any>, config?: AxiosRequestConfig) {
+  async put(
+    url: string,
+    callback: (response: AxiosResponse) => GetServerSidePropsResult<any>,
+    config?: AxiosRequestConfig
+  ) {
     return this.request(url, 'put', callback, config);
   }
 
-  async delete(url: string, callback: (response: AxiosResponse) => GetServerSidePropsResult<any>, config?: AxiosRequestConfig) {
+  async delete(
+    url: string,
+    callback: (response: AxiosResponse) => GetServerSidePropsResult<any>,
+    config?: AxiosRequestConfig
+  ) {
     return this.request(url, 'delete', callback, config);
   }
 }

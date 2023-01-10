@@ -2,10 +2,9 @@ import { FormikHelpers, useFormik } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Container, Form } from 'react-bootstrap';
 import { number, object } from 'yup';
 import Header from '../../src/components/Header';
-import styles from '../../styles/Find.module.scss';
 
 interface Values {
   tel1: string;
@@ -66,12 +65,12 @@ export default function Find() {
         <title>세차새차 - 세차 예약 확인</title>
       </Head>
       <Header />
-      <div className={styles.body}>
-        <Form className={styles.form} onSubmit={formik.handleSubmit}>
-          <div className={styles.title}>예약한 휴대폰 번호를 입력해주세요</div>
+      <Container className="pt-5 px-4 d-flex justify-content-center">
+        <Form className="" onSubmit={formik.handleSubmit}>
+          <h1 className="fw-bold mb-2 tw-break-keep">예약한 휴대폰 번호를 입력해주세요</h1>
           {/* 매장 전화번호 */}
-          <Form.Group className={styles.form_group}>
-            <div className={styles.tel_wrapper}>
+          <Form.Group className="my-4">
+            <div className="d-flex align-items-center gap-1">
               <Form.Control
                 type="tel"
                 name="tel1"
@@ -106,11 +105,11 @@ export default function Find() {
               />
             </div>
           </Form.Group>
-          <Button variant="primary" className={styles.submit} type="submit" disabled={formik.isSubmitting}>
+          <Button variant="primary" className="w-100" type="submit" disabled={formik.isSubmitting}>
             확인
           </Button>
         </Form>
-      </div>
+      </Container>
     </>
   );
 }

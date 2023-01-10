@@ -3,13 +3,12 @@ import { FormikHelpers, useFormik } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
-import { Button, Form, Toast, ToastContainer } from 'react-bootstrap';
+import { Button, Container, Form, Toast, ToastContainer } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../src/components/AuthHeader';
 import UserContext from '../../src/context/UserProvider';
 import { client } from '../../src/function/request';
-import styles from '../../styles/Auth.module.scss';
 
 interface Values {
   email: string;
@@ -78,18 +77,18 @@ export default function Password() {
       <Head>
         <title>세차새차 - 비밀번호 변경</title>
       </Head>
-      <div className={styles.container}>
+      <Container className="pt-5 d-flex flex-column align-items-center">
         <AuthHeader />
 
-        <div className={styles.form_container}>
-          <div className={styles.title}>비밀번호 재설정</div>
+        <div className="mt-5 tw-w-[300px]">
+          <h1 className="fw-bold">비밀번호 재설정</h1>
 
-          <Form className={styles.form} onSubmit={formik.handleSubmit}>
+          <Form className="d-flex flex-column mt-3 gap-2" onSubmit={formik.handleSubmit}>
             <Form.Group>
               <Form.Text>이메일 주소를 입력해주세요</Form.Text>
               <Form.Control
                 type="email"
-                className={styles.inputs}
+                className="tw-h-[45px]"
                 placeholder="이메일"
                 name="email"
                 value={formik.values.email}
@@ -98,12 +97,17 @@ export default function Password() {
               />
               <Form.Control.Feedback type="invalid">{formik.errors.email}</Form.Control.Feedback>
             </Form.Group>
-            <Button variant="primary" type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+            <Button
+              variant="primary"
+              type="submit"
+              className="d-flex align-items-center justify-content-center tw-h-[45px]"
+              disabled={formik.isSubmitting}
+            >
               {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : '메일 보내기'}
             </Button>
           </Form>
         </div>
-      </div>
+      </Container>
 
       <ToastContainer position="bottom-end" className="p-3">
         <Toast>

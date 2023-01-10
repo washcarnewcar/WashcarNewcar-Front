@@ -4,10 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { Container, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { IoIosArrowForward } from 'react-icons/io';
 import Header from '../../src/components/Header';
-import Seperator from '../../src/components/Seperator';
-import styles from '../../styles/FindList.module.scss';
 
 const mockData = [
   {
@@ -83,17 +82,15 @@ export default function FindList() {
         <title>세차새차 - 세차 예약 확인</title>
       </Head>
       <Header />
-      <div className={styles.container}>
-        <div className={styles.title}>예약한 세차</div>
-        <div className={styles.blank} />
+      <Container className="pt-4">
+        <h3 className="fw-bold">예약한 세차</h3>
 
-        <FindListItem data={mockData} />
-        <Seperator />
-        <FindListItem data={mockData} />
-        <Seperator />
-        <FindListItem data={mockData} />
-        <Seperator />
-      </div>
+        <ListGroup variant="flush" className="mt-3">
+          <FindListItem data={mockData} />
+          <FindListItem data={mockData} />
+          <FindListItem data={mockData} />
+        </ListGroup>
+      </Container>
     </>
   );
 }
@@ -104,22 +101,32 @@ interface FindListItemProps {
 
 function FindListItem({ data }: FindListItemProps) {
   return (
-    <Link href={`/reservation/1`} className={styles.item_container}>
-      <div className={styles.item_left}>
-        <div className={styles.item_date}>2022.9.6(화) 16:00</div>
-        <div className={styles.item_info}>
-          <Image src="/style_carcare.jpg" alt="스타일 카케어" width={65} height={65} className={styles.item_image} />
-          <div className={styles.item_info_text}>
-            <div className={styles.item_menu}>외부세차</div>
-            <div className={styles.item_store}>스타일 카케어</div>
-            <div className={styles.item_car}>기아 EV6 / 31하 1450</div>
+    <ListGroupItem action>
+      <Link href={`/reservation/1`} className="text-decoration-none d-flex justify-content-between text-black">
+        <div>
+          <div className="tw-text-md">2022.9.6(화) 16:00</div>
+          <div className="mt-2 d-flex align-items-center">
+            <div className="flex-shrink-0 position-relative tw-w-[80px] tw-h-[80px]">
+              <Image
+                src="/style_carcare.jpg"
+                alt="스타일 카케어"
+                fill
+                sizes="80px"
+                className="tw-object-cover rounded-3"
+              />
+            </div>
+            <div className="ms-3">
+              <div className="fs-4 fw-bold">외부세차</div>
+              <div>스타일 카케어</div>
+              <div className="text-secondary">기아 EV6 / 31하 1450</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div className={styles.item_right}>
-        <div className={styles.item_state}>확인중</div>
-        <IoIosArrowForward size={30} />
-      </div>
-    </Link>
+        <div className="d-flex align-items-center">
+          <div className="fw-bold">확인중</div>
+          <IoIosArrowForward size={30} />
+        </div>
+      </Link>
+    </ListGroupItem>
   );
 }

@@ -3,12 +3,11 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Container, Form } from 'react-bootstrap';
 import { BeatLoader } from 'react-spinners';
 import { object, string } from 'yup';
 import AuthHeader from '../../../src/components/AuthHeader';
 import { client } from '../../../src/function/request';
-import styles from '../../../styles/Auth.module.scss';
 
 interface Values {
   email: string;
@@ -71,17 +70,17 @@ export default function SignUp() {
       <Head>
         <title>세차새차 - 회원가입</title>
       </Head>
-      <div className={styles.container}>
+      <Container className="pt-5 d-flex flex-column align-items-center">
         <AuthHeader />
 
-        <div className={styles.form_container}>
-          <div className={styles.title}>회원가입</div>
+        <div className="mt-5 tw-w-[300px]">
+          <h1 className="fw-bold">회원가입</h1>
 
-          <Form className={styles.form} onSubmit={formik.handleSubmit}>
+          <Form className="d-flex flex-column mt-3 gap-2" onSubmit={formik.handleSubmit}>
             <Form.Group>
               <Form.Control
                 type="email"
-                className={styles.inputs}
+                className="tw-h-[45px]"
                 placeholder="이메일"
                 name="email"
                 value={formik.values.email}
@@ -90,22 +89,27 @@ export default function SignUp() {
               />
               <Form.Control.Feedback type="invalid">{formik.errors.email}</Form.Control.Feedback>
             </Form.Group>
-            <Button variant="primary" type="submit" className={styles.submit_button} disabled={formik.isSubmitting}>
+            <Button
+              variant="primary"
+              type="submit"
+              className="d-flex align-items-center justify-content-center tw-h-[45px]"
+              disabled={formik.isSubmitting}
+            >
               {formik.isSubmitting ? <BeatLoader color="white" size={10} /> : '시작하기'}
             </Button>
             <a href={process.env.NEXT_PUBLIC_API + '/oauth2/authorization/kakao'}>
               <Image src="/kakao_login_large_wide.png" alt="카카오 로그인" height={45} width={300} priority />
             </a>
 
-            <div className={styles.change}>
+            <div className="d-flex justify-content-between">
               <div>이미 계정이 있으신가요?</div>
-              <Link href="/auth/login" className={styles.change_text}>
+              <Link href="/auth/login" className="text-decoration-none">
                 로그인
               </Link>
             </div>
           </Form>
         </div>
-      </div>
+      </Container>
     </>
   );
 }
